@@ -1,0 +1,18 @@
+name: Deploy to server
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+    deploy:
+      runs-on: self-hosted
+      steps:
+        - name: Pulling latest changes
+          run: git -C /home/project/mygov-bot pull
+        
+        - name: Build docker containers
+          run: docker-compose -f /home/project/mygov-bot/docker-compose.prod.yml build
+          
+        - name: Deploy changes
+          run: docker-compose -f /home/project/mygov-bot/docker-compose.prod.yml up -d
