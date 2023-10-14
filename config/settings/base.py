@@ -39,6 +39,9 @@ ALLOWED_HOSTS = [get_env_value('ALLOWED_HOSTS')]
 
 # Application definition
 LOCAL_APPS = [
+    "apps.product",
+    'apps.customer',
+    'apps.merchant',
 ]
 
 INSTALLED_APPS = [
