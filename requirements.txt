@@ -8,3 +8,7 @@ sentry-sdk
 django_model_utils
 pillow
 django_filter
+django-modeltranslation
+requests
+# pip install coreapi pyyaml
+drf-yasg==1.21.6
