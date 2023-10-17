@@ -7,3 +7,4 @@ django-cors-headers
 sentry-sdk
 django_model_utils
 pillow
+django_filter
