@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
-
+from .utils import ProductItemCreatorMixin
 from .models import Category, SubCategory, ProductItem, Ticket, Phone, Good, Image
 
 
@@ -28,22 +28,40 @@ class ProductItemSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class TicketSerializer(serializers.ModelSerializer):
+class TicketSerializer(ProductItemCreatorMixin):
+    product = ProductItemSerializer()
+
     class Meta:
         model = Ticket
         fields = "__all__"
 
+    def create(self, validate_data):
+        product = self.create_pruduct(validate_data)
+        return Ticket.objects.create(**validate_data, product=product)
 
-class PhoneSerializer(serializers.ModelSerializer):
+
+class PhoneSerializer(ProductItemCreatorMixin):
+    product = ProductItemSerializer()
+
     class Meta:
         model = Phone
         fields = "__all__"
 
+    def create(self, validate_data):
+        product = self.create_pruduct()
+        return Phone.objects.create(**validate_data, product=product)
 
-class GoodSerializer(serializers.ModelSerializer):
+
+class GoodSerializer(ProductItemCreatorMixin):
+    product = ProductItemSerializer()
+
     class Meta:
         model = Good
         fields = "__all__"
+
+    def create(self, validate_data):
+        product = self.create_pruduct()
+        return Good.objects.create(**validate_data, product=product)
 
 
 class ImageSerializer(serializers.ModelSerializer):
