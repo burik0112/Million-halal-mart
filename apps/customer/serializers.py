@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
-from .models import Profile, Location, News, ViewedNews, Favorite
+
+from .models import Favorite, Location, News, Profile, ViewedNews
 
 
 class CustomPageNumberPagination(PageNumberPagination):

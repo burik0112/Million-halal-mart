@@ -1,18 +1,11 @@
-from rest_framework.generics import (
-    ListAPIView,
-    CreateAPIView,
-    RetrieveUpdateDestroyAPIView,
-)
-
-from .models import Order, OrderItem
-
-from .serializers import (
-    OrderSerializer,
-    OrderItemSerializer,
-    CustomPageNumberPagination,
-)
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
+from rest_framework.generics import (CreateAPIView, ListAPIView,
+                                     RetrieveUpdateDestroyAPIView)
+
+from .models import Order, OrderItem
+from .serializers import (CustomPageNumberPagination, OrderItemSerializer,
+                          OrderSerializer)
 
 # Create your views here.
 

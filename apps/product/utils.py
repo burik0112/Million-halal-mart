@@ -1,5 +1,7 @@
-from .models import ProductItem
 from rest_framework import serializers
+
+from .models import ProductItem
+
 
 class ProductItemCreatorMixin(serializers.ModelSerializer):
     def create_pruduct(self, validation_data):

@@ -1,22 +1,12 @@
-from rest_framework.generics import (
-    ListAPIView,
-    CreateAPIView,
-    RetrieveUpdateDestroyAPIView,
-)
-
-from .models import Profile, Location, News, ViewedNews, Favorite
-
-
-from .serializers import (
-    ProfileSerializer,
-    LocationSerializer,
-    CustomPageNumberPagination,
-    NewsSerializer,
-    ViewedNewsSerializer,
-    FavoriteSerializer,
-)
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
+from rest_framework.generics import (CreateAPIView, ListAPIView,
+                                     RetrieveUpdateDestroyAPIView)
+
+from .models import Favorite, Location, News, Profile, ViewedNews
+from .serializers import (CustomPageNumberPagination, FavoriteSerializer,
+                          LocationSerializer, NewsSerializer,
+                          ProfileSerializer, ViewedNewsSerializer)
 
 # Create your views here.
 

@@ -1,7 +1,9 @@
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
+
+from .models import (Category, Good, Image, Phone, ProductItem, SubCategory,
+                     Ticket)
 from .utils import ProductItemCreatorMixin
-from .models import Category, SubCategory, ProductItem, Ticket, Phone, Good, Image
 
 
 class CustomPageNumberPagination(PageNumberPagination):

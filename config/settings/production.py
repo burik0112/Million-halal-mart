@@ -1,6 +1,7 @@
-from config.settings.base import *
-from sentry_sdk.integrations.django import DjangoIntegration
 import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+from config.settings.base import *
 
 DEBUG = False
 
