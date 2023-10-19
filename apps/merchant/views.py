@@ -1,11 +1,17 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
-from rest_framework.generics import (CreateAPIView, ListAPIView,
-                                     RetrieveUpdateDestroyAPIView)
-
+from rest_framework.generics import (
+    CreateAPIView,
+    ListAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
+from django.shortcuts import render, redirect, HttpResponse
 from .models import Order, OrderItem
-from .serializers import (CustomPageNumberPagination, OrderItemSerializer,
-                          OrderSerializer)
+from .serializers import (
+    CustomPageNumberPagination,
+    OrderItemSerializer,
+    OrderSerializer,
+)
 
 # Create your views here.
 
@@ -42,3 +48,7 @@ class OrderItemListAPIView(ListAPIView):
 class OrderItemRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
+
+
+def test(request):
+    return render(request, "/index.html")
