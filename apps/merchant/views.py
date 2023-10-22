@@ -51,4 +51,4 @@ class OrderItemRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
 
 
 def test(request):
-    return render(request, "/index.html")
+    return render(request, "index.html")
