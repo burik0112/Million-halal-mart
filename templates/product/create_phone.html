@@ -4,66 +4,15 @@
   rel="stylesheet"
 />
 {% extends "base.html" %}
-<!-- Form for Adding Phone Products -->
+<!-- Form for Adding Phone and ProductItem -->
 {% block content %}
-<div class="container mt-5">
-  <h2>Add Phone Product</h2>
-  <form action="/add_phone/" method="post">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="mb-3">
-          <label for="brandName" class="form-label">Brand Name</label>
-          <input
-            type="text"
-            class="form-control"
-            id="brandName"
-            name="brand_name"
-            required
-          />
-        </div>
-        <div class="mb-3">
-          <label for="modelName" class="form-label">Model Name</label>
-          <input
-            type="text"
-            class="form-control"
-            id="modelName"
-            name="model_name"
-            required
-          />
-        </div>
-        <div class="mb-3">
-          <label for="ram" class="form-label">RAM</label>
-          <select class="form-select" id="ram" name="ram" required>
-            <option value="0">4 GB</option>
-            <option value="1">6 GB</option>
-            <option value="2">8 GB</option>
-            <option value="3">12 GB</option>
-            <option value="4">16 GB</option>
-            <option value="5">32 GB</option>
-          </select>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="mb-3">
-          <label for="storage" class="form-label">Storage</label>
-          <select class="form-select" id="storage" name="storage" required>
-            <option value="0">32 GB</option>
-            <option value="1">64 GB</option>
-            <option value="2">128 GB</option>
-            <option value="3">256 GB</option>
-            <option value="4">512 GB</option>
-            <option value="5">1 TB</option>
-            <option value="6">2 TB</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <button type="submit" class="btn btn-primary">Add Phone</button>
-        </div>
-      </div>
-    </div>
+<div class="container">
+  <h2>Create Phone and ProductItem</h2>
+  <form method="post" enctype="multipart/form-data">
+    <!-- Add enctype attribute -->
+    {% csrf_token %} {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Submit</button>
   </form>
-</div>
 
-<!-- Bootstrap JS (optional) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</div>
 {% endblock %}
