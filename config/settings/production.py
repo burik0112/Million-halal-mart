@@ -5,8 +5,8 @@ from config.settings.base import *
 
 DEBUG = False
 
-STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "../", "staticfiles")
+# STATIC_URL = "static/"
+# STATIC_ROOT = os.path.join(BASE_DIR, "../", "staticfiles")
 
 # sentry_sdk.init(
 #     dsn="",

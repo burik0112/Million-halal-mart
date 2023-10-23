@@ -12,4 +12,6 @@ urlpatterns = [
     path("api/product/", include("apps.product.urls")),
     path("api/merchant/", include("apps.merchant.urls")),
     path("admin/", admin.site.urls, name="admin"),
-] + swagger_urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path("dashboard/product/", include("apps.product.admin.urls")),
+] + swagger_urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
