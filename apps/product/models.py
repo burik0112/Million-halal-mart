@@ -97,7 +97,7 @@ class Good(models.Model):
 class Image(models.Model):
     image = models.ImageField(upload_to="images")
     name = models.CharField(max_length=255)
-    product = models.OneToOneField(ProductItem, on_delete=models.CASCADE, related_name='images')
+    product = models.ForeignKey(ProductItem, on_delete=models.CASCADE, related_name='images')
 
     def __str__(self) -> str:
         return self.name
