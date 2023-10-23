@@ -10,8 +10,8 @@
     <meta content="" name="keywords" />
 
     <!-- Favicons -->
-    <link href="assets/img/favicon.png" rel="icon" />
-    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
+    <link href="{% static "assets/img/favicon.png" %}" rel="icon" />
+    <link href="{% static "assets/img/apple-touch-icon.png" %}" rel="apple-touch-icon" />
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect" />
@@ -59,13 +59,6 @@
     <!-- Template Main CSS File -->
     <link href="{% static 'assets/css/style.css' %}" rel="stylesheet" />
 
-    <!-- =======================================================
-  * Template Name: NiceAdmin
-  * Updated: Sep 18 2023 with Bootstrap v5.3.2
-  * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
   </head>
 
   <body>
@@ -73,7 +66,7 @@
     <header id="header" class="header fixed-top d-flex align-items-center">
       <div class="d-flex align-items-center justify-content-between">
         <a href="index.html" class="logo d-flex align-items-center">
-          <img src="assets/img/logo.png" alt="" />
+          <img src="{% static "assets/img/logo.png" %}" alt="" />
           <span class="d-none d-lg-block">NiceAdmin</span>
         </a>
         <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -212,7 +205,7 @@
               <li class="message-item">
                 <a href="#">
                   <img
-                    src="assets/img/messages-1.jpg"
+                    src="{% static "assets/img/messages-1.jpg" %}"
                     alt=""
                     class="rounded-circle"
                   />
@@ -233,7 +226,7 @@
               <li class="message-item">
                 <a href="#">
                   <img
-                    src="assets/img/messages-2.jpg"
+                    src="{% static "assets/img/messages-2.jpg" %}"
                     alt=""
                     class="rounded-circle"
                   />
@@ -254,7 +247,7 @@
               <li class="message-item">
                 <a href="#">
                   <img
-                    src="assets/img/messages-3.jpg"
+                    src="{% static "assets/img/messages-3.jpg" %}"
                     alt=""
                     class="rounded-circle"
                   />
@@ -287,7 +280,7 @@
               data-bs-toggle="dropdown"
             >
               <img
-                src="assets/img/profile-img.jpg"
+                src="{% static "assets/img/profile-img.jpg" %}"
                 alt="Profile"
                 class="rounded-circle"
               />
@@ -580,7 +573,7 @@
             data-bs-parent="#sidebar-nav"
           >
             <li>
-              <a href="icons-bootstrap.html">
+              <a href="icons-bootstrap.html">assets/vendor/php-email-form/validate.js
                 <i class="bi bi-circle"></i><span>Bootstrap Icons</span>
               </a>
             </li>
@@ -700,14 +693,14 @@
     ></a>
 
     <!-- Vendor JS Files -->
-    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
-    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/chart.js/chart.umd.js"></script>
-    <script src="assets/vendor/echarts/echarts.min.js"></script>
-    <script src="assets/vendor/quill/quill.min.js"></script>
-    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
-    <script src="assets/vendor/tinymce/tinymce.min.js"></script>
-    <script src="assets/vendor/php-email-form/validate.js"></script>
+    <script src="{% static "assets/vendor/apexcharts/apexcharts.min.js" %}"></script>
+    <script src="{% static "assets/vendor/bootstrap/js/bootstrap.bundle.min.js" %}"></script>
+    <script src="{% static "assets/vendor/chart.js/chart.umd.js" %}"></script>
+    <script src="{% static "assets/vendor/echarts/echarts.min.js" %}"></script>
+    <script src="{% static "assets/vendor/quill/quill.min.js" %}"></script>
+    <script src="{% static "assets/vendor/simple-datatables/simple-datatables.js" %}"></script>
+    <script src="{% static "assets/vendor/tinymce/tinymce.min.js" %}"></script>
+    <script src="{% static "assets/vendor/php-email-form/validate.js" %}"></script>
 
     <!-- Template Main JS File -->
     <script src="{% static 'assets/js/main.js' %}"></script>
