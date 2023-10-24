@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="card-title">Phone Good List</h5>
+          <a href="{% url 'good_create' %}" class="btn btn-success">Create Good Product</a>
+        </div>
+        <table class="table datatable">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Category</th>
+              <th scope="col">Name</th>
+              <th scope="col">Ingredients</th>
+              <th scope="col">Description</th>
+              <th scope="col">Price</th>
+              <th scope="col">Measure</th>
+              <th scope="col">Available Quantity</th>
+              <th scope="col">Stock</th>
+              <th scope="col">Expire date</th>
+              <th scope="col">Bonus</th>
+              <th scope="col">Active</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Loop through your phone products here -->
+            <tr>
+              <th scope="row">1</th>
+              <td>Smartphones</td>
+              <td>Ingredients</td>
+              <td>iPhone 13</td>
+              <td>Latest iPhone model</td>
+              <td>$999</td>
+              <td>Unit</td>
+              <td>10</td>
+              <td>100</td>
+              <td>23.10.2023</td>
+              <td>50</td>
+              <td>True</td>
+              <td>
+                <button class="btn btn-primary btn-sm">Edit</button>
+                <button class="btn btn-danger btn-sm">Delete</button>
+              </td>
+            </tr>
+            <!-- End loop -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

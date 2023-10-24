@@ -1,16 +1,21 @@
 from django import forms
 from django.forms import ClearableFileInput
-from ..models import Phone, ProductItem, SubCategory, Image
+from ..models import Phone, ProductItem, SubCategory, Image, Ticket, Good
+
 
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
+
     def __init__(self, *args, **kwargs):
-        kwargs.setdefault('attrs', {})
-        kwargs['attrs'].update({
-            'class': 'form-control',
-            'multiple': True,
-        })
+        kwargs.setdefault("attrs", {})
+        kwargs["attrs"].update(
+            {
+                "class": "form-control",
+                "multiple": True,
+            }
+        )
         super(MultipleFileInput, self).__init__(*args, **kwargs)
+
 
 class MultipleFileField(forms.ImageField):
     def __init__(self, *args, **kwargs):
@@ -25,42 +30,67 @@ class MultipleFileField(forms.ImageField):
             result = single_file_clean(data, initial)
         return result
 
+
 class PhoneProductItemForm(forms.ModelForm):
     class Meta:
         model = Phone
-        fields = ['brand_name', 'model_name', 'ram', 'storage']
+        fields = ["brand_name", "model_name", "ram", "storage"]
         widgets = {
-            'brand_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'model_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'ram': forms.Select(attrs={'class': 'form-control'}),
-            'storage': forms.Select(attrs={'class': 'form-control'}),
+            "brand_name": forms.TextInput(attrs={"class": "form-control"}),
+            "model_name": forms.TextInput(attrs={"class": "form-control"}),
+            "ram": forms.Select(attrs={"class": "form-control"}),
+            "storage": forms.Select(attrs={"class": "form-control"}),
             # Add more fields here
         }
 
     # Fields for ProductItem
-    category = forms.ModelChoiceField(queryset=SubCategory.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
-    name = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    desc = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'form-control'}))
-    price = forms.DecimalField(decimal_places=1, max_digits=10, widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    measure = forms.ChoiceField(choices=ProductItem.CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
-    available_quantity = forms.IntegerField(min_value=0, widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    stock = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    bonus = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    active = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
-    images = MultipleFileField() # New field for multiple images # New field for multiple images
+    category = forms.ModelChoiceField(
+        queryset=SubCategory.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control"}),
+    )
+    name = forms.CharField(
+        max_length=255, widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    desc = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    price = forms.DecimalField(
+        decimal_places=1,
+        max_digits=10,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
+    measure = forms.ChoiceField(
+        choices=ProductItem.CHOICES,
+        widget=forms.Select(attrs={"class": "form-control"}),
+    )
+    available_quantity = forms.IntegerField(
+        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
+    )
+    stock = forms.IntegerField(
+        widget=forms.NumberInput(attrs={"class": "form-control"})
+    )
+    bonus = forms.IntegerField(
+        widget=forms.NumberInput(attrs={"class": "form-control"})
+    )
+    active = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+    images = (
+        MultipleFileField()
+    )  # New field for multiple images # New field for multiple images
 
     def save(self, commit=True):
         phone = super().save(commit=False)
         product_item = ProductItem(
-            category=self.cleaned_data['category'],
-            name=self.cleaned_data['name'],
-            desc=self.cleaned_data['desc'],
-            price=self.cleaned_data['price'],
-            measure=self.cleaned_data['measure'],
-            available_quantity=self.cleaned_data['available_quantity'],
-            stock=self.cleaned_data['stock'],
-            bonus=self.cleaned_data['bonus'],
-            active=self.cleaned_data['active']
+            category=self.cleaned_data["category"],
+            name=self.cleaned_data["name"],
+            desc=self.cleaned_data["desc"],
+            price=self.cleaned_data["price"],
+            measure=self.cleaned_data["measure"],
+            available_quantity=self.cleaned_data["available_quantity"],
+            stock=self.cleaned_data["stock"],
+            bonus=self.cleaned_data["bonus"],
+            active=self.cleaned_data["active"],
         )
         if commit:
             product_item.save()
@@ -68,11 +98,149 @@ class PhoneProductItemForm(forms.ModelForm):
             phone.save()
 
             # Save multiple images
-            for img in self.files.getlist('images'):
+            for img in self.files.getlist("images"):
                 image = Image(
                     image=img,
                     name=f"{self.cleaned_data['name']}_{img.name}",
-                    product=product_item
+                    product=product_item,
                 )
                 image.save()
         return phone
+
+
+class TicketProductItemForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ["event_name"]
+
+    category = forms.ModelChoiceField(
+        queryset=SubCategory.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control"}),
+    )
+    event_name = forms.CharField(
+        max_length=255, widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    desc = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    price = forms.DecimalField(
+        decimal_places=1,
+        max_digits=10,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
+
+    available_quantity = forms.IntegerField(
+        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
+    )
+    stock = forms.IntegerField(
+        widget=forms.NumberInput(attrs={"class": "form-control"})
+    )
+    bonus = forms.IntegerField(
+        widget=forms.NumberInput(attrs={"class": "form-control"})
+    )
+    active = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+    images = (
+        MultipleFileField()
+    )  # New field for multiple images # New field for multiple images
+    event_date = forms.DateTimeField()
+
+    def save(self, commit=True):
+        ticket = super().save(commit=False)
+        product_item = ProductItem(
+            category=self.cleaned_data["category"],
+            name=self.cleaned_data["name"],
+            desc=self.cleaned_data["desc"],
+            price=self.cleaned_data["price"],
+            available_quantity=self.cleaned_data["available_quantity"],
+            stock=self.cleaned_data["stock"],
+            bonus=self.cleaned_data["bonus"],
+            active=self.cleaned_data["active"],
+            event_date=self.cleaned_data["event_date"],
+        )
+        if commit:
+            product_item.save()
+            ticket.product = product_item
+            ticket.save()
+
+            # Save multiple images
+            for img in self.files.getlist("images"):
+                image = Image(
+                    image=img,
+                    name=f"{self.cleaned_data['name']}_{img.name}",
+                    product=product_item,
+                )
+                image.save()
+        return ticket
+
+
+class GoodProductItemForm(forms.ModelForm):
+    class Meta:
+        model = Good
+        fields = ["name", "ingredients", "expire_date"]
+
+    category = forms.ModelChoiceField(
+        queryset=SubCategory.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control"}),
+    )
+    name = forms.CharField(
+        max_length=255, widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    ingredients = forms.CharField(
+        max_length=255, widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    desc = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    price = forms.DecimalField(
+        decimal_places=1,
+        max_digits=10,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
+
+    available_quantity = forms.IntegerField(
+        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
+    )
+    stock = forms.IntegerField(
+        widget=forms.NumberInput(attrs={"class": "form-control"})
+    )
+    bonus = forms.IntegerField(
+        widget=forms.NumberInput(attrs={"class": "form-control"})
+    )
+    active = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+    images = (
+        MultipleFileField()
+    )  # New field for multiple images # New field for multiple images
+    expire_date = forms.DateTimeField()
+
+    def save(self, commit=True):
+        good = super().save(commit=False)
+        product_item = ProductItem(
+            category=self.cleaned_data["category"],
+            name=self.cleaned_data["name"],
+            ingredients=self.cleaned_data["ingredients"],
+            desc=self.cleaned_data["desc"],
+            price=self.cleaned_data["price"],
+            available_quantity=self.cleaned_data["available_quantity"],
+            stock=self.cleaned_data["stock"],
+            bonus=self.cleaned_data["bonus"],
+            active=self.cleaned_data["active"],
+            expire_date=self.cleaned_data["expire_date"],
+        )
+        if commit:
+            product_item.save()
+            good.product = product_item
+            good.save()
+
+            # Save multiple images
+            for img in self.files.getlist("images"):
+                image = Image(
+                    image=img,
+                    name=f"{self.cleaned_data['name']}_{img.name}",
+                    product=product_item,
+                )
+                image.save()
+        return good
