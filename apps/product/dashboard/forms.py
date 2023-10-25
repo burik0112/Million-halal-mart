@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ClearableFileInput
-from ..models import Phone, ProductItem, SubCategory, Image
+from ..models import Phone, ProductItem, SubCategory, Image, Category
 
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
@@ -28,18 +28,18 @@ class MultipleFileField(forms.ImageField):
 class PhoneProductItemForm(forms.ModelForm):
     class Meta:
         model = Phone
-        fields = ['brand_name', 'model_name', 'ram', 'storage']
+        fields = ['model_name', 'ram', 'storage','category','color']
         widgets = {
-            'brand_name': forms.TextInput(attrs={'class': 'form-control'}),
             'model_name': forms.TextInput(attrs={'class': 'form-control'}),
             'ram': forms.Select(attrs={'class': 'form-control'}),
             'storage': forms.Select(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'color': forms.Select(attrs={'class': 'form-control'}),
             # Add more fields here
         }
 
     # Fields for ProductItem
-    category = forms.ModelChoiceField(queryset=SubCategory.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
-    name = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    category = forms.ModelChoiceField(queryset=Category.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
     desc = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'form-control'}))
     price = forms.DecimalField(decimal_places=1, max_digits=10, widget=forms.NumberInput(attrs={'class': 'form-control'}))
     measure = forms.ChoiceField(choices=ProductItem.CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
@@ -52,8 +52,6 @@ class PhoneProductItemForm(forms.ModelForm):
     def save(self, commit=True):
         phone = super().save(commit=False)
         product_item = ProductItem(
-            category=self.cleaned_data['category'],
-            name=self.cleaned_data['name'],
             desc=self.cleaned_data['desc'],
             price=self.cleaned_data['price'],
             measure=self.cleaned_data['measure'],
@@ -65,13 +63,14 @@ class PhoneProductItemForm(forms.ModelForm):
         if commit:
             product_item.save()
             phone.product = product_item
+            phone.category = self.cleaned_data['category']  # Category field added
             phone.save()
 
             # Save multiple images
             for img in self.files.getlist('images'):
                 image = Image(
                     image=img,
-                    name=f"{self.cleaned_data['name']}_{img.name}",
+                    name=f"{self.cleaned_data['model_name']}_{img.name}",
                     product=product_item
                 )
                 image.save()

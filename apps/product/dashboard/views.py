@@ -27,8 +27,10 @@ class CreatePhoneView(View):
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):
+        print("post bo'dimi")
         form = PhoneProductItemForm(request.POST, request.FILES)  # request.FILES ni o'tkazish
         if form.is_valid():
+            print("kirdimi")
             form.save()
             return redirect('phone-list')
         return render(request, self.template_name, {'form': form})

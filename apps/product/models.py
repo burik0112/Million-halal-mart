@@ -33,8 +33,8 @@ class ProductItem(TimeStampedModel, models.Model):
         (2, "L"),
         (3, "PAKET"),
     )
-    category = models.ForeignKey(SubCategory, on_delete=models.CASCADE, related_name='productitem')
-    name = models.CharField(max_length=255)
+    
+
     desc = models.TextField()
     price = models.DecimalField(decimal_places=1, max_digits=10, default=0)
     measure = models.IntegerField(choices=CHOICES, default=0)
@@ -74,14 +74,29 @@ class Phone(models.Model):
         (4, "16 GB"),
         (5, "32 GB"),
     )
+    COLOR_CHOICES = (
+        ('red', 'Red'),
+        ('blue', 'Blue'),
+        ('green', 'Green'),
+        ('black', 'Black'),
+        ('white', 'White'),
+        ('gold', 'Gold'),
+        ('silver', 'Silver'),
+        # va boshqalar
+    )
+    
+    color = models.CharField(
+        max_length=10,
+        choices=COLOR_CHOICES,
+        default='black',
+    )
     product = models.OneToOneField(ProductItem, on_delete=models.CASCADE, related_name='phones')
-    brand_name = models.CharField(max_length=255)
     model_name = models.CharField(max_length=255)
     ram = models.IntegerField(choices=RAM, default=0)
     storage = models.IntegerField(choices=STORAGE, default=0)
-
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL,null=True, related_name='phones')
     def __str__(self) -> str:
-        return self.brand_name
+        return self.model_name
 
 
 class Good(models.Model):

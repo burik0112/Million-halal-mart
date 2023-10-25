@@ -1,18 +1,53 @@
-<!-- Bootstrap CSS -->
-<link
-  href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-  rel="stylesheet"
-/>
-{% extends "base.html" %}
-<!-- Form for Adding Phone and ProductItem -->
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <div class="container">
   <h2>Create Phone and ProductItem</h2>
   <form method="post" enctype="multipart/form-data">
-    <!-- Add enctype attribute -->
-    {% csrf_token %} {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
+    {% csrf_token %}
+    <div class="row">
+      <!-- First Column -->
+      <div class="col-md-6">
+        <div class="mb-3">{{ form.color.label_tag }} {{ form.color }}</div>
+        <div class="mb-3">
+          {{ form.model_name.label_tag }} {{ form.model_name }}
+        </div>
+        <div class="mb-3">{{ form.ram.label_tag }} {{ form.ram }}</div>
+        <div class="mb-3">{{ form.measure.label_tag }} {{ form.measure }}</div>
+        <div class="mb-3">{{ form.storage.label_tag }} {{ form.storage }}</div>
+        <div class="mb-3">{{ form.bonus.label_tag }} {{ form.bonus }}</div>
+      </div>
+      <!-- Second Column -->
+      <div class="col-md-6">
+        <div class="mb-3">
+          {{ form.category.label_tag }} {{ form.category }}
+        </div>
+        <div class="mb-3">{{ form.stock.label_tag }} {{ form.stock }}</div>
 
+        <div class="mb-3">{{ form.price.label_tag }} {{ form.price }}</div>
+        <div class="mb-3">{{ form.name.label_tag }} {{ form.name }}</div>
+        <div class="mb-3">
+          {{ form.available_quantity.label_tag }} {{ form.available_quantity }}
+        </div>
+        <div class="mb-3">
+          <label for="id_images">Images:</label>{{ form.images }}
+        </div>
+        {% comment %} <div class="mb-3">{{ form.active.label_tag }}{{ form.active }}</div> {% endcomment %}
+
+        <!-- Add more fields here -->
+      </div>
+      <div class="col-md-12">
+        <div class="mb-3">{{ form.desc.label_tag }} {{ form.desc }}</div>
+      </div>
+      <div class="col-md-12">
+        <div class="mb-3">active {{ form.active }}</div>
+      </div>
+    </div>
+    <!-- Single Column for Submit Button -->
+    <div class="row">
+      <div class="col-12 text-end">
+        <!-- text-end klassi qo'shildi -->
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </div>
+  </form>
 </div>
 {% endblock %}
