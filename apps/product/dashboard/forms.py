@@ -34,12 +34,13 @@ class MultipleFileField(forms.ImageField):
 class PhoneProductItemForm(forms.ModelForm):
     class Meta:
         model = Phone
-        fields = ["brand_name", "model_name", "ram", "storage"]
+        fields = ['model_name', 'ram', 'storage','category','color']
         widgets = {
-            "brand_name": forms.TextInput(attrs={"class": "form-control"}),
-            "model_name": forms.TextInput(attrs={"class": "form-control"}),
-            "ram": forms.Select(attrs={"class": "form-control"}),
-            "storage": forms.Select(attrs={"class": "form-control"}),
+            'model_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'ram': forms.Select(attrs={'class': 'form-control'}),
+            'storage': forms.Select(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'color': forms.Select(attrs={'class': 'form-control'}),
             # Add more fields here
         }
 
@@ -82,27 +83,26 @@ class PhoneProductItemForm(forms.ModelForm):
     def save(self, commit=True):
         phone = super().save(commit=False)
         product_item = ProductItem(
-            category=self.cleaned_data["category"],
-            name=self.cleaned_data["name"],
-            desc=self.cleaned_data["desc"],
-            price=self.cleaned_data["price"],
-            measure=self.cleaned_data["measure"],
-            available_quantity=self.cleaned_data["available_quantity"],
-            stock=self.cleaned_data["stock"],
-            bonus=self.cleaned_data["bonus"],
-            active=self.cleaned_data["active"],
+            desc=self.cleaned_data['desc'],
+            price=self.cleaned_data['price'],
+            measure=self.cleaned_data['measure'],
+            available_quantity=self.cleaned_data['available_quantity'],
+            stock=self.cleaned_data['stock'],
+            bonus=self.cleaned_data['bonus'],
+            active=self.cleaned_data['active']
         )
         if commit:
             product_item.save()
             phone.product = product_item
+            phone.category = self.cleaned_data['category']  # Category field added
             phone.save()
 
             # Save multiple images
             for img in self.files.getlist("images"):
                 image = Image(
                     image=img,
-                    name=f"{self.cleaned_data['name']}_{img.name}",
-                    product=product_item,
+                    name=f"{self.cleaned_data['model_name']}_{img.name}",
+                    product=product_item
                 )
                 image.save()
         return phone

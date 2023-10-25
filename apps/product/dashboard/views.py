@@ -33,6 +33,7 @@ class CreatePhoneView(View):
             request.POST, request.FILES
         )  # request.FILES ni o'tkazish
         if form.is_valid():
+            print("kirdimi")
             form.save()
             return redirect("phone-list")
         return render(request, self.template_name, {"form": form})
