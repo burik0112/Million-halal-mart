@@ -44,7 +44,7 @@ class ProductItem(TimeStampedModel, models.Model):
     active = models.BooleanField(default=True)
 
     def __str__(self) -> str:
-        return self.name
+        return self.desc
 
 
 class Ticket(models.Model):
