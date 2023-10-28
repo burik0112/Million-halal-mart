@@ -4,6 +4,12 @@ from model_utils.models import TimeStampedModel
 
 # Create your models here.
 class Category(TimeStampedModel, models.Model):
+    PRODUCT_TYPE = (
+        ('f','Food'),
+        ('p','Phone'),
+        ('t','Ticket')
+    )
+    main_type = models.CharField(max_length=1,choices=PRODUCT_TYPE)
     name = models.CharField(max_length=255)
     image = models.ImageField(upload_to="category")
     desc = models.TextField()
@@ -51,6 +57,7 @@ class Ticket(models.Model):
     event_name = models.CharField(max_length=255)
     product = models.OneToOneField(ProductItem, on_delete=models.CASCADE, related_name='tickets')
     event_date = models.DateField(auto_now=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL,null=True, related_name='tickets')
 
     def __str__(self) -> str:
         return self.event_name
@@ -104,6 +111,7 @@ class Good(models.Model):
     product = models.OneToOneField(ProductItem, on_delete=models.CASCADE, related_name='goods')
     ingredients = models.CharField(max_length=255, blank=True)
     expire_date = models.DateField()
+    sub_cat = models.ForeignKey("product.SubCategory",on_delete=models.SET_NULL,null=True)
 
     def __str__(self) -> str:
         return self.name
