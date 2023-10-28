@@ -1,15 +1,14 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
-from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.generics import ListAPIView
 
-from .models import Category, Good, Image, Phone, ProductItem, SubCategory, Ticket
+from .models import Category, Good, Image, Phone, SubCategory, Ticket
 from .serializers import (
     CategorySerializer,
     CustomPageNumberPagination,
     GoodSerializer,
     ImageSerializer,
     PhoneSerializer,
-    ProductItemSerializer,
     SubCategorySerializer,
     TicketSerializer,
 )
@@ -21,8 +20,8 @@ class CategoryListAPIView(ListAPIView):
     queryset = Category.objects.all().order_by("-pk")
     serializer_class = CategorySerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
-    search_fields = ["name",'main_type']
-    filterset_fields = ["name",'main_type']
+    search_fields = ["name", "main_type"]
+    filterset_fields = ["name", "main_type"]
     pagination_class = CustomPageNumberPagination
 
 
@@ -68,7 +67,12 @@ class GoodListAPIView(ListAPIView):
     serializer_class = GoodSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
     search_fields = ["product__name", "product__category__name", "name", "ingredients"]
-    filterset_fields = ["product__name", "product__category__name", "name", "ingredients"]
+    filterset_fields = [
+        "product__name",
+        "product__category__name",
+        "name",
+        "ingredients",
+    ]
     pagination_class = CustomPageNumberPagination
 
 
