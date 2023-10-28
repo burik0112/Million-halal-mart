@@ -1,6 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from .models import (Category, Good, Image, Phone, ProductItem, SubCategory,
                      Ticket)
@@ -18,6 +18,7 @@ class CategoryListAPIView(ListAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
     search_fields = ["name"]
     pagination_class = CustomPageNumberPagination
+
 
 
 class SubCategoryListAPIView(ListAPIView):
