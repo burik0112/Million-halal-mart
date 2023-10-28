@@ -22,7 +22,25 @@ class PhoneListView(ListView):
 
 
 class CreatePhoneView(View):
-    template_name = "product/create_phone.html"
+    template_name = "product/phone_create.html"
+
+    def get(self, request):
+        form = PhoneProductItemForm()
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request):
+        form = PhoneProductItemForm(
+            request.POST, request.FILES
+        )  # request.FILES ni o'tkazish
+        if form.is_valid():
+            print("kirdimi")
+            form.save()
+            return redirect("phone-list")
+        return render(request, self.template_name, {"form": form})
+
+
+class CreatePhoneCategory(View):
+    template_name = "product/phone_category_create.html"
 
     def get(self, request):
         form = PhoneProductItemForm()

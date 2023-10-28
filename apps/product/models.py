@@ -4,12 +4,8 @@ from model_utils.models import TimeStampedModel
 
 # Create your models here.
 class Category(TimeStampedModel, models.Model):
-    PRODUCT_TYPE = (
-        ('f','Food'),
-        ('p','Phone'),
-        ('t','Ticket')
-    )
-    main_type = models.CharField(max_length=1,choices=PRODUCT_TYPE)
+    PRODUCT_TYPE = (("f", "Food"), ("p", "Phone"), ("t", "Ticket"))
+    main_type = models.CharField(max_length=1, choices=PRODUCT_TYPE)
     name = models.CharField(max_length=255)
     image = models.ImageField(upload_to="category")
     desc = models.TextField()
@@ -21,7 +17,9 @@ class Category(TimeStampedModel, models.Model):
 
 
 class SubCategory(TimeStampedModel, models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategory')
+    category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, related_name="subcategory"
+    )
     name = models.CharField(max_length=255)
     image = models.ImageField(upload_to="subcategory")
     desc = models.TextField()
@@ -39,7 +37,6 @@ class ProductItem(TimeStampedModel, models.Model):
         (2, "L"),
         (3, "PAKET"),
     )
-    
 
     desc = models.TextField()
     price = models.DecimalField(decimal_places=1, max_digits=10, default=0)
@@ -55,9 +52,13 @@ class ProductItem(TimeStampedModel, models.Model):
 
 class Ticket(models.Model):
     event_name = models.CharField(max_length=255)
-    product = models.OneToOneField(ProductItem, on_delete=models.CASCADE, related_name='tickets')
+    product = models.OneToOneField(
+        ProductItem, on_delete=models.CASCADE, related_name="tickets"
+    )
     event_date = models.DateField(auto_now=True)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL,null=True, related_name='tickets')
+    category = models.ForeignKey(
+        Category, on_delete=models.SET_NULL, null=True, related_name="tickets"
+    )
 
     def __str__(self) -> str:
         return self.event_name
@@ -82,36 +83,55 @@ class Phone(models.Model):
         (5, "32 GB"),
     )
     COLOR_CHOICES = (
-        ('red', 'Red'),
-        ('blue', 'Blue'),
-        ('green', 'Green'),
-        ('black', 'Black'),
-        ('white', 'White'),
-        ('gold', 'Gold'),
-        ('silver', 'Silver'),
+        ("red", "Red"),
+        ("blue", "Blue"),
+        ("green", "Green"),
+        ("black", "Black"),
+        ("white", "White"),
+        ("gold", "Gold"),
+        ("silver", "Silver"),
         # va boshqalar
     )
-    
+    CONDITION = (
+        ("good", "Good"),
+        ("exc", "Excellent"),
+        ("used", "Used"),
+        ("new", "New"),
+    )
     color = models.CharField(
         max_length=10,
         choices=COLOR_CHOICES,
-        default='black',
+        default="black",
     )
-    product = models.OneToOneField(ProductItem, on_delete=models.CASCADE, related_name='phones')
+    condition = models.CharField(
+        max_length=10,
+        choices=CONDITION,
+        default="new",
+    )
+    product = models.OneToOneField(
+        ProductItem, on_delete=models.CASCADE, related_name="phones"
+    )
     model_name = models.CharField(max_length=255)
     ram = models.IntegerField(choices=RAM, default=0)
     storage = models.IntegerField(choices=STORAGE, default=0)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL,null=True, related_name='phones')
+    category = models.ForeignKey(
+        Category, on_delete=models.SET_NULL, null=True, related_name="phones"
+    )
+
     def __str__(self) -> str:
         return self.model_name
 
 
 class Good(models.Model):
     name = models.CharField(max_length=255)
-    product = models.OneToOneField(ProductItem, on_delete=models.CASCADE, related_name='goods')
+    product = models.OneToOneField(
+        ProductItem, on_delete=models.CASCADE, related_name="goods"
+    )
     ingredients = models.CharField(max_length=255, blank=True)
     expire_date = models.DateField()
-    sub_cat = models.ForeignKey("product.SubCategory",on_delete=models.SET_NULL,null=True)
+    sub_cat = models.ForeignKey(
+        "product.SubCategory", on_delete=models.SET_NULL, null=True
+    )
 
     def __str__(self) -> str:
         return self.name
@@ -120,7 +140,9 @@ class Good(models.Model):
 class Image(models.Model):
     image = models.ImageField(upload_to="images")
     name = models.CharField(max_length=255)
-    product = models.ForeignKey(ProductItem, on_delete=models.CASCADE, related_name='images')
+    product = models.ForeignKey(
+        ProductItem, on_delete=models.CASCADE, related_name="images"
+    )
 
     def __str__(self) -> str:
         return self.name
