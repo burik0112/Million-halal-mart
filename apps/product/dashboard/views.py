@@ -33,7 +33,6 @@ class CreatePhoneView(View):
             request.POST, request.FILES
         )  # request.FILES ni o'tkazish
         if form.is_valid():
-            print("kirdimi")
             form.save()
             return redirect("phone-list")
         return render(request, self.template_name, {"form": form})
@@ -48,9 +47,15 @@ class PhoneCategoryCreateView(CreateView):
         # You can add any additional processing here if needed
         return super().form_valid(form)
 
-    def get_success_url(self):
-        # Redirect to the detail page of the newly created category
-        return self.object.get_absolute_url()
+    def post(self, request):
+        form = PhoneProductItemForm(
+            request.POST, request.FILES
+        )  # request.FILES ni o'tkazish
+        if form.is_valid():
+            form.save()
+            return redirect("create_phone")
+        return render(request, self.template_name, {"form": form})
+
 
 
 class TicketListView(ListView):

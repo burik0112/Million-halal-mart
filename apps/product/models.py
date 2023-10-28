@@ -18,9 +18,6 @@ class Category(TimeStampedModel, models.Model):
     def __str__(self) -> str:
         return self.name
 
-    def get_absolute_url(self):
-        return reverse("category-detail", args=[str(self.id)])
-
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super(Category, self).save(*args, **kwargs)
