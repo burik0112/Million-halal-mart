@@ -1,19 +1,29 @@
 from django.db import models
 from model_utils.models import TimeStampedModel
+from django.urls import reverse
+from django.utils.text import slugify
+from django.utils import timezone
 
 
 # Create your models here.
 class Category(TimeStampedModel, models.Model):
     PRODUCT_TYPE = (("f", "Food"), ("p", "Phone"), ("t", "Ticket"))
-    main_type = models.CharField(max_length=1, choices=PRODUCT_TYPE)
+    main_type = models.CharField(max_length=1, choices=PRODUCT_TYPE, default='f')
     name = models.CharField(max_length=255)
     image = models.ImageField(upload_to="category")
     desc = models.TextField()
     stock = models.IntegerField(default=0)
     bonus = models.IntegerField(default=0)
-
+    active=models.BooleanField(default=True)
     def __str__(self) -> str:
         return self.name
+
+    def get_absolute_url(self):
+        return reverse("category-detail", args=[str(self.id)])
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(Category, self).save(*args, **kwargs)
 
 
 class SubCategory(TimeStampedModel, models.Model):

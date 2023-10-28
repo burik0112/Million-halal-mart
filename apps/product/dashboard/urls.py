@@ -6,12 +6,12 @@ from .views import (
     TicketListView,
     GoodListView,
     GoodView,
-    CreatePhoneCategory
+    PhoneCategoryCreateView
 )
 
 urlpatterns = [
     path("create-phone/", CreatePhoneView.as_view(), name="create_phone"),
-    path("phone-category/", CreatePhoneCategory.as_view(), name="create_phone_category"),
+    path("phone-category/", PhoneCategoryCreateView.as_view(), name="create_phone_category"),
 
     path("phones/", PhoneListView.as_view(), name="phone_list"),
     path("ticket-create/", TicketView.as_view(), name="ticket_create"),

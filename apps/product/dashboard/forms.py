@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ClearableFileInput
-from ..models import Phone, ProductItem, SubCategory, Image, Ticket, Good
+from ..models import Phone, ProductItem, SubCategory, Image, Ticket, Good, Category
 
 
 class MultipleFileInput(forms.ClearableFileInput):
@@ -100,6 +100,20 @@ class PhoneProductItemForm(forms.ModelForm):
                 image.save()
         return phone
 
+
+class PhoneCategoryCreateForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['main_type', 'name', 'image', 'desc', 'stock', 'bonus','active']
+        widgets = {
+            'main_type': forms.Select(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'desc': forms.Textarea(attrs={'class': 'form-control'}),
+            'stock': forms.NumberInput(attrs={'class': 'form-control'}),
+            'bonus': forms.NumberInput(attrs={'class': 'form-control'}),
+            'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
 
 class TicketProductItemForm(forms.ModelForm):
     class Meta:

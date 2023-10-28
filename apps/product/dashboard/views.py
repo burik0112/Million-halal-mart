@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView
-from ..models import Phone, Ticket, Good
+from ..models import Phone, Ticket, Good, Category
 from django.views import View
 from django.views.generic.edit import CreateView
-from .forms import PhoneProductItemForm, TicketProductItemForm, GoodProductItemForm
+from .forms import PhoneProductItemForm, TicketProductItemForm, GoodProductItemForm, PhoneCategoryCreateForm
 
 
 class PhoneListView(ListView):
@@ -39,22 +39,18 @@ class CreatePhoneView(View):
         return render(request, self.template_name, {"form": form})
 
 
-class CreatePhoneCategory(View):
-    template_name = "product/phone_category_create.html"
+class PhoneCategoryCreateView(CreateView):
+    model = Category
+    form_class = PhoneCategoryCreateForm
+    template_name = "product/category_create.html"  # Replace with your template path
 
-    def get(self, request):
-        form = PhoneProductItemForm()
-        return render(request, self.template_name, {"form": form})
+    def form_valid(self, form):
+        # You can add any additional processing here if needed
+        return super().form_valid(form)
 
-    def post(self, request):
-        form = PhoneProductItemForm(
-            request.POST, request.FILES
-        )  # request.FILES ni o'tkazish
-        if form.is_valid():
-            print("kirdimi")
-            form.save()
-            return redirect("phone-list")
-        return render(request, self.template_name, {"form": form})
+    def get_success_url(self):
+        # Redirect to the detail page of the newly created category
+        return self.object.get_absolute_url()
 
 
 class TicketListView(ListView):
