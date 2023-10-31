@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ClearableFileInput
-from ..models import Phone, ProductItem, SubCategory, Image, Ticket, Good
+from ..models import Phone, ProductItem, SubCategory, Image, Ticket, Good, Category
 
 
 class MultipleFileInput(forms.ClearableFileInput):
@@ -34,13 +34,14 @@ class MultipleFileField(forms.ImageField):
 class PhoneProductItemForm(forms.ModelForm):
     class Meta:
         model = Phone
-        fields = ['model_name', 'ram', 'storage','category','color']
+        fields = ['model_name', 'ram', 'storage','category','color', 'condition']
         widgets = {
             'model_name': forms.TextInput(attrs={'class': 'form-control'}),
             'ram': forms.Select(attrs={'class': 'form-control'}),
             'storage': forms.Select(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-control'}),
             'color': forms.Select(attrs={'class': 'form-control'}),
+            'condition': forms.Select(attrs={'class': 'form-control'}),
             # Add more fields here
         }
 
@@ -49,9 +50,6 @@ class PhoneProductItemForm(forms.ModelForm):
         queryset=SubCategory.objects.all(),
         widget=forms.Select(attrs={"class": "form-control"}),
     )
-    name = forms.CharField(
-        max_length=255, widget=forms.TextInput(attrs={"class": "form-control"})
-    )
     desc = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
@@ -59,10 +57,6 @@ class PhoneProductItemForm(forms.ModelForm):
         decimal_places=1,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-    )
-    measure = forms.ChoiceField(
-        choices=ProductItem.CHOICES,
-        widget=forms.Select(attrs={"class": "form-control"}),
     )
     available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
@@ -85,7 +79,6 @@ class PhoneProductItemForm(forms.ModelForm):
         product_item = ProductItem(
             desc=self.cleaned_data['desc'],
             price=self.cleaned_data['price'],
-            measure=self.cleaned_data['measure'],
             available_quantity=self.cleaned_data['available_quantity'],
             stock=self.cleaned_data['stock'],
             bonus=self.cleaned_data['bonus'],
@@ -107,6 +100,20 @@ class PhoneProductItemForm(forms.ModelForm):
                 image.save()
         return phone
 
+
+class PhoneCategoryCreateForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['main_type', 'name', 'image', 'desc', 'stock', 'bonus','active']
+        widgets = {
+            'main_type': forms.Select(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'desc': forms.Textarea(attrs={'class': 'form-control'}),
+            'stock': forms.NumberInput(attrs={'class': 'form-control'}),
+            'bonus': forms.NumberInput(attrs={'class': 'form-control'}),
+            'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
 
 class TicketProductItemForm(forms.ModelForm):
     class Meta:

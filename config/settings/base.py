@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "drf_yasg",
+    'django_filters',
     "rest_framework",
     "corsheaders",
 ] + LOCAL_APPS
@@ -72,7 +73,9 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
-
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
 CORS_ALLOW_ALL_ORIGINS = True
 # CORS ORIGIN
 
