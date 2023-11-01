@@ -109,12 +109,17 @@ class SendOTPView(generics.GenericAPIView):
 
         return Response({"message": "OTP sent successfully"}, status=status.HTTP_200_OK)
 
-@api_view(['POST'])
-def verify_otp(request):
-    phone_number = request.data.get('phone_number')
-    otp = request.data.get('otp')
+class VerifyOTPView(generics.GenericAPIView):
+    serializer_class = ProfileSerializer  # Sizning serializeringiz
 
-    # OTPni bazadan tekshirish
-    # ...
+    def post(self, request, *args, **kwargs):
+        phone_number = request.data.get('phone_number')
+        otp = request.data.get('otp')
 
-    return Response({"message": "OTP verified successfully"}, status=status.HTTP_200_OK)
+        # OTPni bazadan tekshirish
+        profile = Profile.objects.get(phone_number=phone_number)
+        if profile.otp == otp:
+            return Response({"message": "OTP verified successfully"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
+
