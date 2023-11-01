@@ -1,0 +1,40 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <h2>Create Product Category</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row">
+      
+      <!-- First Column -->
+      <div class="col-md-6">      
+        <div class="mb-3">{{ form.main_type.label_tag }} {{ form.main_type }}</div>
+        <div class="mb-3">{{ form.stock.label_tag }} {{ form.stock }}</div>
+        <div class="mb-3">
+          <label for="id_images">Category image:</label>{{ form.image }}
+        </div>
+      </div>
+      
+      <!-- Second Column -->
+      <div class="col-md-6">
+        <div class="mb-3">{{ form.name.label_tag }} {{ form.name }}</div>
+        <div class="mb-3">{{ form.bonus.label_tag }} {{ form.bonus }}</div>
+      </div>
+      
+      
+      <div class="col-md-12">
+        <div class="mb-3">{{ form.desc.label_tag }} {{ form.desc }}</div>
+      </div>
+      <div class="col-md-12">
+        <div class="mb-3">{{ form.active }}Active </div>
+      </div>
+    </div>
+    <!-- Single Column for Submit Button -->
+    <div class="row">
+      <div class="col-12 text-end">
+        <!-- text-end klassi qo'shildi -->
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,12 +1,20 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
-from rest_framework.generics import (CreateAPIView, ListAPIView,
-                                     RetrieveUpdateDestroyAPIView)
+from rest_framework.generics import (
+    CreateAPIView,
+    ListAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
 
 from .models import Favorite, Location, News, Profile, ViewedNews
-from .serializers import (CustomPageNumberPagination, FavoriteSerializer,
-                          LocationSerializer, NewsSerializer,
-                          ProfileSerializer, ViewedNewsSerializer)
+from .serializers import (
+    CustomPageNumberPagination,
+    FavoriteSerializer,
+    LocationSerializer,
+    NewsSerializer,
+    ProfileSerializer,
+    ViewedNewsSerializer,
+)
 
 # Create your views here.
 
@@ -31,6 +39,7 @@ class LocationListAPIView(ListAPIView):
     serializer_class = LocationSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
     search_fields = ["user__full_name", "address"]
+    filterset_fields = ["user__full_name", "address"]
     pagination_class = CustomPageNumberPagination
 
 
@@ -44,6 +53,7 @@ class NewsListAPIView(ListAPIView):
     serializer_class = NewsSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
     search_fields = ["description"]
+    filterset_fields = ["description"]
     pagination_class = CustomPageNumberPagination
 
 
@@ -61,7 +71,7 @@ class FavoriteListAPIView(ListAPIView):
     queryset = Favorite.objects.all().order_by("-pk")
     serializer_class = FavoriteSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
-    filter_fields = ["product__category"]
+    filterset_fields = ["user", "product"]
     search_fields = ["product__name", "user__full_name"]
     pagination_class = CustomPageNumberPagination
 

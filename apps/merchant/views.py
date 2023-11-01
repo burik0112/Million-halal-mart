@@ -26,6 +26,7 @@ class OrderListAPIView(ListAPIView):
     serializer_class = OrderSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ["user__full_name"]
+    filterset_fields = ["user__full_name"]
     pagination_class = CustomPageNumberPagination
 
 
