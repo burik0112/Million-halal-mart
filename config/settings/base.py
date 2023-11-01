@@ -176,3 +176,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, "../", "staticfiles")
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+ACCOUNT_SID='YOUR ACCOUNT SID'
+AUTH_TOKEN='YOUR AUTH TOKEN'
+COUNTRY_CODE='+country code of your choice'
+TWILIO_WHATSAPP_NUMBER='whatsapp:+14155238886'
+TWILIO_PHONE_NUMBER='number you get from Twilio'
