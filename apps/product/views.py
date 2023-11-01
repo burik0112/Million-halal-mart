@@ -29,8 +29,7 @@ class SubCategoryListAPIView(ListAPIView):
     queryset = SubCategory.objects.all().order_by("-pk")
     serializer_class = SubCategorySerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
-    search_fields = ["name", "category__name"]
-    filterset_fields = ["name", "category__name"]
+    filterset_fields = ["category"]
     pagination_class = CustomPageNumberPagination
 
 
@@ -38,8 +37,7 @@ class TicketListAPIView(ListAPIView):
     queryset = Ticket.objects.all().order_by("-pk")
     serializer_class = TicketSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
-    search_fields = ["product__name", "product__category__name", "event_name"]
-    filterset_fields = ["product__name", "product__category__name", "event_name"]
+    filterset_fields = ["product",]
     pagination_class = CustomPageNumberPagination
 
 
@@ -48,17 +46,10 @@ class PhoneListAPIView(ListAPIView):
     serializer_class = PhoneSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
     filterset_fields = [
-        "product__name",
-        "product__category__name",
-        "brand_name",
-        "model_name",
+        "category",
+        "product"
     ]
-    search_fields = [
-        "product__name",
-        "product__category__name",
-        "brand_name",
-        "model_name",
-    ]
+
     pagination_class = CustomPageNumberPagination
 
 
@@ -66,12 +57,9 @@ class GoodListAPIView(ListAPIView):
     queryset = Good.objects.all().order_by("-pk")
     serializer_class = GoodSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
-    search_fields = ["product__name", "product__category__name", "name", "ingredients"]
     filterset_fields = [
-        "product__name",
-        "product__category__name",
-        "name",
-        "ingredients",
+        "sub_cat",
+        "product",
     ]
     pagination_class = CustomPageNumberPagination
 
@@ -80,6 +68,5 @@ class ImageListAPIView(ListAPIView):
     queryset = Image.objects.all().order_by("-pk")
     serializer_class = ImageSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
-    search_fields = ["product__name", "product__category__name", "name"]
-    filterset_fields = ["product__name", "product__category__name", "name"]
+    filterset_fields = ["product"]
     pagination_class = CustomPageNumberPagination
