@@ -89,7 +89,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
 class SendOTPView(generics.GenericAPIView):
-    serializer_class = ProfileSerializer  # Sizning serializeringiz
+    serializer_class = ProfileSerializer  
 
     def post(self, request, *args, **kwargs):
         phone_number = request.data.get('phone_number')
@@ -110,7 +110,7 @@ class SendOTPView(generics.GenericAPIView):
         return Response({"message": "OTP sent successfully"}, status=status.HTTP_200_OK)
 
 class VerifyOTPView(generics.GenericAPIView):
-    serializer_class = ProfileSerializer  # Sizning serializeringiz
+    serializer_class = ProfileSerializer  
 
     def post(self, request, *args, **kwargs):
         phone_number = request.data.get('phone_number')
