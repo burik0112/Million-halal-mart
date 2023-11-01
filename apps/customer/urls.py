@@ -18,4 +18,8 @@ urlpatterns = [
     path("favorite/create", views.FavoriteCreateAPIView.as_view()),
     path("favorite/list", views.FavoriteListAPIView.as_view()),
     path("favorite/<int:pk>/retriev", views.FavoriteRetrieveUpdateDelete.as_view()),
+    
+    path('send_otp/', views.send_otp, name='send_otp'),
+    path('verify_otp/', views.verify_otp, name='verify_otp'),
+
 ]

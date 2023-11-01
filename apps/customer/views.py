@@ -5,7 +5,8 @@ from rest_framework.generics import (
     ListAPIView,
     RetrieveUpdateDestroyAPIView,
 )
-
+from rest_framework import generics
+from .utils import generate_otp
 from .models import Favorite, Location, News, Profile, ViewedNews
 from .serializers import (
     CustomPageNumberPagination,
@@ -79,3 +80,41 @@ class FavoriteListAPIView(ListAPIView):
 class FavoriteRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     queryset = Favorite.objects.all()
     serializer_class = FavoriteSerializer
+
+
+from twilio.rest import Client
+from django.conf import settings
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
+class SendOTPView(generics.GenericAPIView):
+    serializer_class = ProfileSerializer  # Sizning serializeringiz
+
+    def post(self, request, *args, **kwargs):
+        phone_number = request.data.get('phone_number')
+        otp = generate_otp()
+
+        client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+        message = client.messages.create(
+            body=f"Your OTP code is {otp}",
+            from_=settings.TWILIO_PHONE_NUMBER,
+            to=phone_number
+        )
+
+        # OTPni bazaga saqlash
+        profile = Profile.objects.get(phone_number=phone_number)
+        profile.otp = otp
+        profile.save()
+
+        return Response({"message": "OTP sent successfully"}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def verify_otp(request):
+    phone_number = request.data.get('phone_number')
+    otp = request.data.get('otp')
+
+    # OTPni bazadan tekshirish
+    # ...
+
+    return Response({"message": "OTP verified successfully"}, status=status.HTTP_200_OK)
