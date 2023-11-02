@@ -97,7 +97,7 @@ class Phone(models.Model):
         ("white", "White"),
         ("gold", "Gold"),
         ("silver", "Silver"),
-        # va boshqalar
+        
     )
     CONDITION = (
         ("good", "Good"),
