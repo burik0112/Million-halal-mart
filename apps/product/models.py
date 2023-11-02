@@ -10,7 +10,7 @@ class Category(TimeStampedModel, models.Model):
     PRODUCT_TYPE = (("f", "Food"), ("p", "Phone"), ("t", "Ticket"))
     main_type = models.CharField(max_length=1, choices=PRODUCT_TYPE, default='f')
     name = models.CharField(max_length=255)
-    image = models.ImageField(upload_to="category")
+    image = models.ImageField(upload_to="media/category")
     desc = models.TextField()
     stock = models.IntegerField(default=0)
     bonus = models.IntegerField(default=0)
@@ -28,7 +28,7 @@ class SubCategory(TimeStampedModel, models.Model):
         Category, on_delete=models.CASCADE, related_name="subcategory"
     )
     name = models.CharField(max_length=255)
-    image = models.ImageField(upload_to="subcategory")
+    image = models.ImageField(upload_to="media/subcategory")
     desc = models.TextField()
     stock = models.IntegerField(default=0)
     bonus = models.IntegerField(default=0)
@@ -145,7 +145,7 @@ class Good(models.Model):
 
 
 class Image(models.Model):
-    image = models.ImageField(upload_to="images")
+    image = models.ImageField(upload_to="media/images")
     name = models.CharField(max_length=255)
     product = models.ForeignKey(
         ProductItem, on_delete=models.CASCADE, related_name="images"
