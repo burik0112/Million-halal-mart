@@ -18,9 +18,7 @@ class Category(TimeStampedModel, models.Model):
     def __str__(self) -> str:
         return self.name
 
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
-        super(Category, self).save(*args, **kwargs)
+
 
 
 class SubCategory(TimeStampedModel, models.Model):

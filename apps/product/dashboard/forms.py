@@ -47,7 +47,7 @@ class PhoneProductItemForm(forms.ModelForm):
 
     # Fields for ProductItem
     category = forms.ModelChoiceField(
-        queryset=SubCategory.objects.all(),
+        queryset=Category.objects.filter(main_type="p"),
         widget=forms.Select(attrs={"class": "form-control"}),
     )
     desc = forms.CharField(
@@ -104,9 +104,9 @@ class PhoneProductItemForm(forms.ModelForm):
 class PhoneCategoryCreateForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ['main_type', 'name', 'image', 'desc', 'stock', 'bonus','active']
+        fields = [ 'name', 'image', 'desc', 'stock', 'bonus','active']
         widgets = {
-            'main_type': forms.Select(attrs={'class': 'form-control'}),
+            # 'main_type': forms.Select(attrs={'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'desc': forms.Textarea(attrs={'class': 'form-control'}),
