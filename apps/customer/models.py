@@ -10,7 +10,6 @@ class Profile(TimeStampedModel, models.Model):
     phone_number = models.CharField(max_length=15)
     cashback = models.IntegerField(default=0)
     otp=models.CharField(max_length=100,null=True,blank=True)
-    uid=models.CharField(default=f'{uuid.uuid4}',max_length=200)
 
     def __str__(self) -> str:
         return self.full_name

@@ -34,7 +34,7 @@ class CreatePhoneView(View):
         )  # request.FILES ni o'tkazish
         if form.is_valid():
             form.save()
-            return redirect("phone-list")
+            return redirect("phone_list")
         return render(request, self.template_name, {"form": form})
 
 class PhoneCategoryCreateView(CreateView):

@@ -151,3 +151,14 @@ class Image(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+class SoldProduct(TimeStampedModel, models.Model):
+    product=models.ForeignKey(ProductItem, on_delete=models.SET_NULL, null=True, related_name='sold_products')
+    user = models.ForeignKey('customer.Profile', on_delete=models.SET_NULL, null=True)
+    amount = models.DecimalField(decimal_places=2, default=0, max_digits=10)
+    quantity=models.PositiveIntegerField(default=0)
+
+    def __int__(self) -> int:
+        return self.id
+    

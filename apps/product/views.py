@@ -70,3 +70,10 @@ class ImageListAPIView(ListAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter]  
     filterset_fields = ["product"]
     pagination_class = CustomPageNumberPagination
+
+class FamousTickets(ListAPIView):
+    queryset = Ticket.objects.all().order_by("-pk")
+    serializer_class = TicketSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]  
+    filterset_fields = ["product",]
+    pagination_class = CustomPageNumberPagination
