@@ -1,5 +1,5 @@
 # Chatbot Service
-[![Deploy to server](https://github.com/karimoff96/DjangoTemplate.git/actions/workflows/deploy.yml/badge.svg?branch=master)](https://github.com/karimoff96/DjangoTemplate.git/actions/workflows/deploy.yml)
+[![Deploy to server](https://github.com/karimoff96/DjangoTemplate.git/actions/workflows/deploy.yml/badge.svg?branch=master)](https://github.com/karimoff96/Million-halal-mart.git/actions/workflows/deploy.yml)
 
 Welcome to Django+Docker initial template repository. This is dockerized django project for easy setup and deployment.
 
@@ -22,8 +22,8 @@ Before you begin, ensure you have the following installed:
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/karimoff96/DjangoTemplate.git
-   cd DjangoTemplate
+   git clone https://github.com/karimoff96/Million-halal-mart.git
+   cd 
 
 ## Environment Configuration:
 
