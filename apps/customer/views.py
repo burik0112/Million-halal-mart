@@ -83,7 +83,7 @@ class FavoriteListAPIView(ListAPIView):
     pagination_class = CustomPageNumberPagination
     
     def get_queryset(self):
-        return Favorite.objects.filter(user=self.request.user).order_by("-pk")
+        return Favorite.objects.filter(user=self.request.user.profile).order_by("-pk")
 
 
 class FavoriteRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
