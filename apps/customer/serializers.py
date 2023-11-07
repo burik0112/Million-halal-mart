@@ -39,25 +39,25 @@ class FavoriteSerializer(serializers.ModelSerializer):
         model = Favorite
         fields = "__all__"
 
-class TicketSerializer(serializers.ModelSerializer):
+class TicketForFavouriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = "__all__"
 
-class PhoneSerializer(serializers.ModelSerializer):
+class PhoneFavouriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Phone
         fields = "__all__"
 
-class GoodSerializer(serializers.ModelSerializer):
+class GoodFavouriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Good
         fields = "__all__"
 
 class ProductItemForFavouriteSerializer(serializers.ModelSerializer):
-    tickets = TicketSerializer(read_only=True)
-    phones = PhoneSerializer(read_only=True)
-    goods = GoodSerializer(read_only=True)
+    tickets = TicketForFavouriteSerializer(read_only=True)
+    phones = PhoneFavouriteSerializer(read_only=True)
+    goods = GoodFavouriteSerializer(read_only=True)
 
     class Meta:
         model = ProductItem
