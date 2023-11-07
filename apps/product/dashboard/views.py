@@ -34,24 +34,24 @@ class CreatePhoneView(View):
         )  # request.FILES ni o'tkazish
         if form.is_valid():
             form.save()
-            return redirect("phone-list")
+            return redirect("phone_list")
         return render(request, self.template_name, {"form": form})
+
 
 class PhoneCategoryCreateView(CreateView):
     model = Category
     form_class = PhoneCategoryCreateForm
     template_name = 'product/category_create.html'
-    success_url = reverse_lazy('create_phone')  
+    success_url = reverse_lazy('create_phone')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = 'Create New Phone Category'
         return context
-    
-    def form_valid(self,form):
-        form.instance.main_type = 'p'
-        return super().form_valid(form) 
 
+    def form_valid(self, form):
+        form.instance.main_type = 'p'
+        return super().form_valid(form)
 
 
 class TicketListView(ListView):
