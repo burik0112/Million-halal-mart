@@ -6,6 +6,11 @@ from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
 )
 from rest_framework import generics
+from twilio.rest import Client
+from django.conf import settings
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from .utils import generate_otp
 from .models import Favorite, Location, News, Profile, ViewedNews
 from .serializers import (
@@ -15,6 +20,7 @@ from .serializers import (
     NewsSerializer,
     ProfileSerializer,
     ViewedNewsSerializer,
+    FavoriteListSerializer
 )
 
 # Create your views here.
@@ -70,11 +76,14 @@ class FavoriteCreateAPIView(CreateAPIView):
 
 class FavoriteListAPIView(ListAPIView):
     queryset = Favorite.objects.all().order_by("-pk")
-    serializer_class = FavoriteSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
+    serializer_class = FavoriteListSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]  
     filterset_fields = ["user", "product"]
     search_fields = ["product__name", "user__full_name"]
     pagination_class = CustomPageNumberPagination
+    
+    def get_queryset(self):
+        return Favorite.objects.filter(user=self.request.user.profile).order_by("-pk")
 
 
 class FavoriteRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
@@ -82,11 +91,7 @@ class FavoriteRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     serializer_class = FavoriteSerializer
 
 
-from twilio.rest import Client
-from django.conf import settings
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
+
 
 class SendOTPView(generics.GenericAPIView):
     serializer_class = ProfileSerializer  
