@@ -18,7 +18,12 @@ body {
   background: #f6f9ff;
   color: #444444;
 }
-
+table {
+  margin: 0 auto;
+}
+th, td {
+  text-align: center;
+}
 a {
   color: #4154f1;
   text-decoration: none;
@@ -1231,3 +1236,4 @@ h6 {
   font-size: 13px;
   color: #012970;
 }
+

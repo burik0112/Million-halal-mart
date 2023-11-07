@@ -9,7 +9,7 @@ from .forms import PhoneProductItemForm, TicketProductItemForm, GoodProductItemF
 
 class PhoneListView(ListView):
     model = Phone
-    template_name = "phone_list.html"  # your template name
+    template_name = "product/electronics/phone_list.html"  # your template name
     context_object_name = "phones"
 
     def get_queryset(self):
@@ -21,8 +21,8 @@ class PhoneListView(ListView):
         return context
 
 
-class CreatePhoneView(View):
-    template_name = "product/phone_create.html"
+class PhoneCreateView(View):
+    template_name = "product/electronics/phone_create.html"
 
     def get(self, request):
         form = PhoneProductItemForm()
@@ -56,7 +56,7 @@ class PhoneCategoryCreateView(CreateView):
 
 class TicketListView(ListView):
     model = Ticket
-    template_name = "product/ticket_list.html"  # your template name
+    template_name = "product/tickets/ticket_list.html"  # your template name
     context_object_name = "tickets"
 
     def get_queryset(self):
@@ -68,8 +68,8 @@ class TicketListView(ListView):
         return context
 
 
-class TicketView(View):
-    template_name = "product/ticket_create.html"
+class TicketCreateView(View):
+    template_name = "product/tickets/ticket_create.html"
 
     def get(self, request):
         form = TicketProductItemForm()
@@ -87,7 +87,7 @@ class TicketView(View):
 
 class GoodListView(ListView):
     model = Good
-    template_name = "product/good_list.html"  # your template name
+    template_name = "product/goods/good_list.html"  # your template name
     context_object_name = "goods"
 
     def get_queryset(self):
@@ -100,7 +100,7 @@ class GoodListView(ListView):
 
 
 class GoodView(View):
-    template_name = "product/good_create.html"
+    template_name = "product/goods/good_create.html"
 
     def get(self, request):
         form = GoodProductItemForm()
