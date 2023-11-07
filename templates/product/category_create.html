@@ -4,23 +4,22 @@
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="row">
-      
+
       <!-- First Column -->
-      <div class="col-md-6">      
-        {% comment %} <div class="mb-3">{{ form.main_type.label_tag }} {{ form.main_type }}</div> {% endcomment %}
+      <div class="col-md-6">
+        <div class="mb-3">{{ form.name.label_tag }} {{ form.name }}</div>
         <div class="mb-3">{{ form.stock.label_tag }} {{ form.stock }}</div>
+      </div>
+
+      <!-- Second Column -->
+      <div class="col-md-6">
         <div class="mb-3">
           <label for="id_images">Category image:</label>{{ form.image }}
         </div>
-      </div>
-      
-      <!-- Second Column -->
-      <div class="col-md-6">
-        <div class="mb-3">{{ form.name.label_tag }} {{ form.name }}</div>
         <div class="mb-3">{{ form.bonus.label_tag }} {{ form.bonus }}</div>
       </div>
-      
-      
+
+
       <div class="col-md-12">
         <div class="mb-3">{{ form.desc.label_tag }} {{ form.desc }}</div>
       </div>

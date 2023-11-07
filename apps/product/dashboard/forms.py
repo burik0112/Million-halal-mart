@@ -62,13 +62,14 @@ class PhoneProductItemForm(forms.ModelForm):
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
     )
     stock = forms.IntegerField(
-        widget=forms.NumberInput(attrs={"class": "form-control"})
+        widget=forms.NumberInput(attrs={"class": "form-control"}), required=False, initial=0
     )
     bonus = forms.IntegerField(
-        widget=forms.NumberInput(attrs={"class": "form-control"})
+        widget=forms.NumberInput(attrs={"class": "form-control"}), required=False, initial=0
     )
     active = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        initial=True
     )
     images = (
         MultipleFileField()
@@ -140,13 +141,13 @@ class TicketProductItemForm(forms.ModelForm):
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
     )
     stock = forms.IntegerField(
-        widget=forms.NumberInput(attrs={"class": "form-control"})
+        widget=forms.NumberInput(attrs={"class": "form-control"}), initial=0
     )
     bonus = forms.IntegerField(
-        widget=forms.NumberInput(attrs={"class": "form-control"})
+        widget=forms.NumberInput(attrs={"class": "form-control"}), initial=0
     )
     active = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}), initial=True
     )
     images = (
         MultipleFileField()
