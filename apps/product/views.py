@@ -13,7 +13,9 @@ from .serializers import (
     PhoneSerializer,
     SubCategorySerializer,
     TicketSerializer,
-    TicketPopularSerializer
+    TicketPopularSerializer,
+    PhonePopularSerializer,
+    GoodPopularSerializer
 )
 
 # Create your views here.
@@ -90,6 +92,40 @@ class PopularTicketsAPIView(ListAPIView):
     def get_queryset(self):
        
         return Ticket.objects.annotate(
+            sold_count=Sum('product__sold_products__quantity')
+        ).order_by('-sold_count')
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+class PopularPhonesAPIView(ListAPIView):
+    queryset = Phone.objects.all()
+    serializer_class = PhonePopularSerializer
+    pagination_class = CustomPageNumberPagination
+    
+
+    def get_queryset(self):
+       
+        return Phone.objects.annotate(
+            sold_count=Sum('product__sold_products__quantity')
+        ).order_by('-sold_count')
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+class PopularGoodAPIView(ListAPIView):
+    queryset = Good.objects.all()
+    serializer_class = GoodPopularSerializer
+    pagination_class = CustomPageNumberPagination
+    
+
+    def get_queryset(self):
+       
+        return Good.objects.annotate(
             sold_count=Sum('product__sold_products__quantity')
         ).order_by('-sold_count')
 

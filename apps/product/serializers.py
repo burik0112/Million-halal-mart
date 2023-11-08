@@ -78,3 +78,19 @@ class TicketPopularSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = ['event_name', 'event_date', 'sold_count','product']
+
+class PhonePopularSerializer(serializers.ModelSerializer):
+    product = ProductItemSerializer()
+    sold_count = serializers.IntegerField(read_only=True) 
+
+    class Meta:
+        model = Phone
+        fields = "__all__"
+
+class GoodPopularSerializer(serializers.ModelSerializer):
+    product = ProductItemSerializer()
+    sold_count = serializers.IntegerField(read_only=True) 
+
+    class Meta:
+        model = Good
+        fields = "__all__"
