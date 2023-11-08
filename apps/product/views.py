@@ -88,7 +88,7 @@ class PopularTicketsAPIView(ListAPIView):
     
 
     def get_queryset(self):
-        # Ticketlarni sotilgan miqdori bo'yicha saralash
+       
         return Ticket.objects.annotate(
             sold_count=Sum('product__sold_products__quantity')
         ).order_by('-sold_count')
