@@ -1,6 +1,8 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import ListAPIView
+from django.db.models import Sum, Count
+from rest_framework.response import Response
 
 from .models import Category, Good, Image, Phone, SubCategory, Ticket
 from .serializers import (
@@ -11,6 +13,7 @@ from .serializers import (
     PhoneSerializer,
     SubCategorySerializer,
     TicketSerializer,
+    TicketPopularSerializer
 )
 
 # Create your views here.
@@ -77,3 +80,20 @@ class FamousTickets(ListAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter]  
     filterset_fields = ["product",]
     pagination_class = CustomPageNumberPagination
+
+class PopularTicketsAPIView(ListAPIView):
+    queryset = Ticket.objects.all()
+    serializer_class = TicketPopularSerializer
+    pagination_class = CustomPageNumberPagination
+    
+
+    def get_queryset(self):
+        # Ticketlarni sotilgan miqdori bo'yicha saralash
+        return Ticket.objects.annotate(
+            sold_count=Sum('product__sold_products__quantity')
+        ).order_by('-sold_count')
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

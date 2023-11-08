@@ -70,3 +70,10 @@ class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
         fields = "__all__"
+
+class TicketPopularSerializer(serializers.ModelSerializer):
+    sold_count = serializers.IntegerField(read_only=True) 
+
+    class Meta:
+        model = Ticket
+        fields = ['event_name', 'event_date', 'sold_count']
