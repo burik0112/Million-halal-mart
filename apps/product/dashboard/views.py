@@ -4,7 +4,7 @@ from django.views.generic import ListView
 from ..models import Phone, Ticket, Good, Category
 from django.views import View
 from django.views.generic.edit import CreateView
-from .forms import PhoneProductItemForm, TicketProductItemForm, GoodProductItemForm, PhoneCategoryCreateForm
+from .forms import PhoneProductItemForm, TicketProductItemForm, GoodProductItemForm, PhoneCategoryCreateForm, TicketCategoryCreateForm
 
 
 class PhoneListView(ListView):
@@ -72,6 +72,7 @@ class TicketCreateView(View):
     template_name = "product/tickets/ticket_create.html"
 
     def get(self, request):
+        print('gettttttttttttttttttttttttttttttt')
         form = TicketProductItemForm()
         return render(request, self.template_name, {"form": form})
 
@@ -79,10 +80,28 @@ class TicketCreateView(View):
         form = TicketProductItemForm(
             request.POST, request.FILES
         )  # request.FILES ni o'tkazish
+        print(form)
         if form.is_valid():
             form.save()
+            print(123123123123)
             return redirect("ticket-list")
         return render(request, self.template_name, {"form": form})
+
+
+class TicketCategoryCreateView(CreateView):
+    model = Category
+    form_class = TicketCategoryCreateForm
+    template_name = 'product/category_create.html'
+    success_url = reverse_lazy('ticket_create')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = 'Create New Ticket Category'
+        return context
+
+    def form_valid(self, form):
+        form.instance.main_type = 't'
+        return super().form_valid(form)
 
 
 class GoodListView(ListView):

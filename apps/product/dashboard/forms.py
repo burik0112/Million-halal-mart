@@ -115,6 +115,19 @@ class PhoneCategoryCreateForm(forms.ModelForm):
             'bonus': forms.NumberInput(attrs={'class': 'form-control'}),
             'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+class TicketCategoryCreateForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = [ 'name', 'image', 'desc', 'stock', 'bonus','active']
+        widgets = {
+            # 'main_type': forms.Select(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'desc': forms.Textarea(attrs={'class': 'form-control'}),
+            'stock': forms.NumberInput(attrs={'class': 'form-control'}),
+            'bonus': forms.NumberInput(attrs={'class': 'form-control'}),
+            'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
 
 class TicketProductItemForm(forms.ModelForm):
     class Meta:
@@ -122,7 +135,7 @@ class TicketProductItemForm(forms.ModelForm):
         fields = ["event_name"]
 
     category = forms.ModelChoiceField(
-        queryset=SubCategory.objects.all(),
+        queryset=Category.objects.filter(main_type="t"),
         widget=forms.Select(attrs={"class": "form-control"}),
     )
     event_name = forms.CharField(

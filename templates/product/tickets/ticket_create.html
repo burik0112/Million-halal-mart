@@ -35,7 +35,7 @@
             {{ form.category.label_tag }} {{ form.category }}
           </div>
           <div class="col-md-3 d-flex align-items-center">
-            <a href="{% url 'create_category' %}" class="btn btn-success btn-sm">Add category</a>
+            <a href="{% url 'ticket_category' %}" class="btn btn-success btn-sm">Add category</a>
           </div>
         </div>
         <div class="mb-3">{{ form.price.label_tag }} {{ form.price }}</div>
@@ -46,6 +46,7 @@
       <div class="col-md-12">
         <div class="mb-3">{{ form.desc.label_tag }} {{ form.desc }}</div>
       </div>
+      
       <div class="col-md-12">
         <div class="mb-3">{{ form.active }}Active </div>
       </div>
