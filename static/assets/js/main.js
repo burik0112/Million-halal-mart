@@ -319,3 +319,7 @@
   }
 
 })();
+
+$('#datepicker').datepicker({
+  uiLibrary: 'bootstrap'
+});
