@@ -72,18 +72,16 @@ class TicketCreateView(View):
     template_name = "product/tickets/ticket_create.html"
 
     def get(self, request):
-        print('gettttttttttttttttttttttttttttttt')
         form = TicketProductItemForm()
         return render(request, self.template_name, {"form": form})
 
     def post(self, request):
         form = TicketProductItemForm(
             request.POST, request.FILES
-        )  # request.FILES ni o'tkazish
-        print(form)
+        )
         if form.is_valid():
+            print(123123123213123)
             form.save()
-            print(123123123123)
             return redirect("ticket-list")
         return render(request, self.template_name, {"form": form})
 

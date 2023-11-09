@@ -34,7 +34,8 @@ class MultipleFileField(forms.ImageField):
 class PhoneProductItemForm(forms.ModelForm):
     class Meta:
         model = Phone
-        fields = ['model_name', 'ram', 'storage','category','color', 'condition']
+        fields = ['model_name', 'ram', 'storage',
+                  'category', 'color', 'condition']
         widgets = {
             'model_name': forms.TextInput(attrs={'class': 'form-control'}),
             'ram': forms.Select(attrs={'class': 'form-control'}),
@@ -88,7 +89,8 @@ class PhoneProductItemForm(forms.ModelForm):
         if commit:
             product_item.save()
             phone.product = product_item
-            phone.category = self.cleaned_data['category']  # Category field added
+            # Category field added
+            phone.category = self.cleaned_data['category']
             phone.save()
 
             # Save multiple images
@@ -105,7 +107,7 @@ class PhoneProductItemForm(forms.ModelForm):
 class PhoneCategoryCreateForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = [ 'name', 'image', 'desc', 'stock', 'bonus','active']
+        fields = ['name', 'image', 'desc', 'stock', 'bonus', 'active']
         widgets = {
             # 'main_type': forms.Select(attrs={'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -115,10 +117,12 @@ class PhoneCategoryCreateForm(forms.ModelForm):
             'bonus': forms.NumberInput(attrs={'class': 'form-control'}),
             'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+
 class TicketCategoryCreateForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = [ 'name', 'image', 'desc', 'stock', 'bonus','active']
+        fields = ['name', 'image', 'desc', 'stock', 'bonus', 'active']
         widgets = {
             # 'main_type': forms.Select(attrs={'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -128,12 +132,16 @@ class TicketCategoryCreateForm(forms.ModelForm):
             'bonus': forms.NumberInput(attrs={'class': 'form-control'}),
             'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
 
 class TicketProductItemForm(forms.ModelForm):
     class Meta:
         model = Ticket
         fields = ["event_name"]
-
+        widgets = {
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            # Add more fields here
+        }
     category = forms.ModelChoiceField(
         queryset=Category.objects.filter(main_type="t"),
         widget=forms.Select(attrs={"class": "form-control"}),
@@ -170,19 +178,18 @@ class TicketProductItemForm(forms.ModelForm):
     def save(self, commit=True):
         ticket = super().save(commit=False)
         product_item = ProductItem(
-            category=self.cleaned_data["category"],
-            name=self.cleaned_data["name"],
             desc=self.cleaned_data["desc"],
             price=self.cleaned_data["price"],
             available_quantity=self.cleaned_data["available_quantity"],
             stock=self.cleaned_data["stock"],
             bonus=self.cleaned_data["bonus"],
             active=self.cleaned_data["active"],
-            event_date=self.cleaned_data["event_date"],
         )
         if commit:
             product_item.save()
             ticket.product = product_item
+            # Category field added
+            ticket.category = self.cleaned_data['category']
             ticket.save()
 
             # Save multiple images
