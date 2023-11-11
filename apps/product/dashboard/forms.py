@@ -140,14 +140,19 @@ class TicketProductItemForm(forms.ModelForm):
         fields = ["event_name"]
         widgets = {
             'category': forms.Select(attrs={'class': 'form-control'}),
-            # Add more fields here
+            'event_name': forms.TextInput(attrs={'class': 'form-control'}),
+            # 'event_date': forms.DateInput(
+            #     attrs={'type': 'date', 'placeholder': 'yyyy-mm-dd (DOB)', 'class': 'form-control'}
+            # )
         }
+    
     category = forms.ModelChoiceField(
         queryset=Category.objects.filter(main_type="t"),
         widget=forms.Select(attrs={"class": "form-control"}),
     )
-    event_name = forms.CharField(
-        max_length=255, widget=forms.TextInput(attrs={"class": "form-control"})
+    event_date = forms.DateTimeField(
+        input_formats=['%Y-%m-%d'],  # Adjust the format as needed
+        widget=forms.DateTimeInput(attrs={"type": "date", "class": "form-control"})
     )
     desc = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
@@ -173,7 +178,7 @@ class TicketProductItemForm(forms.ModelForm):
     images = (
         MultipleFileField()
     )  # New field for multiple images # New field for multiple images
-    event_date = forms.DateTimeField()
+    
 
     def save(self, commit=True):
         ticket = super().save(commit=False)
@@ -196,7 +201,7 @@ class TicketProductItemForm(forms.ModelForm):
             for img in self.files.getlist("images"):
                 image = Image(
                     image=img,
-                    name=f"{self.cleaned_data['name']}_{img.name}",
+                    name=f"{self.cleaned_data['event_name']}_{img.name}",
                     product=product_item,
                 )
                 image.save()

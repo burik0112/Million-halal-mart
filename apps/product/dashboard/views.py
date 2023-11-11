@@ -80,10 +80,11 @@ class TicketCreateView(View):
             request.POST, request.FILES
         )
         if form.is_valid():
-            print(123123123213123)
             form.save()
             return redirect("ticket-list")
-        return render(request, self.template_name, {"form": form})
+        else:
+            print(form.errors)
+            return render(request, self.template_name, {"form": form})
 
 
 class TicketCategoryCreateView(CreateView):
