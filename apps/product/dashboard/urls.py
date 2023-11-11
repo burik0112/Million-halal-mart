@@ -7,7 +7,9 @@ from .views import (
     GoodListView,
     GoodView,
     PhoneCategoryCreateView,
-    TicketCategoryCreateView
+    TicketCategoryCreateView,
+    PhoneEditDeleteView,
+    PhoneDeleteView,
 )
 
 urlpatterns = [
@@ -19,4 +21,7 @@ urlpatterns = [
     path("tickets/", TicketListView.as_view(), name="ticket-list"),
     path("good-create/", GoodView.as_view(), name="good_create"),
     path("goods/", GoodListView.as_view(), name="good-list"),
+    
+    path('phones/edit-delete/<int:pk>/', PhoneEditDeleteView.as_view(), name='edit_delete_phone'),
+    path('phone/<int:pk>/delete/', PhoneDeleteView.as_view(), name='delete_phone'),
 ]
