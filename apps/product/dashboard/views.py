@@ -1,10 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView
 from ..models import Phone, Ticket, Good, Category
 from django.views import View
 from django.views.generic.edit import CreateView
-from .forms import PhoneProductItemForm, TicketProductItemForm, GoodProductItemForm, PhoneCategoryCreateForm, TicketCategoryCreateForm
+from .forms import PhoneProductItemForm, TicketProductItemForm, GoodProductItemForm, PhoneCategoryCreateForm, TicketCategoryCreateForm, PhoneEditForm
 
 
 class PhoneListView(ListView):
@@ -132,3 +132,35 @@ class GoodView(View):
             form.save()
             return redirect("good-list")
         return render(request, self.template_name, {"form": form})
+
+
+class PhoneEditDeleteView(View):
+    template_name = 'product/electronics/edit_delete_phone.html'
+
+    def get(self, request, pk):
+        phone = get_object_or_404(Phone, pk=pk)
+        print("Debug: phone object:", phone, "ID:", phone.id) 
+        form = PhoneEditForm(instance=phone)
+        return render(request, self.template_name, {'form': form, 'phone': phone})
+
+    def post(self, request, pk):
+        phone = get_object_or_404(Phone, pk=pk)
+        if 'edit' in request.POST:
+            form = PhoneEditForm(request.POST, instance=phone)
+            if form.is_valid():
+                form.save()
+                return redirect('phone_list')  # Redirect to phone list or detail view
+        elif 'delete' in request.POST:
+            product_item = phone.product
+            phone.delete()  # Delete the Phone instance
+            product_item.delete()  # Delete the associated ProductItem
+            return redirect('phone_list')  # Redirect to phone list
+        return render(request, self.template_name, {'form': form, 'phone': phone})
+    
+class PhoneDeleteView(View):
+    def post(self, request, pk):
+        phone = get_object_or_404(Phone, pk=pk)
+        product_item = phone.product
+        phone.delete()  # Delete the Phone instance
+        product_item.delete()  # Delete the associated ProductItem
+        return redirect('phone_list')  # Redirect to phone list
