@@ -5,23 +5,27 @@ from .views import (
     TicketCreateView,
     TicketListView,
     GoodListView,
-    GoodView,
+    GoodCreateView,
     PhoneCategoryCreateView,
     TicketCategoryCreateView,
     PhoneEditDeleteView,
     PhoneDeleteView,
+    GoodCategoryCreateView
 )
 
 urlpatterns = [
     path("create-phone/", PhoneCreateView.as_view(), name="create_phone"),
     path("phone-category/", PhoneCategoryCreateView.as_view(), name="phone_category"),
     path("phones/", PhoneListView.as_view(), name="phone_list"),
+    path('phones/edit-delete/<int:pk>/', PhoneEditDeleteView.as_view(), name='edit_delete_phone'),
+    path('phone/<int:pk>/delete/', PhoneDeleteView.as_view(), name='delete_phone'),
+
     path("ticket-create/", TicketCreateView.as_view(), name="ticket_create"),
     path("ticket-category/", TicketCategoryCreateView.as_view(), name="ticket_category"),
     path("tickets/", TicketListView.as_view(), name="ticket-list"),
-    path("good-create/", GoodView.as_view(), name="good_create"),
+
+    path("good-create/", GoodCreateView.as_view(), name="good_create"),
+    path("good-category/", GoodCategoryCreateView.as_view(), name="good_category"),
     path("goods/", GoodListView.as_view(), name="good-list"),
     
-    path('phones/edit-delete/<int:pk>/', PhoneEditDeleteView.as_view(), name='edit_delete_phone'),
-    path('phone/<int:pk>/delete/', PhoneDeleteView.as_view(), name='delete_phone'),
 ]

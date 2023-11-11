@@ -209,7 +209,6 @@ class GoodCategoryCreateForm(forms.ModelForm):
         model = Category
         fields = ['name', 'image', 'desc', 'stock', 'bonus', 'active']
         widgets = {
-            # 'main_type': forms.Select(attrs={'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'desc': forms.Textarea(attrs={'class': 'form-control'}),
@@ -241,7 +240,10 @@ class GoodProductItemForm(forms.ModelForm):
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
-
+    measure = forms.ChoiceField(
+        choices=ProductItem.CHOICES, 
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
     available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
     )
@@ -269,6 +271,7 @@ class GoodProductItemForm(forms.ModelForm):
             price=self.cleaned_data["price"],
             available_quantity=self.cleaned_data["available_quantity"],
             stock=self.cleaned_data["stock"],
+            measure=self.cleaned_data["measure"],
             bonus=self.cleaned_data["bonus"],
             active=self.cleaned_data["active"],
             expire_date=self.cleaned_data["expire_date"],
