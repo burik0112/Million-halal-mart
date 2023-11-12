@@ -222,8 +222,16 @@ class GoodCategoryCreateForm(forms.ModelForm):
 class GoodProductItemForm(forms.ModelForm):
     class Meta:
         model = Good
-        fields = ["name", "ingredients", "expire_date"]
-
+        fields = ['category', 'name', 'expire_date', 'ingredients', ]
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'ingredients': forms.TextInput(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'expire_date': forms.DateTimeField(
+                input_formats=['%Y-%m-%d'],  # Adjust the format as needed
+                widget=forms.DateTimeInput(
+                    attrs={"type": "date", "class": "form-control"})
+            )}
     category = forms.ModelChoiceField(
         queryset=SubCategory.objects.all(),
         widget=forms.Select(attrs={"class": "form-control"}),
@@ -261,7 +269,11 @@ class GoodProductItemForm(forms.ModelForm):
     images = (
         MultipleFileField()
     )  # New field for multiple images # New field for multiple images
-    expire_date = forms.DateTimeField()
+    expire_date = forms.DateTimeField(
+        input_formats=['%Y-%m-%d'],  # Adjust the format as needed
+        widget=forms.DateTimeInput(
+            attrs={"type": "date", "class": "form-control"})
+    )
 
     def save(self, commit=True):
         good = super().save(commit=False)

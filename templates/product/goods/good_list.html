@@ -35,8 +35,7 @@
               <th scope="row" class="text-center">{{ good.id }}</th>
               <td class="text-center">{{ good.name }}</td>
               <td class="text-center">
-                <img src="{{ good.product.images.first.image.url }}" alt="{{ good.name }}" width="50"
-                  height="50" />
+                <img src="{{ good.product.images.first.image.url }}" alt="{{ good.name }}" width="50" height="50" />
               </td>
               <td class="text-center">{{ good.category }}</td>
               <td class="text-center">{{ good.ingredients }}</td>
@@ -45,8 +44,8 @@
               <td class="text-center">{{ good.product.get_measure_display }}</td>
               <td class="text-center">{{ good.product.available_quantity }}</td>
               <td class="text-center">{{ good.expire_date }}</td>
-              <td class="text-center">{{ good.product.stock }}</td>
-              <td class="text-center">{{ good.product.bonus }}</td>
+              <td class="text-center">{{ good.product.stock }} %</td>
+              <td class="text-center">{{ good.product.bonus }} %</td>
               {% if good.product.active %}
                 <td ><img src="{% static 'assets/img/check.png' %}" height="20" width="20" alt="Mavjud"></td>
               {% else %}

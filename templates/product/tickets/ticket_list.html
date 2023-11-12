@@ -40,8 +40,8 @@
               <td class="text-center">{{ ticket.event_date }}</td>
               <td class="text-center">₩{{ ticket.product.price }}</td>
               <td class="text-center">{{ ticket.product.available_quantity }}</td>
-              <td class="text-center">{{ ticket.product.stock }}</td>
-              <td class="text-center">{{ ticket.product.bonus }}</td>
+              <td class="text-center">{{ ticket.product.stock }} %</td>
+              <td class="text-center">{{ ticket.product.bonus }} %</td>
             {% if ticket.product.active %}
               <td ><img src="{% static 'assets/img/check.png' %}" height="20" width="20" alt="Mavjud"></td>
             {% else %}
