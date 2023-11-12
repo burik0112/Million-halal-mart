@@ -142,14 +142,15 @@ class TicketProductItemForm(forms.ModelForm):
             'category': forms.Select(attrs={'class': 'form-control'}),
             'event_name': forms.TextInput(attrs={'class': 'form-control'}),
         }
-    
+
     category = forms.ModelChoiceField(
         queryset=Category.objects.filter(main_type="t"),
         widget=forms.Select(attrs={"class": "form-control"}),
     )
     event_date = forms.DateTimeField(
         input_formats=['%Y-%m-%d'],  # Adjust the format as needed
-        widget=forms.DateTimeInput(attrs={"type": "date", "class": "form-control"})
+        widget=forms.DateTimeInput(
+            attrs={"type": "date", "class": "form-control"})
     )
     desc = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
@@ -175,7 +176,6 @@ class TicketProductItemForm(forms.ModelForm):
     images = (
         MultipleFileField()
     )  # New field for multiple images # New field for multiple images
-    
 
     def save(self, commit=True):
         ticket = super().save(commit=False)
@@ -204,6 +204,7 @@ class TicketProductItemForm(forms.ModelForm):
                 image.save()
         return ticket
 
+
 class GoodCategoryCreateForm(forms.ModelForm):
     class Meta:
         model = Category
@@ -216,6 +217,7 @@ class GoodCategoryCreateForm(forms.ModelForm):
             'bonus': forms.NumberInput(attrs={'class': 'form-control'}),
             'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
 
 class GoodProductItemForm(forms.ModelForm):
     class Meta:
@@ -241,7 +243,7 @@ class GoodProductItemForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
     measure = forms.ChoiceField(
-        choices=ProductItem.CHOICES, 
+        choices=ProductItem.CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
     available_quantity = forms.IntegerField(
@@ -294,40 +296,39 @@ class GoodProductItemForm(forms.ModelForm):
 
 class PhoneEditForm(forms.ModelForm):
     product_desc = forms.CharField(
-        required=False, 
+        required=False,
         widget=forms.Textarea(attrs={'class': 'form-control'})
     )
     product_price = forms.DecimalField(
-        decimal_places=1, 
-        max_digits=10, 
+        decimal_places=1,
+        max_digits=10,
         widget=forms.NumberInput(attrs={'class': 'form-control'})
     )
     product_measure = forms.ChoiceField(
-        choices=ProductItem.CHOICES, 
+        choices=ProductItem.CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
     product_available_quantity = forms.IntegerField(
-        min_value=0, 
+        min_value=0,
         widget=forms.NumberInput(attrs={'class': 'form-control'})
     )
     product_stock = forms.IntegerField(
-        min_value=0, 
+        min_value=0,
         widget=forms.NumberInput(attrs={'class': 'form-control'})
     )
     product_bonus = forms.IntegerField(
-        min_value=0, 
+        min_value=0,
         widget=forms.NumberInput(attrs={'class': 'form-control'})
     )
     product_active = forms.BooleanField(
-        required=False, 
+        required=False,
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
 
-
     class Meta:
         model = Phone
-        fields = ['model_name', 'color', 'condition', 'ram', 'storage', 'category', 
-                  'product_desc', 'product_price', 'product_measure', 
+        fields = ['model_name', 'color', 'condition', 'ram', 'storage', 'category',
+                  'product_desc', 'product_price', 'product_measure',
                   'product_available_quantity', 'product_stock', 'product_bonus', 'product_active']
         widgets = {
             'model_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -366,3 +367,70 @@ class PhoneEditForm(forms.ModelForm):
             product_item.save()
             phone.save()
         return phone
+
+
+class TicketEditForm(forms.ModelForm):
+    product_desc = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control'})
+    )
+    product_price = forms.DecimalField(
+        decimal_places=1,
+        max_digits=10,
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+
+    product_available_quantity = forms.IntegerField(
+        min_value=0,
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+    product_stock = forms.IntegerField(
+        min_value=0,
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+    product_bonus = forms.IntegerField(
+        min_value=0,
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+    product_active = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+
+    class Meta:
+        model = Ticket
+        exclude = ['event_date']
+        fields = ['event_name', 'event_date', 'category',
+                  'product_desc', 'product_price', 'product_available_quantity', 'product_stock', 'product_bonus', 'product_active']
+        widgets = {
+            'event_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'event_date': forms.Select(attrs={'class': 'form-select'}),
+            'category': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(TicketEditForm, self).__init__(*args, **kwargs)
+        if self.instance and self.instance.product:
+            product = self.instance.product
+            self.fields['product_desc'].initial = product.desc
+            self.fields['product_price'].initial = product.price
+            self.fields['product_available_quantity'].initial = product.available_quantity
+            self.fields['product_stock'].initial = product.stock
+            self.fields['product_bonus'].initial = product.bonus
+            self.fields['product_active'].initial = product.active
+
+    def save(self, commit=True):
+        ticket = super(TicketEditForm, self).save(commit=False)
+        if not ticket.product_id:
+            ticket.product = ProductItem()
+        product_item = ticket.product
+        product_item.desc = self.cleaned_data['product_desc']
+        product_item.price = self.cleaned_data['product_price']
+        product_item.available_quantity = self.cleaned_data['product_available_quantity']
+        product_item.stock = self.cleaned_data['product_stock']
+        product_item.bonus = self.cleaned_data['product_bonus']
+        product_item.active = self.cleaned_data['product_active']
+        if commit:
+            product_item.save()
+            ticket.save()
+        return ticket

@@ -10,7 +10,9 @@ from .views import (
     TicketCategoryCreateView,
     PhoneEditDeleteView,
     PhoneDeleteView,
-    GoodCategoryCreateView
+    GoodCategoryCreateView,
+    TicketDeleteView,
+    TicketEditDeleteView
 )
 
 urlpatterns = [
@@ -23,6 +25,8 @@ urlpatterns = [
     path("ticket-create/", TicketCreateView.as_view(), name="ticket_create"),
     path("ticket-category/", TicketCategoryCreateView.as_view(), name="ticket_category"),
     path("tickets/", TicketListView.as_view(), name="ticket-list"),
+    path('ticket/edit-delete/<int:pk>/', TicketEditDeleteView.as_view(), name='edit_delete_ticket'),
+    path('ticket/<int:pk>/delete/', TicketDeleteView.as_view(), name='delete_ticket'),
 
     path("good-create/", GoodCreateView.as_view(), name="good_create"),
     path("good-category/", GoodCategoryCreateView.as_view(), name="good_category"),
