@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView
-from ..models import Phone, Ticket, Good, Category
+from ..models import Phone, Ticket, Good, Category, SubCategory
 from django.views import View
 from django.views.generic.edit import CreateView
 from .forms import PhoneProductItemForm, TicketProductItemForm, GoodProductItemForm, PhoneCategoryCreateForm, TicketCategoryCreateForm, PhoneEditForm, GoodCategoryCreateForm, TicketEditForm
@@ -117,7 +117,7 @@ class GoodListView(ListView):
 
 
 class GoodCategoryCreateView(CreateView):
-    model = Category
+    model = SubCategory
     form_class = GoodCategoryCreateForm
     template_name = 'product/category_create.html'
     success_url = reverse_lazy('good_create')
@@ -128,7 +128,7 @@ class GoodCategoryCreateView(CreateView):
         return context
 
     def form_valid(self, form):
-        form.instance.main_type = 'g'
+        form.instance.main_type = 'f'
         return super().form_valid(form)
 
 
