@@ -1,6 +1,9 @@
 from django import forms
 from django.forms import ClearableFileInput
-from ..models import Phone, ProductItem, SubCategory, Image, Ticket, Good, Category
+from ..models import (Phone, ProductItem, SubCategory,
+                      Image, Ticket, Good, Category)
+
+from apps.customer.models import News
 
 
 class MultipleFileInput(forms.ClearableFileInput):
@@ -446,3 +449,14 @@ class TicketEditForm(forms.ModelForm):
             product_item.save()
             ticket.save()
         return ticket
+
+
+class NewsForm(forms.ModelForm):
+    class Meta:
+        model = News
+        fields = ['title', 'description', 'image', 'active']
+
+    widgets = {
+        'start_date': forms.TextInput(attrs={'type': 'datetime-local'}),
+        'end_date': forms.TextInput(attrs={'type': 'datetime-local'}),
+    }

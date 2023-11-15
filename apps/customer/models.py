@@ -21,6 +21,7 @@ class Location(TimeStampedModel, models.Model):
 
 
 class News(TimeStampedModel, models.Model):
+    title=models.CharField(max_length=255, blank=True, null=True)
     start_date = models.DateTimeField(auto_now=True)
     end_date = models.DateTimeField(auto_now=True)
     description = models.TextField()

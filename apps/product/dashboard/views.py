@@ -2,9 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView
 from ..models import Phone, Ticket, Good, Category, SubCategory
+from apps.customer.models import News
 from django.views import View
 from django.views.generic.edit import CreateView
-from .forms import PhoneProductItemForm, TicketProductItemForm, GoodProductItemForm, PhoneCategoryCreateForm, TicketCategoryCreateForm, PhoneEditForm, GoodCategoryCreateForm, TicketEditForm
+from .forms import (PhoneProductItemForm, NewsForm, TicketProductItemForm, GoodProductItemForm, PhoneCategoryCreateForm,
+                    TicketCategoryCreateForm, PhoneEditForm, GoodCategoryCreateForm, TicketEditForm, NewsForm)
 
 
 class PhoneListView(ListView):
@@ -212,3 +214,35 @@ class TicketDeleteView(View):
         ticket.delete()  # Delete the Phone instance
         product_item.delete()  # Delete the associated ProductItem
         return redirect('ticket-list')  # Redirect to phone list
+
+
+class NewsListView(ListView):
+    model = News
+    template_name = "customer/news/news_list.html"
+    context_object_name = "news"
+
+    def get_queryset(self):
+        return News.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class NewsCreateView(View):
+    template_name = "customer/news/news_create.html"
+
+    def get(self, request):
+        form = NewsForm()
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request):
+        form = NewsForm(
+            request.POST, request.FILES
+        )
+        if form.is_valid():
+            form.save()
+            return redirect("news-list")
+        else:
+            print(form.errors)
+            return render(request, self.template_name, {"form": form})
