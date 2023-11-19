@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
 from model_utils.models import TimeStampedModel
-import uuid
 
 # Create your models here.
 class Profile(TimeStampedModel, models.Model):
