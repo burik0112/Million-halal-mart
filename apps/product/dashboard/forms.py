@@ -281,17 +281,12 @@ class GoodProductItemForm(forms.ModelForm):
     def save(self, commit=True):
         good = super().save(commit=False)
         product_item = ProductItem(
-            category=self.cleaned_data["category"],
-            name=self.cleaned_data["name"],
-            ingredients=self.cleaned_data["ingredients"],
             desc=self.cleaned_data["desc"],
             price=self.cleaned_data["price"],
             available_quantity=self.cleaned_data["available_quantity"],
             stock=self.cleaned_data["stock"],
-            measure=self.cleaned_data["measure"],
             bonus=self.cleaned_data["bonus"],
             active=self.cleaned_data["active"],
-            expire_date=self.cleaned_data["expire_date"],
         )
         if commit:
             product_item.save()
@@ -450,6 +445,81 @@ class TicketEditForm(forms.ModelForm):
             ticket.save()
         return ticket
 
+class GoodEditForm(forms.ModelForm):
+    # Fields for the Good model
+    name = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    ingredients = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control'})
+    )
+    expire_date = forms.DateField(
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
+    )
+
+    # Fields for the related ProductItem
+    product_desc = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control'})
+    )
+    product_price = forms.DecimalField(
+        decimal_places=2,
+        max_digits=10,
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+    product_available_quantity = forms.IntegerField(
+        min_value=0,
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+    product_stock = forms.IntegerField(
+        min_value=0,
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+    product_bonus = forms.IntegerField(
+        min_value=0,
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+    product_active = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+
+    class Meta:
+        model = Good
+        fields = ['name', 'ingredients', 'expire_date', 'sub_cat', 
+                  'product_desc', 'product_price', 'product_available_quantity', 
+                  'product_stock', 'product_bonus', 'product_active']
+        widgets = {
+            'sub_cat': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(GoodEditForm, self).__init__(*args, **kwargs)
+        if self.instance and self.instance.product:
+            product = self.instance.product
+            self.fields['product_desc'].initial = product.desc
+            self.fields['product_price'].initial = product.price
+            self.fields['product_available_quantity'].initial = product.available_quantity
+            self.fields['product_stock'].initial = product.stock
+            self.fields['product_bonus'].initial = product.bonus
+            self.fields['product_active'].initial = product.active
+
+    def save(self, commit=True):
+        good = super(GoodEditForm, self).save(commit=False)
+        if not good.product_id:
+            good.product = ProductItem()
+        product_item = good.product
+        product_item.desc = self.cleaned_data['product_desc']
+        product_item.price = self.cleaned_data['product_price']
+        product_item.available_quantity = self.cleaned_data['product_available_quantity']
+        product_item.stock = self.cleaned_data['product_stock']
+        product_item.bonus = self.cleaned_data['product_bonus']
+        product_item.active = self.cleaned_data['product_active']
+        if commit:
+            product_item.save()
+            good.save()
+        return good
 
 class NewsForm(forms.ModelForm):
     class Meta:

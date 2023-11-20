@@ -6,7 +6,7 @@ from apps.customer.models import News
 from django.views import View
 from django.views.generic.edit import CreateView
 from .forms import (PhoneProductItemForm, NewsForm, TicketProductItemForm, GoodProductItemForm, PhoneCategoryCreateForm,
-                    TicketCategoryCreateForm, PhoneEditForm, GoodCategoryCreateForm, TicketEditForm, NewsForm)
+                    TicketCategoryCreateForm, PhoneEditForm, GoodCategoryCreateForm, TicketEditForm, NewsForm,GoodEditForm)
 
 
 class PhoneListView(ListView):
@@ -150,6 +150,27 @@ class GoodCreateView(View):
             return redirect("good-list")
         return render(request, self.template_name, {"form": form})
 
+class GoodEditDeleteView(View):
+    template_name = 'product/goods/good_edit.html'
+
+    def get(self, request, pk):
+        good = get_object_or_404(Good, pk=pk)
+        form = GoodEditForm(instance=good)
+        return render(request, self.template_name, {'form': form, 'good': good})
+
+    def post(self, request, pk):
+        good = get_object_or_404(Good, pk=pk)
+        if 'edit' in request.POST:
+            form = GoodEditForm(request.POST, instance=good)
+            if form.is_valid():
+                form.save()
+                return redirect('good-list')
+        elif 'delete' in request.POST:
+            product_item = good.product
+            good.delete()  # Delete the Phone instance
+            product_item.delete()  # Delete the associated ProductItem
+            return redirect('good-list')  # Redirect to phone list
+        return render(request, self.template_name, {'form': form, 'good': good})
 
 class PhoneEditDeleteView(View):
     template_name = 'product/electronics/edit_delete_phone.html'
@@ -215,6 +236,13 @@ class TicketDeleteView(View):
         product_item.delete()  # Delete the associated ProductItem
         return redirect('ticket-list')  # Redirect to phone list
 
+class GoodDeleteView(View):
+    def post(self, request, pk):
+        ticket = get_object_or_404(Good, pk=pk)
+        product_item = ticket.product
+        ticket.delete()  # Delete the Phone instance
+        product_item.delete()  # Delete the associated ProductItem
+        return redirect('good-list')  # Redirect to phone list
 
 class NewsListView(ListView):
     model = News
