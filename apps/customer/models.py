@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
 from model_utils.models import TimeStampedModel
-import uuid
 
 # Create your models here.
 class Profile(TimeStampedModel, models.Model):
@@ -21,6 +20,7 @@ class Location(TimeStampedModel, models.Model):
 
 
 class News(TimeStampedModel, models.Model):
+    title=models.CharField(max_length=255, blank=True, null=True)
     start_date = models.DateTimeField(auto_now=True)
     end_date = models.DateTimeField(auto_now=True)
     description = models.TextField()

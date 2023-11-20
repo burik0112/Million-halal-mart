@@ -6,7 +6,7 @@
   {% csrf_token %} {{ form.as_p }}
   <button type="submit" class="btn btn-primary" name="edit">Save Changes</button>
   <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteConfirmModal" id="yourDeleteButtonId">
-    Delete Phone
+    Delete Ticket
 </button>
 </form>
 
@@ -20,11 +20,11 @@
           </button>
         </div>
         <div class="modal-body">
-          Are you sure you want to delete this phone?
+          Are you sure you want to delete this ticket?
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          <form method="post" action="{% url 'delete_phone' phone.id %}">
+          <form method="post" action="{% url 'delete_ticket' ticket.id %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger">Delete</button>
           </form>

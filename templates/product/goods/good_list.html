@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+{% load static %}
 <div class="row">
   <div class="col-lg-12">
     <div class="card">
@@ -12,15 +13,16 @@
           <thead>
             <tr>
               <th scope="col">#</th>
-              <th scope="col">Category</th>
               <th scope="col">Name</th>
+              <th scope="col">Image</th>
+              <th scope="col">Category</th>
               <th scope="col">Ingredients</th>
               <th scope="col">Description</th>
               <th scope="col">Price</th>
               <th scope="col">Measure</th>
               <th scope="col">Available Quantity</th>
-              <th scope="col">Stock</th>
               <th scope="col">Expire date</th>
+              <th scope="col">Stock</th>
               <th scope="col">Bonus</th>
               <th scope="col">Active</th>
               <th scope="col">Actions</th>
@@ -28,24 +30,32 @@
           </thead>
           <tbody>
             <!-- Loop through your phone products here -->
+            {% for good in goods %}
             <tr>
-              <th scope="row">1</th>
-              <td>Smartphones</td>
-              <td>Ingredients</td>
-              <td>iPhone 13</td>
-              <td>Latest iPhone model</td>
-              <td>$999</td>
-              <td>Unit</td>
-              <td>10</td>
-              <td>100</td>
-              <td>23.10.2023</td>
-              <td>50</td>
-              <td>True</td>
-              <td>
-                <button class="btn btn-primary btn-sm">Edit</button>
-                <button class="btn btn-danger btn-sm">Delete</button>
+              <th scope="row" class="text-center">{{ good.id }}</th>
+              <td class="text-center">{{ good.name }}</td>
+              <td class="text-center">
+                <img src="{{ good.product.images.first.image.url }}" alt="{{ good.name }}" width="50" height="50" />
               </td>
+              <td class="text-center">{{ good.category }}</td>
+              <td class="text-center">{{ good.ingredients }}</td>
+              <td class="text-center">{{ good.product.desc }}</td>
+              <td class="text-center">₩{{ good.product.price }}</td>
+              <td class="text-center">{{ good.product.get_measure_display }}</td>
+              <td class="text-center">{{ good.product.available_quantity }}</td>
+              <td class="text-center">{{ good.expire_date }}</td>
+              <td class="text-center">{{ good.product.stock }} %</td>
+              <td class="text-center">{{ good.product.bonus }} %</td>
+              {% if good.product.active %}
+                <td ><img src="{% static 'assets/img/check.png' %}" height="20" width="20" alt="Mavjud"></td>
+              {% else %}
+                <td ><img src="{% static 'assets/img/cancel.png' %}" height="20" width="20" alt="Mavjud emas"></td>
+              {% endif %}
+                <td class="text-center">
+                  <a href="" class="btn btn-primary btn-sm">Edit</a>
+                </td>
             </tr>
+            {% endfor %}
             <!-- End loop -->
           </tbody>
         </table>

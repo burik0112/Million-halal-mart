@@ -14,3 +14,4 @@ requests
 drf-yasg==1.21.6
 coreapi
 twilio
+django-modeltranslation

@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView
-from ..models import Phone, Ticket, Good, Category
+from ..models import Phone, Ticket, Good, Category, SubCategory
+from apps.customer.models import News
 from django.views import View
 from django.views.generic.edit import CreateView
-from .forms import PhoneProductItemForm, TicketProductItemForm, GoodProductItemForm, PhoneCategoryCreateForm, TicketCategoryCreateForm, PhoneEditForm
+from .forms import (PhoneProductItemForm, NewsForm, TicketProductItemForm, GoodProductItemForm, PhoneCategoryCreateForm,
+                    TicketCategoryCreateForm, PhoneEditForm, GoodCategoryCreateForm, TicketEditForm, NewsForm)
 
 
 class PhoneListView(ListView):
@@ -105,7 +107,7 @@ class TicketCategoryCreateView(CreateView):
 
 class GoodListView(ListView):
     model = Good
-    template_name = "product/goods/good_list.html"  # your template name
+    template_name = "product/goods/good_list.html"
     context_object_name = "goods"
 
     def get_queryset(self):
@@ -113,11 +115,26 @@ class GoodListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Add any extra context here
         return context
 
 
-class GoodView(View):
+class GoodCategoryCreateView(CreateView):
+    model = SubCategory
+    form_class = GoodCategoryCreateForm
+    template_name = 'product/category_create.html'
+    success_url = reverse_lazy('good_create')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = 'Create New Good Category'
+        return context
+
+    def form_valid(self, form):
+        form.instance.main_type = 'f'
+        return super().form_valid(form)
+
+
+class GoodCreateView(View):
     template_name = "product/goods/good_create.html"
 
     def get(self, request):
@@ -139,7 +156,6 @@ class PhoneEditDeleteView(View):
 
     def get(self, request, pk):
         phone = get_object_or_404(Phone, pk=pk)
-        print("Debug: phone object:", phone, "ID:", phone.id) 
         form = PhoneEditForm(instance=phone)
         return render(request, self.template_name, {'form': form, 'phone': phone})
 
@@ -149,14 +165,16 @@ class PhoneEditDeleteView(View):
             form = PhoneEditForm(request.POST, instance=phone)
             if form.is_valid():
                 form.save()
-                return redirect('phone_list')  # Redirect to phone list or detail view
+                # Redirect to phone list or detail view
+                return redirect('phone_list')
         elif 'delete' in request.POST:
             product_item = phone.product
             phone.delete()  # Delete the Phone instance
             product_item.delete()  # Delete the associated ProductItem
             return redirect('phone_list')  # Redirect to phone list
         return render(request, self.template_name, {'form': form, 'phone': phone})
-    
+
+
 class PhoneDeleteView(View):
     def post(self, request, pk):
         phone = get_object_or_404(Phone, pk=pk)
@@ -164,3 +182,67 @@ class PhoneDeleteView(View):
         phone.delete()  # Delete the Phone instance
         product_item.delete()  # Delete the associated ProductItem
         return redirect('phone_list')  # Redirect to phone list
+
+
+class TicketEditDeleteView(View):
+    template_name = 'product/tickets/edit_delete_ticket.html'
+
+    def get(self, request, pk):
+        ticket = get_object_or_404(Ticket, pk=pk)
+        form = TicketEditForm(instance=ticket)
+        return render(request, self.template_name, {'form': form, 'ticket': ticket})
+
+    def post(self, request, pk):
+        ticket = get_object_or_404(Ticket, pk=pk)
+        if 'edit' in request.POST:
+            form = TicketEditForm(request.POST, instance=ticket)
+            if form.is_valid():
+                form.save()
+                return redirect('ticket-list')
+        elif 'delete' in request.POST:
+            product_item = ticket.product
+            ticket.delete()  # Delete the Phone instance
+            product_item.delete()  # Delete the associated ProductItem
+            return redirect('ticket-list')  # Redirect to phone list
+        return render(request, self.template_name, {'form': form, 'ticket': ticket})
+
+
+class TicketDeleteView(View):
+    def post(self, request, pk):
+        ticket = get_object_or_404(Ticket, pk=pk)
+        product_item = ticket.product
+        ticket.delete()  # Delete the Phone instance
+        product_item.delete()  # Delete the associated ProductItem
+        return redirect('ticket-list')  # Redirect to phone list
+
+
+class NewsListView(ListView):
+    model = News
+    template_name = "customer/news/news_list.html"
+    context_object_name = "news"
+
+    def get_queryset(self):
+        return News.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class NewsCreateView(View):
+    template_name = "customer/news/news_create.html"
+
+    def get(self, request):
+        form = NewsForm()
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request):
+        form = NewsForm(
+            request.POST, request.FILES
+        )
+        if form.is_valid():
+            form.save()
+            return redirect("news-list")
+        else:
+            print(form.errors)
+            return render(request, self.template_name, {"form": form})

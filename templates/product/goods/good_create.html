@@ -7,10 +7,55 @@
 <!-- Form for Adding Phone and ProductItem -->
 {% block content %}
 <div class="container">
-  <h2>Create Good and ProductItem</h2>
+  <h2>Create new Good</h2>
   <form method="post" enctype="multipart/form-data">
     <!-- Add enctype attribute -->
-    {% csrf_token %} {{ form.as_p }}
+    {% csrf_token %}
+    <div class="row">
+
+      <!-- First Column -->
+      <div class="col-md-6">
+        <div class="mb-3">
+          {{ form.name.label_tag }} {{ form.name }}
+        </div>
+        <div class="mb-3">{{ form.ingredients.label_tag }} {{ form.ingredients }}</div>
+        <div class="mb-3">{{ form.stock.label_tag }} {{ form.stock }}</div>
+        <div class="mb-3">{{ form.price.label_tag }} {{ form.price }}</div>
+        <div class="mb-3">{{ form.measure.label_tag }} {{ form.measure }}</div>
+        <div class="mb-3">
+          <label for="id_images">Images:</label>{{ form.images }}
+        </div>
+      </div>
+
+      <!-- Second Column -->
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-9 mb-3">
+            {{ form.category.label_tag }} {{ form.category }}
+          </div>
+          <div class="col-md-3 d-flex align-items-center">
+            <a href="{% url 'good_category' %}" class="btn btn-success btn-sm">Add category</a>
+          </div>
+        </div>
+        <div class="mb-3">{{ form.bonus.label_tag }} {{ form.bonus }}</div>
+        <div class="mb-3">
+          {{ form.available_quantity.label_tag }} {{ form.available_quantity }}
+        </div>
+        <div class="col-sm-10">
+          {{ form.expire_date.label_tag }} {{ form.expire_date }}
+        </div>
+      </div>
+
+
+      <div class="col-md-12">
+        <div class="mb-3">{{ form.desc.label_tag }} {{ form.desc }}</div>
+      </div>
+
+      <div class="col-md-12">
+        <div class="mb-3">{{ form.active }}Active </div>
+      </div>
+    </div>
+    <!-- {{ form.as_p }} -->
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 
