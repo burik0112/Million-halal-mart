@@ -457,7 +457,7 @@
 
         <li class="nav-item">
           <a
-            class="nav-link collapsed"
+            class="nav-link {% if not 'dashboard/product' in request.path  %}collapsed{% endif %} "
             data-bs-target="#forms-nav"
             data-bs-toggle="collapse"
             href="#"
@@ -467,21 +467,24 @@
           </a>
           <ul
             id="forms-nav"
-            class="nav-content collapse"
+            class="nav-content {% if not 'dashboard/product' in request.path  %}collapse{% endif %}"
             data-bs-parent="#sidebar-nav"
           >
             <li>
-              <a href="{% url 'phone_list'  %}">
+              {% url 'phone_list' as phone_list %}
+              <a class="{% if request.path == phone_list %}active{% endif %}" href="{% url 'phone_list'  %}">
                 <i class="bi bi-circle"></i><span>Phones and Electrones</span>
               </a>
             </li>
             <li>
-              <a href="{% url 'ticket-list'  %}">
+              {% url 'ticket-list' as ticket_list %}
+              <a class="{% if request.path == ticket_list %}active{% endif %}" href="{% url 'ticket-list'  %}">
                 <i class="bi bi-circle"></i><span>Tickets</span>
               </a>
             </li>
             <li>
-              <a href="{% url 'good-list' %}">
+              {% url 'good-list' as good_list %}
+              <a  class="{% if request.path == good_list %}active{% endif %}" href="{% url 'good-list' %}">
                 <i class="bi bi-circle"></i><span>Food Products</span>
               </a>
             </li>
