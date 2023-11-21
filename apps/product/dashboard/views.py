@@ -167,9 +167,9 @@ class GoodEditDeleteView(View):
                 return redirect('good-list')
         elif 'delete' in request.POST:
             product_item = good.product
-            good.delete()  # Delete the Phone instance
+            good.delete()  # Delete the Good instance
             product_item.delete()  # Delete the associated ProductItem
-            return redirect('good-list')  # Redirect to phone list
+            return redirect('good-list')  # Redirect to good list
         return render(request, self.template_name, {'form': form, 'good': good})
 
 class PhoneEditDeleteView(View):

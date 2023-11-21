@@ -23,6 +23,10 @@ class SubCategorySerializer(serializers.ModelSerializer):
         model = SubCategory
         fields = "__all__"
 
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Image
+        fields = "__all__"
 
 class ProductItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -56,7 +60,7 @@ class PhoneSerializer(ProductItemCreatorMixin):
 
 class GoodSerializer(ProductItemCreatorMixin):
     product = ProductItemSerializer()
-
+    images = ImageSerializer(many=True, read_only=True)
     class Meta:
         model = Good
         fields = "__all__"
@@ -66,10 +70,7 @@ class GoodSerializer(ProductItemCreatorMixin):
         return Good.objects.create(**validate_data, product=product)
 
 
-class ImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Image
-        fields = "__all__"
+
 
 class TicketPopularSerializer(serializers.ModelSerializer):
     product = ProductItemSerializer()
