@@ -73,7 +73,6 @@ class GoodSerializer(ProductItemCreatorMixin):
 
 
 
-
 class TicketPopularSerializer(serializers.ModelSerializer):
     product = ProductItemSerializer()
     sold_count = serializers.IntegerField(read_only=True) 

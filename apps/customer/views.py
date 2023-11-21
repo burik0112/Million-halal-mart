@@ -10,9 +10,8 @@ from twilio.rest import Client
 from django.conf import settings
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
 from .utils import generate_otp
-from .models import Favorite, Location, News, Profile, ViewedNews
+from .models import Favorite, Location, News, Profile, ViewedNews, Banner
 from .serializers import (
     CustomPageNumberPagination,
     FavoriteSerializer,
@@ -20,7 +19,8 @@ from .serializers import (
     NewsSerializer,
     ProfileSerializer,
     ViewedNewsSerializer,
-    FavoriteListSerializer
+    FavoriteListSerializer,
+    BannerSerializer
 )
 
 # Create your views here.
@@ -44,7 +44,8 @@ class LocationCreateAPIView(CreateAPIView):
 class LocationListAPIView(ListAPIView):
     queryset = Location.objects.all().order_by("-pk")
     serializer_class = LocationSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
+    filter_backends = [DjangoFilterBackend,
+                       SearchFilter]  # Add both filter backends
     search_fields = ["user__full_name", "address"]
     filterset_fields = ["user__full_name", "address"]
     pagination_class = CustomPageNumberPagination
@@ -58,10 +59,16 @@ class LocationRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
 class NewsListAPIView(ListAPIView):
     queryset = News.objects.all().order_by("-pk")
     serializer_class = NewsSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
+    filter_backends = [DjangoFilterBackend,
+                       SearchFilter]  # Add both filter backends
     search_fields = ["description"]
     filterset_fields = ["description"]
     pagination_class = CustomPageNumberPagination
+
+
+class NewsRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
+    queryset = News.objects.all()
+    serializer_class = NewsSerializer
 
 
 class ViewedNewsCreateAPIView(CreateAPIView):
@@ -77,11 +84,11 @@ class FavoriteCreateAPIView(CreateAPIView):
 class FavoriteListAPIView(ListAPIView):
     queryset = Favorite.objects.all().order_by("-pk")
     serializer_class = FavoriteListSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]  
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ["user", "product"]
     search_fields = ["product__name", "user__full_name"]
     pagination_class = CustomPageNumberPagination
-    
+
     def get_queryset(self):
         return Favorite.objects.filter(user=self.request.user.profile).order_by("-pk")
 
@@ -91,16 +98,15 @@ class FavoriteRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     serializer_class = FavoriteSerializer
 
 
-
-
 class SendOTPView(generics.GenericAPIView):
-    serializer_class = ProfileSerializer  
+    serializer_class = ProfileSerializer
 
     def post(self, request, *args, **kwargs):
         phone_number = request.data.get('phone_number')
         otp = generate_otp()
 
-        client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+        client = Client(settings.TWILIO_ACCOUNT_SID,
+                        settings.TWILIO_AUTH_TOKEN)
         message = client.messages.create(
             body=f"Your OTP code is {otp}",
             from_=settings.TWILIO_PHONE_NUMBER,
@@ -114,8 +120,9 @@ class SendOTPView(generics.GenericAPIView):
 
         return Response({"message": "OTP sent successfully"}, status=status.HTTP_200_OK)
 
+
 class VerifyOTPView(generics.GenericAPIView):
-    serializer_class = ProfileSerializer  
+    serializer_class = ProfileSerializer
 
     def post(self, request, *args, **kwargs):
         phone_number = request.data.get('phone_number')
@@ -128,3 +135,8 @@ class VerifyOTPView(generics.GenericAPIView):
         else:
             return Response({"message": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
 
+
+class BannerListAPIView(ListAPIView):
+    queryset = Banner.objects.all().order_by("-pk")
+    serializer_class = BannerSerializer
+    pagination_class = CustomPageNumberPagination

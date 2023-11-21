@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 from apps.product.models import ProductItem, Good, Phone, Ticket
-from .models import Favorite, Location, News, Profile, ViewedNews
+from .models import Favorite, Location, News, Profile, ViewedNews, Banner
 
 
 class CustomPageNumberPagination(PageNumberPagination):
@@ -70,3 +70,7 @@ class FavoriteListSerializer(serializers.ModelSerializer):
         model = Favorite
         fields = "__all__"
 
+class BannerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Banner
+        fields = "__all__"

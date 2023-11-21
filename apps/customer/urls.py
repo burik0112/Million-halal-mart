@@ -11,6 +11,7 @@ urlpatterns = [
     path("location/<int:pk>/retriev", views.LocationRetrieveUpdateDelete.as_view()),
     
     path("news/list", views.NewsListAPIView.as_view()),
+    path("news/<int:pk>/retriev", views.NewsRetrieveUpdateDelete.as_view()),
     
     path("viewed/create", views.ViewedNewsCreateAPIView.as_view()),
     path("viewed/list", views.ViewedNewsCreateAPIView.as_view()),
@@ -21,5 +22,7 @@ urlpatterns = [
     
     path('send_otp/', views.SendOTPView.as_view(), name='send_otp'),
     path('verify_otp/', views.VerifyOTPView.as_view(), name='verify_otp'),
+
+    path('banners/', views.BannerListAPIView.as_view(), name='banner'),
 
 ]
