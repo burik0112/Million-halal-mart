@@ -29,6 +29,7 @@ class ImageSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class ProductItemSerializer(serializers.ModelSerializer):
+    images = ImageSerializer(many=True, read_only=True)
     class Meta:
         model = ProductItem
         fields = "__all__"
@@ -60,10 +61,11 @@ class PhoneSerializer(ProductItemCreatorMixin):
 
 class GoodSerializer(ProductItemCreatorMixin):
     product = ProductItemSerializer()
-    images = ImageSerializer(many=True, read_only=True)
+    
     class Meta:
         model = Good
         fields = "__all__"
+        read_only_fields = "images",
 
     def create(self, validate_data):
         product = self.create_pruduct()
