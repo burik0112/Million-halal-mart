@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     'django_filters',
     "rest_framework",
+    "rest_framework.authtoken",
     "corsheaders",
 ] + LOCAL_APPS
 
@@ -138,6 +139,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
