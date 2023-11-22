@@ -90,11 +90,11 @@ class FavoriteListAPIView(ListAPIView):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-        # Agar foydalanuvchi tizimga kirmagan bo'lsa, bo'sh ro'yxat qaytariladi
+        
         if not self.request.user.is_authenticated:
             return Favorite.objects.none()
 
-        # Foydalanuvchiga tegishli favoritlarni qaytarish
+        
         return Favorite.objects.filter(user=self.request.user.profile).select_related('product', 'user').order_by("-pk")
 
 
