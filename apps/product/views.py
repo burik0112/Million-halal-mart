@@ -3,7 +3,7 @@ from rest_framework.filters import SearchFilter
 from rest_framework.generics import ListAPIView
 from django.db.models import Sum, Count
 from rest_framework.response import Response
-
+from django.db.models import Q
 from .models import Category, Good, Image, Phone, SubCategory, Ticket
 from .serializers import (
     CategorySerializer,
@@ -15,7 +15,7 @@ from .serializers import (
     TicketSerializer,
     TicketPopularSerializer,
     PhonePopularSerializer,
-    GoodPopularSerializer
+    GoodPopularSerializer,
 )
 
 # Create your views here.
@@ -24,7 +24,7 @@ from .serializers import (
 class CategoryListAPIView(ListAPIView):
     queryset = Category.objects.all().order_by("-pk")
     serializer_class = CategorySerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]  
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ["name", "main_type"]
     filterset_fields = ["name", "main_type"]
     pagination_class = CustomPageNumberPagination
@@ -33,7 +33,7 @@ class CategoryListAPIView(ListAPIView):
 class SubCategoryListAPIView(ListAPIView):
     queryset = SubCategory.objects.all().order_by("-pk")
     serializer_class = SubCategorySerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]  
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ["category"]
     pagination_class = CustomPageNumberPagination
 
@@ -41,7 +41,7 @@ class SubCategoryListAPIView(ListAPIView):
 class TicketListAPIView(ListAPIView):
     queryset = Ticket.objects.all().order_by("-pk")
     serializer_class = TicketSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]  
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ["product",]
     pagination_class = CustomPageNumberPagination
 
@@ -49,7 +49,7 @@ class TicketListAPIView(ListAPIView):
 class PhoneListAPIView(ListAPIView):
     queryset = Phone.objects.all().order_by("-pk")
     serializer_class = PhoneSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]  
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = [
         "category",
         "product"
@@ -61,7 +61,7 @@ class PhoneListAPIView(ListAPIView):
 class GoodListAPIView(ListAPIView):
     queryset = Good.objects.all().order_by("-pk")
     serializer_class = GoodSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]  
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = [
         "sub_cat",
         "product",
@@ -72,25 +72,26 @@ class GoodListAPIView(ListAPIView):
 class ImageListAPIView(ListAPIView):
     queryset = Image.objects.all().order_by("-pk")
     serializer_class = ImageSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]  
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ["product"]
     pagination_class = CustomPageNumberPagination
+
 
 class FamousTickets(ListAPIView):
     queryset = Ticket.objects.all().order_by("-pk")
     serializer_class = TicketSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]  
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ["product",]
     pagination_class = CustomPageNumberPagination
+
 
 class PopularTicketsAPIView(ListAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketPopularSerializer
     pagination_class = CustomPageNumberPagination
-    
 
     def get_queryset(self):
-       
+
         return Ticket.objects.annotate(
             sold_count=Sum('product__sold_products__quantity')
         ).order_by('-sold_count')
@@ -100,14 +101,14 @@ class PopularTicketsAPIView(ListAPIView):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+
 class PopularPhonesAPIView(ListAPIView):
     queryset = Phone.objects.all()
     serializer_class = PhonePopularSerializer
     pagination_class = CustomPageNumberPagination
-    
 
     def get_queryset(self):
-       
+
         return Phone.objects.annotate(
             sold_count=Sum('product__sold_products__quantity')
         ).order_by('-sold_count')
@@ -116,15 +117,15 @@ class PopularPhonesAPIView(ListAPIView):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-    
+
+
 class PopularGoodAPIView(ListAPIView):
     queryset = Good.objects.all()
     serializer_class = GoodPopularSerializer
     pagination_class = CustomPageNumberPagination
-    
 
     def get_queryset(self):
-       
+
         return Good.objects.annotate(
             sold_count=Sum('product__sold_products__quantity')
         ).order_by('-sold_count')
@@ -133,3 +134,49 @@ class PopularGoodAPIView(ListAPIView):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class NewTicketsListView(ListAPIView):
+    queryset = Ticket.objects.all().order_by('product__created')
+    serializer_class = TicketSerializer
+    pagination_class = CustomPageNumberPagination
+
+
+class NewPhonesListView(ListAPIView):
+    queryset = Phone.objects.all().order_by('product__created')
+    serializer_class = PhoneSerializer
+    pagination_class = CustomPageNumberPagination
+
+
+class NewGoodsListView(ListAPIView):
+    queryset = Good.objects.all().order_by('product__created')
+    serializer_class = GoodSerializer
+    pagination_class = CustomPageNumberPagination
+
+
+class TicketsOnSaleListView(ListAPIView):
+    serializer_class = TicketSerializer
+
+    def get_queryset(self):
+        queryset = Ticket.objects.filter(
+            Q(product__bonus__gt=0) | Q(product__stock__gt=0)
+        )
+        return queryset
+
+class PhonesOnSaleListView(ListAPIView):
+    serializer_class = PhoneSerializer
+
+    def get_queryset(self):
+        queryset = Phone.objects.filter(
+            Q(product__bonus__gt=0) | Q(product__stock__gt=0)
+        )
+        return queryset
+
+class GoodsOnSaleListView(ListAPIView):
+    serializer_class = GoodSerializer
+
+    def get_queryset(self):
+        queryset = Good.objects.filter(
+            Q(product__bonus__gt=0) | Q(product__stock__gt=0)
+        )
+        return queryset

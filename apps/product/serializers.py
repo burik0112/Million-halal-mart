@@ -23,13 +23,16 @@ class SubCategorySerializer(serializers.ModelSerializer):
         model = SubCategory
         fields = "__all__"
 
+
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
         fields = "__all__"
 
+
 class ProductItemSerializer(serializers.ModelSerializer):
     images = ImageSerializer(many=True, read_only=True)
+
     class Meta:
         model = ProductItem
         fields = "__all__"
@@ -47,6 +50,7 @@ class TicketSerializer(ProductItemCreatorMixin):
         return Ticket.objects.create(**validate_data, product=product)
 
 
+
 class PhoneSerializer(ProductItemCreatorMixin):
     product = ProductItemSerializer()
 
@@ -61,7 +65,7 @@ class PhoneSerializer(ProductItemCreatorMixin):
 
 class GoodSerializer(ProductItemCreatorMixin):
     product = ProductItemSerializer()
-    
+
     class Meta:
         model = Good
         fields = "__all__"
@@ -72,26 +76,27 @@ class GoodSerializer(ProductItemCreatorMixin):
         return Good.objects.create(**validate_data, product=product)
 
 
-
 class TicketPopularSerializer(serializers.ModelSerializer):
     product = ProductItemSerializer()
-    sold_count = serializers.IntegerField(read_only=True) 
+    sold_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Ticket
-        fields = ['event_name', 'event_date', 'sold_count','product']
+        fields = ['event_name', 'event_date', 'sold_count', 'product']
+
 
 class PhonePopularSerializer(serializers.ModelSerializer):
     product = ProductItemSerializer()
-    sold_count = serializers.IntegerField(read_only=True) 
+    sold_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Phone
         fields = "__all__"
 
+
 class GoodPopularSerializer(serializers.ModelSerializer):
     product = ProductItemSerializer()
-    sold_count = serializers.IntegerField(read_only=True) 
+    sold_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Good
