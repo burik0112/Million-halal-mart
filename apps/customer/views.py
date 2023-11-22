@@ -5,10 +5,9 @@ from rest_framework.generics import (
     ListAPIView,
     RetrieveUpdateDestroyAPIView,
 )
-from rest_framework import generics
+from rest_framework import generics, status, permissions
 from twilio.rest import Client
 from django.conf import settings
-from rest_framework import status
 from rest_framework.response import Response
 from .utils import generate_otp
 from .models import Favorite, Location, News, Profile, ViewedNews, Banner
@@ -82,6 +81,7 @@ class FavoriteCreateAPIView(CreateAPIView):
 
 
 class FavoriteListAPIView(ListAPIView):
+    permission_class = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Favorite.objects.all().order_by("-pk")
     serializer_class = FavoriteListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
@@ -90,7 +90,12 @@ class FavoriteListAPIView(ListAPIView):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-        return Favorite.objects.filter(user=self.request.user.profile).order_by("-pk")
+        # Agar foydalanuvchi tizimga kirmagan bo'lsa, bo'sh ro'yxat qaytariladi
+        if not self.request.user.is_authenticated:
+            return Favorite.objects.none()
+
+        # Foydalanuvchiga tegishli favoritlarni qaytarish
+        return Favorite.objects.filter(user=self.request.user.profile).select_related('product', 'user').order_by("-pk")
 
 
 class FavoriteRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
