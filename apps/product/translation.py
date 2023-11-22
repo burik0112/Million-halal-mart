@@ -8,7 +8,7 @@ class ConnectTranslationOptions(TranslationOptions):
 
 @register(SubCategory)
 class ConnectTranslationOptions(TranslationOptions):
-    fields = ('category__name', 'name', 'desc')
+    fields = ( 'name', 'desc')
 
 @register(ProductItem)
 class ConnectTranslationOptions(TranslationOptions):
@@ -16,16 +16,16 @@ class ConnectTranslationOptions(TranslationOptions):
 
 @register(Ticket)
 class ConnectTranslationOptions(TranslationOptions):
-    fields = ('event_name', 'product__desc', 'category__name', 'category_desc')
+    fields = ('event_name',)
 
 @register(Phone)
 class ConnectTranslationOptions(TranslationOptions):
-    fields = ('model_name', 'product__desc', 'category__name', 'category_desc')
+    fields = ('model_name', )
 
 @register(Good)
 class ConnectTranslationOptions(TranslationOptions):
-    fields = ('name', 'product__desc', 'sub_cat__name', 'sub_cat_desc', 'ingredients')
+    fields = ('name', 'ingredients')
 
 @register(Image)
 class ConnectTranslationOptions(TranslationOptions):
-    fields = ('name', 'product__desc')
+    fields = ('name', )
