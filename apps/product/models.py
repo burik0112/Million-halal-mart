@@ -29,7 +29,7 @@ class SubCategory(TimeStampedModel, models.Model):
     desc = models.TextField()
     stock = models.IntegerField(default=0)
     bonus = models.IntegerField(default=0)
-
+    active = models.BooleanField(default=True)
     def __str__(self) -> str:
         return self.name
 
@@ -131,7 +131,7 @@ class Good(models.Model):
         ProductItem, on_delete=models.CASCADE, related_name="goods"
     )
     ingredients = models.CharField(max_length=255, blank=True)
-    expire_date = models.DateField()
+    expire_date = models.DateField(null=True)
     sub_cat = models.ForeignKey(
         "product.SubCategory", on_delete=models.SET_NULL, null=True
     )
