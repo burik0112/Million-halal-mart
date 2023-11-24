@@ -8,7 +8,7 @@ from model_utils.models import TimeStampedModel
 class Profile(TimeStampedModel, models.Model):
     origin = models.OneToOneField(User, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=15)
+    phone_number = models.CharField(max_length=17)
     cashback = models.IntegerField(default=0)
     otp = models.CharField(max_length=100, null=True, blank=True)
 

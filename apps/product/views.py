@@ -1,6 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import ListAPIView
+from rest_framework import views, status
 from django.db.models import Sum, Count
 from rest_framework.response import Response
 from django.db.models import Q
@@ -180,3 +181,23 @@ class GoodsOnSaleListView(ListAPIView):
             Q(product__bonus__gt=0) | Q(product__stock__gt=0)
         )
         return queryset
+
+
+class MultiProductSearchView(views.APIView):
+    def get(self, request):
+        search_query = request.query_params.get('search', None)
+
+        if not search_query:
+            return Response({"message": "No search query provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+        tickets = Ticket.objects.filter(event_name__icontains=search_query)
+        phones = Phone.objects.filter(model_name__icontains=search_query)
+        goods = Good.objects.filter(name__icontains=search_query)
+
+        results = {
+            'tickets': TicketSerializer(tickets, many=True).data,
+            'phones': PhoneSerializer(phones, many=True).data,
+            'goods': GoodSerializer(goods, many=True).data
+        }
+
+        return Response(results)
