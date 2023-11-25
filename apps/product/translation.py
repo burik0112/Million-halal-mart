@@ -3,29 +3,30 @@ from .models import Category, SubCategory, ProductItem, Ticket, Phone, Good, Ima
 
 
 @register(Category)
-class ConnectTranslationOptions(TranslationOptions):
+class CategoryTranslationOptions(TranslationOptions):
     fields = ('name', 'desc')
 
-@register(SubCategory)
-class ConnectTranslationOptions(TranslationOptions):
-    fields = ( 'name', 'desc')
 
-@register(ProductItem)
-class ConnectTranslationOptions(TranslationOptions):
-    fields = ('desc')
+@register(SubCategory)
+class SubCategoryTranslationOptions(TranslationOptions):
+    fields = ('name', 'desc')
+
 
 @register(Ticket)
-class ConnectTranslationOptions(TranslationOptions):
+class TicketTranslationOptions(TranslationOptions):
     fields = ('event_name',)
 
+
 @register(Phone)
-class ConnectTranslationOptions(TranslationOptions):
+class PhoneTranslationOptions(TranslationOptions):
     fields = ('model_name', )
 
+
 @register(Good)
-class ConnectTranslationOptions(TranslationOptions):
+class GoodTranslationOptions(TranslationOptions):
     fields = ('name', 'ingredients')
 
+
 @register(Image)
-class ConnectTranslationOptions(TranslationOptions):
+class ImageTranslationOptions(TranslationOptions):
     fields = ('name', )

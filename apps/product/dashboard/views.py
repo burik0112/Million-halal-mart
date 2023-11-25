@@ -6,7 +6,11 @@ from apps.customer.models import News
 from django.views import View
 from django.views.generic.edit import CreateView
 from .forms import (PhoneProductItemForm, NewsForm, TicketProductItemForm, GoodProductItemForm, PhoneCategoryCreateForm,
-                    TicketCategoryCreateForm, PhoneEditForm, GoodCategoryCreateForm, TicketEditForm, NewsForm,GoodEditForm)
+                    TicketCategoryCreateForm, PhoneEditForm, GoodCategoryCreateForm, TicketEditForm, NewsForm, GoodEditForm)
+
+
+def dashboard(request):
+    return render(request, "index.html")
 
 
 class PhoneListView(ListView):
@@ -19,7 +23,6 @@ class PhoneListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Add any extra context here
         return context
 
 
@@ -150,6 +153,7 @@ class GoodCreateView(View):
             return redirect("good-list")
         return render(request, self.template_name, {"form": form})
 
+
 class GoodEditDeleteView(View):
     template_name = 'product/goods/good_edit.html'
 
@@ -171,6 +175,7 @@ class GoodEditDeleteView(View):
             product_item.delete()  # Delete the associated ProductItem
             return redirect('good-list')  # Redirect to good list
         return render(request, self.template_name, {'form': form, 'good': good})
+
 
 class PhoneEditDeleteView(View):
     template_name = 'product/electronics/edit_delete_phone.html'
@@ -236,6 +241,7 @@ class TicketDeleteView(View):
         product_item.delete()  # Delete the associated ProductItem
         return redirect('ticket-list')  # Redirect to phone list
 
+
 class GoodDeleteView(View):
     def post(self, request, pk):
         ticket = get_object_or_404(Good, pk=pk)
@@ -243,6 +249,7 @@ class GoodDeleteView(View):
         ticket.delete()  # Delete the Phone instance
         product_item.delete()  # Delete the associated ProductItem
         return redirect('good-list')  # Redirect to phone list
+
 
 class NewsListView(ListView):
     model = News

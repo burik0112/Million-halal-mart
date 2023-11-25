@@ -9,9 +9,10 @@ urlpatterns = [
     path("api/product/", include("apps.product.urls")),
     path("api/merchant/", include("apps.merchant.urls")),
     path("admin/", admin.site.urls, name="admin"),
-    path("dashboard/product/", include("apps.product.dashboard.urls")),
-] + swagger_urlpatterns 
+    path("", include("apps.product.dashboard.urls")),
+] + swagger_urlpatterns
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)
