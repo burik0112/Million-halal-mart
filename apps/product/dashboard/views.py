@@ -10,7 +10,7 @@ from .forms import (PhoneProductItemForm, NewsForm, TicketProductItemForm, GoodP
 
 
 def dashboard(request):
-    return render(request, "index.html")
+    return render(request, "base.html")
 
 
 class PhoneListView(ListView):

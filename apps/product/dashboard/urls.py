@@ -21,7 +21,7 @@ from .views import (
 )
 
 urlpatterns = [
-    path("", dashboard, name="dashboard"),
+    path("dashboard/product/", dashboard, name="dashboard"),
     path("create-phone/", PhoneCreateView.as_view(), name="create_phone"),
     path("phone-category/", PhoneCategoryCreateView.as_view(), name="phone_category"),
     path("phones/", PhoneListView.as_view(), name="phone_list"),
