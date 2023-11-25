@@ -9,5 +9,5 @@ urlpatterns = [
     path("item/create", views.OrderItemCreateAPIView.as_view()),
     path("item/list", views.OrderItemListAPIView.as_view()),
     path("item/<int:pk>/retriev", views.OrderItemRetrieveUpdateDelete.as_view()),
-    path("test/", views.test, name="test"),
+
 ]

@@ -6,11 +6,12 @@ from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
 )
 from django.shortcuts import render, redirect, HttpResponse
-from .models import Order, OrderItem
+from .models import Order, OrderItem, Information
 from .serializers import (
     CustomPageNumberPagination,
     OrderItemSerializer,
     OrderSerializer,
+    InformationSerializer,
 )
 
 # Create your views here.
@@ -51,5 +52,9 @@ class OrderItemRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     serializer_class = OrderItemSerializer
 
 
-def test(request):
-    return render(request, "index.html")
+class InformationListAPIView(ListAPIView):
+    queryset = Information.objects.all().order_by("-pk")
+    serializer_class = InformationSerializer
+
+
+

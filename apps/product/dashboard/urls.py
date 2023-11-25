@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    dashboard,
     PhoneListView,
     PhoneCreateView,
     TicketCreateView,
@@ -20,6 +21,7 @@ from .views import (
 )
 
 urlpatterns = [
+    path("", dashboard, name="dashboard"),
     path("create-phone/", PhoneCreateView.as_view(), name="create_phone"),
     path("phone-category/", PhoneCategoryCreateView.as_view(), name="phone_category"),
     path("phones/", PhoneListView.as_view(), name="phone_list"),
@@ -39,7 +41,8 @@ urlpatterns = [
     path("good-create/", GoodCreateView.as_view(), name="good_create"),
     path("good-category/", GoodCategoryCreateView.as_view(), name="good_category"),
     path("goods/", GoodListView.as_view(), name="good-list"),
-    path("good/edit-delete/<int:pk>/",GoodEditDeleteView.as_view(),name='edit-delete-good'),
+    path("good/edit-delete/<int:pk>/",
+         GoodEditDeleteView.as_view(), name='edit-delete-good'),
     path('good/<int:pk>/delete/',
          GoodDeleteView.as_view(), name='delete_good'),
 
