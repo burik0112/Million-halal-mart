@@ -5,6 +5,7 @@ from rest_framework.generics import (
     ListAPIView,
     RetrieveUpdateDestroyAPIView,
 )
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, status, permissions
 from twilio.rest import Client
 from django.conf import settings
@@ -19,7 +20,8 @@ from .serializers import (
     ProfileSerializer,
     ViewedNewsSerializer,
     FavoriteListSerializer,
-    BannerSerializer
+    BannerSerializer,
+    LocationListSerializer,
 )
 
 # Create your views here.
@@ -39,12 +41,14 @@ class LocationCreateAPIView(CreateAPIView):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user.profile)
+
 
 class LocationListAPIView(ListAPIView):
     queryset = Location.objects.all().order_by("-pk")
-    serializer_class = LocationSerializer
-    filter_backends = [DjangoFilterBackend,
-                       SearchFilter]  # Add both filter backends
+    serializer_class = LocationListSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
     search_fields = ["user__full_name", "address"]
     filterset_fields = ["user__full_name", "address"]
     pagination_class = CustomPageNumberPagination
@@ -58,8 +62,7 @@ class LocationRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
 class NewsListAPIView(ListAPIView):
     queryset = News.objects.all().order_by("-pk")
     serializer_class = NewsSerializer
-    filter_backends = [DjangoFilterBackend,
-                       SearchFilter]  # Add both filter backends
+    filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
     search_fields = ["description"]
     filterset_fields = ["description"]
     pagination_class = CustomPageNumberPagination
@@ -78,6 +81,10 @@ class ViewedNewsCreateAPIView(CreateAPIView):
 class FavoriteCreateAPIView(CreateAPIView):
     queryset = Favorite.objects.all()
     serializer_class = FavoriteSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user.profile)
 
 
 class FavoriteListAPIView(ListAPIView):
@@ -90,12 +97,14 @@ class FavoriteListAPIView(ListAPIView):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-        
         if not self.request.user.is_authenticated:
             return Favorite.objects.none()
 
-        
-        return Favorite.objects.filter(user=self.request.user.profile).select_related('product', 'user').order_by("-pk")
+        return (
+            Favorite.objects.filter(user=self.request.user.profile)
+            .select_related("product", "user")
+            .order_by("-pk")
+        )
 
 
 class FavoriteRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
@@ -107,15 +116,14 @@ class SendOTPView(generics.GenericAPIView):
     serializer_class = ProfileSerializer
 
     def post(self, request, *args, **kwargs):
-        phone_number = request.data.get('phone_number')
+        phone_number = request.data.get("phone_number")
         otp = generate_otp()
 
-        client = Client(settings.TWILIO_ACCOUNT_SID,
-                        settings.TWILIO_AUTH_TOKEN)
+        client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
         message = client.messages.create(
             body=f"Your OTP code is {otp}",
             from_=settings.TWILIO_PHONE_NUMBER,
-            to=phone_number
+            to=phone_number,
         )
 
         # OTPni bazaga saqlash
@@ -130,15 +138,19 @@ class VerifyOTPView(generics.GenericAPIView):
     serializer_class = ProfileSerializer
 
     def post(self, request, *args, **kwargs):
-        phone_number = request.data.get('phone_number')
-        otp = request.data.get('otp')
+        phone_number = request.data.get("phone_number")
+        otp = request.data.get("otp")
 
         # OTPni bazadan tekshirish
         profile = Profile.objects.get(phone_number=phone_number)
         if profile.otp == otp:
-            return Response({"message": "OTP verified successfully"}, status=status.HTTP_200_OK)
+            return Response(
+                {"message": "OTP verified successfully"}, status=status.HTTP_200_OK
+            )
         else:
-            return Response({"message": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class BannerListAPIView(ListAPIView):

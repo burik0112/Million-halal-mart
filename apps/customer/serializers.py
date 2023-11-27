@@ -17,6 +17,12 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class LocationSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    class Meta:
+        model = Location
+        fields = "__all__"
+
+class LocationListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = "__all__"
@@ -35,24 +41,30 @@ class ViewedNewsSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = Favorite
         fields = "__all__"
+
 
 class TicketForFavouriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = "__all__"
 
+
 class PhoneFavouriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Phone
         fields = "__all__"
 
+
 class GoodFavouriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Good
         fields = "__all__"
+
 
 class ProductItemForFavouriteSerializer(serializers.ModelSerializer):
     tickets = TicketForFavouriteSerializer(read_only=True)
@@ -63,12 +75,14 @@ class ProductItemForFavouriteSerializer(serializers.ModelSerializer):
         model = ProductItem
         fields = "__all__"
 
+
 class FavoriteListSerializer(serializers.ModelSerializer):
     product = ProductItemForFavouriteSerializer()
 
     class Meta:
         model = Favorite
         fields = "__all__"
+
 
 class BannerSerializer(serializers.ModelSerializer):
     class Meta:
