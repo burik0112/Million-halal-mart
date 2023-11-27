@@ -9,10 +9,6 @@ from .forms import (PhoneProductItemForm, NewsForm, TicketProductItemForm, GoodP
                     TicketCategoryCreateForm, PhoneEditForm, GoodCategoryCreateForm, TicketEditForm, NewsForm, GoodEditForm)
 
 
-def dashboard(request):
-    return render(request, "base.html")
-
-
 class PhoneListView(ListView):
     model = Phone
     template_name = "product/electronics/phone_list.html"  # your template name
