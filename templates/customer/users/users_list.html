@@ -13,34 +13,39 @@
           <thead>
             <tr>
               <th scope="col">#</th>
-              <th scope="col">Title</th>
-              <th scope="col">Start date</th>
-              <th scope="col">End date</th>
-              <th scope="col">Description</th>
-              <th scope="col">Image</th>
+              <th scope="col">Full name</th>
+              <th scope="col">Phone number</th>
+              <th scope="col">Cashback</th>
+              <th scope="col">Address</th>
+              <th scope="col">Joined</th>
               <th scope="col">Active</th>
               <th scope="col">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {% for good in news %}
+            {% for user in users %}
             <tr>
-              <th scope="row" class="text-center">{{ good.id }}</th>
-              <td class="text-center">{{ good.title }}</td>
-              <td class="text-center">{{ good.start_date }}</td>
-              <td class="text-center">{{ good.end_date }}</td>
-              <td class="text-center">{{ good.description }}</td>
-              <td class="text-center">
-                <img src="{{ good.image.url }}" alt="{{ good.title }}" width="50" height="50" />
-              </td>
-              {% if good.active %}
-                <td ><img src="{% static 'assets/img/check.png' %}" height="20" width="20" alt="Mavjud"></td>
+              <th scope="row">{{ user.id }}</th>
+              <td>{{ user.full_name }}</td>
+              <td>{{ user.phone_number }}</td>
+              <td class="text-center">{{ user.cashback }}</td>
+              {% with location_instance=user.location.last %}
+              {% if location_instance %}
+              <td>{{ location_instance.address }}</td>
               {% else %}
-                <td ><img src="{% static 'assets/img/cancel.png' %}" height="20" width="20" alt="Mavjud emas"></td>
+              <td>Location not found</td>
               {% endif %}
-                <td class="text-center">
-                  <a href="" class="btn btn-primary btn-sm">Edit</a>
-                </td>
+              <td>{{ user.created }}</td>
+              {% endwith %}
+              <!-- <td>{{ user.description }}</td> -->
+              {% if user.origin.is_active %}
+              <td><img src="{% static 'assets/img/check.png' %}" height="20" width="20" alt="Activate"></td>
+              {% else %}
+              <td><img src="{% static 'assets/img/cancel.png' %}" height="20" width="20" alt="Block"></td>
+              {% endif %}
+              <td>
+                <a href="" class="btn btn-primary btn-sm">Edit</a>
+              </td>
             </tr>
             {% endfor %}
             <!-- End loop -->

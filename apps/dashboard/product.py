@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView
-from ..models import Phone, Ticket, Good, Category, SubCategory
+from apps.product.models import Phone, Ticket, Good, Category, SubCategory
 from apps.customer.models import News
 from django.views import View
 from django.views.generic.edit import CreateView

@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ClearableFileInput
-from ..models import Phone, ProductItem, SubCategory, Image, Ticket, Good, Category
+from apps.product.models import Phone, ProductItem, SubCategory, Image, Ticket, Good, Category
 
 from apps.customer.models import News
 
