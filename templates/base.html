@@ -360,7 +360,8 @@
     <aside id="sidebar" class="sidebar">
       <ul class="sidebar-nav" id="sidebar-nav">
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'dashboard' %}">
+          {% url 'dashboard' as dashboard %}
+          <a class="{% if request.path == dashboard %}active{% endif %} nav-link"  href="{% url 'dashboard' %}">
             <i class="bi bi-grid"></i>
             <span>Dashboard</span>
           </a>
@@ -490,7 +491,8 @@
               </a>
             </li>
             <li>  
-              <a href="{% url 'news-list' %}">
+              {% url 'news-list' as news_list %}
+              <a class="{% if request.path == news_list %}active{% endif %}" href="{% url 'news-list' %}">
                 <i class="bi bi-circle"></i><span>News page</span>
               </a>
             </li>
@@ -598,11 +600,12 @@
         <li class="nav-heading">Pages</li>
 
         <li class="nav-item">
-          <a class="nav-link collapsed" href="{% url 'users-list' %}">
-            <i class="bi bi-person"></i>
-            <span>Users</span>
+          {% url 'users-list' as users_list %}
+          <a class="nav-link {% if request.path == users_list %}active{% endif %}" href="{% url 'users-list' %}">
+              <i class="bi bi-person"></i>
+              <span>Users</span>
           </a>
-        </li>
+      </li>
         <!-- End Profile Page Nav -->
 
         <li class="nav-item">
