@@ -18,7 +18,7 @@ from .product import (
     NewsCreateView,
     GoodDeleteView,
 )
-from .users import (UserListView)
+from .users import (UserListView, UserOrdersView)
 from .main import (dashboard)
 urlpatterns = [
     path("", dashboard, name="dashboard"),
@@ -54,6 +54,7 @@ urlpatterns = [
     path("product/news-create/", NewsCreateView.as_view(), name="news-create"),
 
     path("users/", UserListView.as_view(), name="users-list"),
+    path("users/<int:pk>/order", UserOrdersView.as_view(), name="user-orders-list"),
 
 
 ]

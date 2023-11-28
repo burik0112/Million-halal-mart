@@ -6,8 +6,7 @@
     <div class="card">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
-          <h5 class="card-title">News List</h5>
-          <a href="{% url 'news-create' %}" class="btn btn-success">Create News</a>
+          <h5 class="card-title">Users List</h5>
         </div>
         <table class="table datatable">
           <thead>
@@ -37,14 +36,18 @@
               {% endif %}
               <td>{{ user.created }}</td>
               {% endwith %}
-              <!-- <td>{{ user.description }}</td> -->
-              {% if user.origin.is_active %}
-              <td><img src="{% static 'assets/img/check.png' %}" height="20" width="20" alt="Activate"></td>
-              {% else %}
-              <td><img src="{% static 'assets/img/cancel.png' %}" height="20" width="20" alt="Block"></td>
-              {% endif %}
               <td>
-                <a href="" class="btn btn-primary btn-sm">Edit</a>
+                <a href="{% url 'user-orders-list' user.origin.id %}">  
+                  <i class="fa-solid fa-eye fa-2xl"></i>
+                </a>
+              </td>
+              <td>
+                {% if user.origin.is_active == True %}
+                <a href="" class="btn btn-danger btn-sm">Block</a>
+                {% else %}
+                <a href="" class="btn btn-primary btn-sm">Acivate</a>
+                {% endif %}
+
               </td>
             </tr>
             {% endfor %}

@@ -7,7 +7,7 @@ class Order(TimeStampedModel, models.Model):
         "customer.Profile", on_delete=models.CASCADE, related_name='order')
     products = models.ManyToManyField(
         "product.ProductItem", through='OrderItem', related_name='order')
-
+    comment=models.TextField(blank=True)
 
 class OrderItem(TimeStampedModel, models.Model):
     order = models.ForeignKey(
