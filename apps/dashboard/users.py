@@ -1,4 +1,3 @@
-
 from apps.customer.models import Profile
 from django.views.generic import ListView
 

@@ -21,9 +21,12 @@ body {
 table {
   margin: 0 auto;
 }
-th, td {
-  text-align: center;
+.text-center {
+  text-align: center !important;
 }
+/* th, td {
+  text-align: center;
+} */
 a {
   color: #4154f1;
   text-decoration: none;

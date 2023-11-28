@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.urls import include, path
 from .scheme import swagger_urlpatterns
 from django.shortcuts import redirect
-from apps.product.dashboard.main import index
+from apps.dashboard.main import index
 
 
 def redirect_dashboard(request):
@@ -17,7 +17,7 @@ urlpatterns = [
     path("api/merchant/", include("apps.merchant.urls")),
     path("admin/", admin.site.urls, name="admin"),
     path(
-        "dashboard/", include("apps.product.dashboard.urls"), name="dashboard"
+        "dashboard/", include("apps.dashboard.urls"), name="dashboard"
     ),
     path('index/', index),
     path("", redirect_dashboard)
