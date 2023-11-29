@@ -142,7 +142,6 @@ class RegisterView(APIView):
             defaults={"phone_number": phone_number, "full_name": full_name, "otp": otp},
         )
 
-        # SMS yuborishni alohida funksiyaga o'tkazish
         send_otp_sms(phone_number, otp)
 
         return Response(
@@ -162,8 +161,6 @@ def send_otp_sms(phone_number, otp):
             to=phone_number,
         )
     except Exception as e:
-        # Xatoliklarni qayd etish va boshqarish
-        # Masalan, log qilish yoki xabar yuborishda xatolik haqida xabar berish
         pass
 
 
@@ -175,17 +172,23 @@ class VerifyRegisterOTPView(APIView):
         try:
             profile = Profile.objects.get(phone_number=phone_number)
             if profile.otp == otp:
-                # OTPni tozalash
                 profile.otp = None
                 profile.save()
 
-                # Token yaratish va qaytarish
                 token, created = Token.objects.get_or_create(user=profile.origin)
-                return Response({"token": token.key, "message": "Registration successful"}, status=status.HTTP_200_OK)
+                return Response(
+                    {"token": token.key, "message": "Registration successful"},
+                    status=status.HTTP_200_OK,
+                )
             else:
-                return Response({"message": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"message": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST
+                )
         except Profile.DoesNotExist:
-            return Response({"message": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": "Profile not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
 
 class BannerListAPIView(ListAPIView):
     queryset = Banner.objects.all().order_by("-pk")
