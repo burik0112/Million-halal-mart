@@ -47,8 +47,8 @@ LOCAL_APPS = [
     "apps.merchant",
 ]
 STATICFILES_DIRS = [
-        os.path.join(BASE_DIR, "static"),
-    ]
+    os.path.join(BASE_DIR, "static"),
+]
 INSTALLED_APPS = [
     "modeltranslation",
     "django.contrib.admin",
@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "drf_yasg",
-    'django_filters',
+    "django_filters",
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
@@ -76,7 +76,7 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"]
 }
 CORS_ALLOW_ALL_ORIGINS = True
 # CORS ORIGIN
@@ -144,7 +144,8 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
-    ],}
+    ],
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -168,24 +169,20 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "../", "media/")
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-# STATIC_URL = 'static/'
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, "../static")]
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "../", "mediafiles/")
 
 STATIC_URL = "static/"
-STATICFILES_DIRS = [
-            os.path.join(BASE_DIR, "../",'static')
-       ]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "../", "static")]
 STATIC_ROOT = os.path.join(BASE_DIR, "../", "staticfiles")
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-TOKEN_LIFESPAN = 10 #mins
-OTP_EXPIRE_TIME = 10 #mins
-TWILIO_ACCOUNT_SID = config('TWILIO_ACCOUNT_SID')
-TWILIO_AUTH_TOKEN = config('TWILIO_AUTH_TOKEN')
-TWILIO_PHONE_NUMBER = config('TWILIO_PHONE_NUMBER')
+TOKEN_LIFESPAN = 10  # mins
+OTP_EXPIRE_TIME = 10  # mins
+TWILIO_ACCOUNT_SID = config("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = config("TWILIO_AUTH_TOKEN")
+TWILIO_PHONE_NUMBER = config("TWILIO_PHONE_NUMBER")

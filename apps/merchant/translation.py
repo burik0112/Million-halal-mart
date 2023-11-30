@@ -8,4 +8,4 @@ from .models import Order, OrderItem, Information
 @register(Information)
 class InformationTranslationOptions(TranslationOptions):
     fields = ('reminder', 'agreement', 'shipment_terms',
-              'privacy_policy', 'about_us')
+              'privacy_policy', 'about_us', 'support_center')

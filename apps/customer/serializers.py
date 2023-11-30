@@ -10,6 +10,36 @@ class CustomPageNumberPagination(PageNumberPagination):
     max_page_size = 100
 
 
+class LoginSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(max_length=17)
+    password = serializers.CharField()
+
+    def validate(self, data):
+        phone_number = data.get("phone_number")
+        password = data.get("password")
+
+        if phone_number and password:
+            try:
+                profile = Profile.objects.get(phone_number=phone_number)
+                user = profile.origin
+                if user.check_password(password):
+                    data["user"] = user
+                    return data
+            except Profile.DoesNotExist:
+                pass
+        raise serializers.ValidationError("Invalid phone number or password")
+
+
+class RegisterSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(max_length=17)
+    full_name = serializers.CharField(max_length=255, required=False, allow_blank=True)
+
+    def validate_phone_number(self, value):
+        # Telefon raqamini validatsiya qilish
+        # Masalan, formatni tekshirish yoki raqamning mavjudligini tekshirish
+        return value
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
@@ -18,9 +48,11 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class LocationSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = Location
         fields = "__all__"
+
 
 class LocationListSerializer(serializers.ModelSerializer):
     class Meta:

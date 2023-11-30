@@ -10,8 +10,11 @@ from rest_framework import generics, status, permissions
 from twilio.rest import Client
 from django.conf import settings
 from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
+from rest_framework.views import APIView
 from .utils import generate_otp
 from .models import Favorite, Location, News, Profile, ViewedNews, Banner
+from django.contrib.auth.models import User
 from .serializers import (
     CustomPageNumberPagination,
     FavoriteSerializer,
@@ -22,7 +25,20 @@ from .serializers import (
     FavoriteListSerializer,
     BannerSerializer,
     LocationListSerializer,
+    LoginSerializer,
+    RegisterSerializer,
 )
+
+
+class LoginView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data["user"]
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({"token": token.key}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # Create your views here.
 
@@ -112,44 +128,65 @@ class FavoriteRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     serializer_class = FavoriteSerializer
 
 
-class SendOTPView(generics.GenericAPIView):
-    serializer_class = ProfileSerializer
-
+class RegisterView(APIView):
     def post(self, request, *args, **kwargs):
-        phone_number = request.data.get("phone_number")
+        serializer = RegisterSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        phone_number = serializer.validated_data["phone_number"]
+        full_name = serializer.validated_data.get("full_name", "")
         otp = generate_otp()
 
+        user, _ = User.objects.get_or_create(username=phone_number)
+        profile, _ = Profile.objects.update_or_create(
+            origin=user,
+            defaults={"phone_number": phone_number, "full_name": full_name, "otp": otp},
+        )
+
+        send_otp_sms(phone_number, otp)
+
+        return Response(
+            {
+                "message": "OTP sent successfully. Please verify to complete registration."
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+def send_otp_sms(phone_number, otp):
+    try:
         client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-        message = client.messages.create(
+        client.messages.create(
             body=f"Your OTP code is {otp}",
             from_=settings.TWILIO_PHONE_NUMBER,
             to=phone_number,
         )
-
-        # OTPni bazaga saqlash
-        profile = Profile.objects.get(phone_number=phone_number)
-        profile.otp = otp
-        profile.save()
-
-        return Response({"message": "OTP sent successfully"}, status=status.HTTP_200_OK)
+    except Exception as e:
+        pass
 
 
-class VerifyOTPView(generics.GenericAPIView):
-    serializer_class = ProfileSerializer
-
+class VerifyRegisterOTPView(APIView):
     def post(self, request, *args, **kwargs):
         phone_number = request.data.get("phone_number")
         otp = request.data.get("otp")
 
-        # OTPni bazadan tekshirish
-        profile = Profile.objects.get(phone_number=phone_number)
-        if profile.otp == otp:
+        try:
+            profile = Profile.objects.get(phone_number=phone_number)
+            if profile.otp == otp:
+                profile.otp = None
+                profile.save()
+
+                token, created = Token.objects.get_or_create(user=profile.origin)
+                return Response(
+                    {"token": token.key, "message": "Registration successful"},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"message": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST
+                )
+        except Profile.DoesNotExist:
             return Response(
-                {"message": "OTP verified successfully"}, status=status.HTTP_200_OK
-            )
-        else:
-            return Response(
-                {"message": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST
+                {"message": "Profile not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
 
