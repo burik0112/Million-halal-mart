@@ -43,7 +43,9 @@ class TicketListAPIView(ListAPIView):
     queryset = Ticket.objects.all().order_by("-pk")
     serializer_class = TicketSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ["product",]
+    filterset_fields = [
+        "product",
+    ]
     pagination_class = CustomPageNumberPagination
 
 
@@ -51,10 +53,7 @@ class PhoneListAPIView(ListAPIView):
     queryset = Phone.objects.all().order_by("-pk")
     serializer_class = PhoneSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = [
-        "category",
-        "product"
-    ]
+    filterset_fields = ["category", "product"]
 
     pagination_class = CustomPageNumberPagination
 
@@ -82,7 +81,9 @@ class FamousTickets(ListAPIView):
     queryset = Ticket.objects.all().order_by("-pk")
     serializer_class = TicketSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ["product",]
+    filterset_fields = [
+        "product",
+    ]
     pagination_class = CustomPageNumberPagination
 
 
@@ -92,15 +93,9 @@ class PopularTicketsAPIView(ListAPIView):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-
         return Ticket.objects.annotate(
-            sold_count=Sum('product__sold_products__quantity')
-        ).order_by('-sold_count')
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+            sold_count=Sum("product__sold_products__quantity")
+        ).order_by("-sold_count")
 
 
 class PopularPhonesAPIView(ListAPIView):
@@ -109,15 +104,9 @@ class PopularPhonesAPIView(ListAPIView):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-
         return Phone.objects.annotate(
-            sold_count=Sum('product__sold_products__quantity')
-        ).order_by('-sold_count')
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+            sold_count=Sum("product__sold_products__quantity")
+        ).order_by("-sold_count")
 
 
 class PopularGoodAPIView(ListAPIView):
@@ -126,31 +115,25 @@ class PopularGoodAPIView(ListAPIView):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-
         return Good.objects.annotate(
-            sold_count=Sum('product__sold_products__quantity')
-        ).order_by('-sold_count')
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+            sold_count=Sum("product__sold_products__quantity")
+        ).order_by("-sold_count")
 
 
 class NewTicketsListView(ListAPIView):
-    queryset = Ticket.objects.all().order_by('product__created')
+    queryset = Ticket.objects.all().order_by("product__created")
     serializer_class = TicketSerializer
     pagination_class = CustomPageNumberPagination
 
 
 class NewPhonesListView(ListAPIView):
-    queryset = Phone.objects.all().order_by('product__created')
+    queryset = Phone.objects.all().order_by("product__created")
     serializer_class = PhoneSerializer
     pagination_class = CustomPageNumberPagination
 
 
 class NewGoodsListView(ListAPIView):
-    queryset = Good.objects.all().order_by('product__created')
+    queryset = Good.objects.all().order_by("product__created")
     serializer_class = GoodSerializer
     pagination_class = CustomPageNumberPagination
 
@@ -164,6 +147,7 @@ class TicketsOnSaleListView(ListAPIView):
         )
         return queryset
 
+
 class PhonesOnSaleListView(ListAPIView):
     serializer_class = PhoneSerializer
 
@@ -172,6 +156,7 @@ class PhonesOnSaleListView(ListAPIView):
             Q(product__bonus__gt=0) | Q(product__stock__gt=0)
         )
         return queryset
+
 
 class GoodsOnSaleListView(ListAPIView):
     serializer_class = GoodSerializer
@@ -185,19 +170,22 @@ class GoodsOnSaleListView(ListAPIView):
 
 class MultiProductSearchView(views.APIView):
     def get(self, request):
-        search_query = request.query_params.get('search', None)
+        search_query = request.query_params.get("search", None)
 
         if not search_query:
-            return Response({"message": "No search query provided"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "No search query provided"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         tickets = Ticket.objects.filter(event_name__icontains=search_query)
         phones = Phone.objects.filter(model_name__icontains=search_query)
         goods = Good.objects.filter(name__icontains=search_query)
 
         results = {
-            'tickets': TicketSerializer(tickets, many=True).data,
-            'phones': PhoneSerializer(phones, many=True).data,
-            'goods': GoodSerializer(goods, many=True).data
+            "tickets": TicketSerializer(tickets, many=True).data,
+            "phones": PhoneSerializer(phones, many=True).data,
+            "goods": GoodSerializer(goods, many=True).data,
         }
 
         return Response(results)
