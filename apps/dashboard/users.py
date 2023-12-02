@@ -20,14 +20,11 @@ class UserListView(ListView):
 class UserOrdersView(DetailView):
     model = Profile
     template_name = "customer/users/user_orders_list.html"
-
     def get_context_data(self, **kwargs):
         context = super(UserOrdersView, self).get_context_data(**kwargs)
         orders = Order.objects.filter(user__id=self.kwargs['pk'])
         if orders:
-            print(orders)
             context["orders"] = orders
         else:
             context["no_orders_message"] = "This user has no orders."
-
         return context
