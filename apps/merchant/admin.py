@@ -4,5 +4,12 @@ from .models import *
 
 # Register your models here.
 admin.site.register(Order)
-admin.site.register(Information)
+
+
+class InformationAdmin(admin.ModelAdmin):
+    list_display = ['reminder', 'agreement', 'shipment_terms',
+                    'privacy_policy', 'about_us', 'support_center']
+
+
+admin.site.register(Information, InformationAdmin)
 admin.site.register(OrderItem)
