@@ -16,7 +16,8 @@ urlpatterns = [
     path("favorite/list/", views.FavoriteListAPIView.as_view()),
     path("favorite/<int:pk>/retriev/", views.FavoriteRetrieveUpdateDelete.as_view()),
     path("register/", views.RegisterView.as_view(), name="send_otp"),
-    path("verify_otp/", views.VerifyRegisterOTPView.as_view(), name="verify_otp"),
+    path("verify-otp/", views.VerifyRegisterOTPView.as_view(), name="verify_otp"),
     path("login/", views.LoginView.as_view(), name="login"),
+    path("set-password/", views.SetPasswordView.as_view()),
     path("banners/", views.BannerListAPIView.as_view(), name="banner"),
 ]
