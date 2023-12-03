@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from apps.merchant.models import Information
-from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView
+from django.views.generic import ListView
+from django.views import View
 
 
 def index(request):
@@ -10,5 +11,16 @@ def index(request):
 def dashboard(request):
     return render(request, "base.html")
 
-def get_info(request):
-    return render(request, "dashboard/info_list.html")
+
+class InformationView(ListView):
+    model = Information
+    template_name = "dashboard/info_list.html"  # your template name
+    context_object_name = "infos"
+
+    def get_queryset(self):
+        return Information.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
