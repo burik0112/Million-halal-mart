@@ -27,6 +27,8 @@ from .serializers import (
     LocationListSerializer,
     LoginSerializer,
     RegisterSerializer,
+    VerifyOTPSerializer,
+    SetPasswordSerializer,
 )
 
 
@@ -166,27 +168,46 @@ def send_otp_sms(phone_number, otp):
 
 class VerifyRegisterOTPView(APIView):
     def post(self, request, *args, **kwargs):
-        phone_number = request.data.get("phone_number")
-        otp = request.data.get("otp")
+        serializer = VerifyOTPSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        phone_number = serializer.validated_data["phone_number"]
+        otp = serializer.validated_data["otp"]
+
+        profile = Profile.objects.get(phone_number=phone_number)
+        profile.otp = None
+        profile.save()
+
+        # Bu yerda token berilmaydi, faqat OTPni tasdiqlash amalga oshiriladi
+        return Response(
+            {"message": "OTP verified successfully. Please set your password."},
+            status=status.HTTP_200_OK,
+        )
+
+
+class SetPasswordView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = SetPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        phone_number = serializer.validated_data["phone_number"]
+        new_password = serializer.validated_data["new_password"]
 
         try:
-            profile = Profile.objects.get(phone_number=phone_number)
-            if profile.otp == otp:
-                profile.otp = None
-                profile.save()
+            user = User.objects.get(username=phone_number)
+            user.set_password(new_password)
+            user.save()
 
-                token, created = Token.objects.get_or_create(user=profile.origin)
-                return Response(
-                    {"token": token.key, "message": "Registration successful"},
-                    status=status.HTTP_200_OK,
-                )
-            else:
-                return Response(
-                    {"message": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST
-                )
-        except Profile.DoesNotExist:
+            # Foydalanuvchiga token yaratish yoki topish
+            token, created = Token.objects.get_or_create(user=user)
+
             return Response(
-                {"message": "Profile not found"}, status=status.HTTP_404_NOT_FOUND
+                {"token": token.key, "message": "Password set successfully"},
+                status=status.HTTP_200_OK,
+            )
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
 

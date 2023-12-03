@@ -40,6 +40,33 @@ class RegisterSerializer(serializers.Serializer):
         return value
 
 
+class VerifyOTPSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(max_length=17)
+    otp = serializers.CharField(max_length=100)
+
+    def validate(self, data):
+        phone_number = data.get("phone_number")
+        otp = data.get("otp")
+
+        try:
+            profile = Profile.objects.get(phone_number=phone_number)
+            if profile.otp != otp:
+                raise serializers.ValidationError("Invalid OTP")
+        except Profile.DoesNotExist:
+            raise serializers.ValidationError("Profile not found")
+
+        return data
+
+
+class SetPasswordSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(max_length=17)
+    new_password = serializers.CharField(style={"input_type": "password"})
+
+    def validate_new_password(self, value):
+        # Bu yerda parolni validatsiya qilish qoidalari qo'shilishi mumkin
+        return value
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
