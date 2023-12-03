@@ -27,4 +27,4 @@ class Information(TimeStampedModel, models.Model):
     support_center = models.TextField(blank=True)
 
     def __str__(self) -> str:
-        return self.created
+        return str(self.created)

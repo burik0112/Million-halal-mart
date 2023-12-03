@@ -19,7 +19,7 @@ from .product import (
     GoodDeleteView,
 )
 from .users import (UserListView, UserOrdersView)
-from .main import (dashboard, get_info)
+from .main import (dashboard, InformationView)
 urlpatterns = [
     path("", dashboard, name="dashboard"),
     path("product/create-phone/", PhoneCreateView.as_view(), name="create_phone"),
@@ -56,7 +56,7 @@ urlpatterns = [
     path("users/", UserListView.as_view(), name="users-list"),
     path("users/<int:pk>/order", UserOrdersView.as_view(), name="user-orders-list"),
 
-    path('info/list/', get_info, name='info-list'),
+    path('info/list/', InformationView.as_view(), name='info-list'),
 
 
 ]
