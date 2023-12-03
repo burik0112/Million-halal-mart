@@ -4,7 +4,7 @@ from .models import *
 
 # Register your models here.
 class NewsAdmin(admin.ModelAdmin):
-    list_display=['title', 'start_date','end_date', 'description']
+    list_display=['start_date','title', 'end_date', 'description']
 admin.site.register(Profile)
 admin.site.register(Location)
 admin.site.register(News, NewsAdmin)

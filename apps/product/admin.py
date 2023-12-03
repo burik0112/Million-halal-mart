@@ -27,18 +27,18 @@ admin.site.register(ProductItem, ProductItemAdmin)
 
 
 class TicketAdmin(admin.ModelAdmin):
-    list_display = ['event_name', 'product', 'event_date', 'category']
+    list_display = ['event_date', 'event_name', 'product', 'category']
 
 
 admin.site.register(Ticket, TicketAdmin)
 class PhoneAdmin(admin.ModelAdmin):
-    list_display = ['model_name', 'ram', 'storage', 'category', 'color']
+    list_display = ['category','model_name', 'ram', 'storage',  'color']
 admin.site.register(Phone, PhoneAdmin)
 class GoodAdmin(admin.ModelAdmin):
-    list_display = ['name', 'product', 'ingredients', 'expire_date', 'sub_cat']
+    list_display = ['expire_date', 'name', 'product', 'ingredients',  'sub_cat']
 admin.site.register(Good, GoodAdmin)
 class ImageAdmin(admin.ModelAdmin):
-    list_display = ['name', 'image', 'product']
+    list_display = ['image','name',  'product']
 admin.site.register(Image, ImageAdmin)
 class SoldProductAdmin(admin.ModelAdmin):
     list_display = ['user', 'amount', 'product', 'quantity']
