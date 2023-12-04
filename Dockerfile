@@ -6,6 +6,18 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /code
 
+RUN apt-get update \
+    && apt-get install \
+    -y \
+    --no-install-recommends \
+    --no-install-suggests \
+    # Required for psycopg2
+    gcc \
+    g++ \
+    libpq-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 COPY ./requirements.txt .
 
 RUN apt-get update -y && \
