@@ -1,9 +1,22 @@
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
+from decouple import config
 
 from config.settings.base import *
 
-DEBUG = False
+DEBUG = config("DEBUG")
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("DB_NAME"),
+        "USER": config("BOUNCER_USER"),
+        "PASSWORD": config("BOUNCER_PASSWORD"),
+        "HOST": config("BOUNCER_HOST"),
+        "PORT": config("BOUNCER_PORT"),
+    }
+}
+
 
 # STATIC_URL = "static/"
 # STATIC_ROOT = os.path.join(BASE_DIR, "../", "staticfiles")
