@@ -2,17 +2,17 @@ name: Deploy to server
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
-    deploy:
-      runs-on: self-hosted
-      steps:
-        - name: Pulling latest changes
-          run: git -C /home/project/mygov-bot pull
-        
-        - name: Build docker containers
-          run: docker-compose -f /home/project/mygov-bot/docker-compose.prod.yml build
-          
-        - name: Deploy changes
-          run: docker-compose -f /home/project/mygov-bot/docker-compose.prod.yml up -d
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Pulling latest changes
+        run: git -C /home/ubuntu/Million-halal-mart/ pull
+
+      - name: Build docker containers
+        run: docker-compose -f /home/ubuntu/Million-halal-mart/docker-compose.prod.yml build
+
+      - name: Deploy changes
+        run: docker-compose -f /home/ubuntu/Million-halal-mart/docker-compose.prod.yml up -d
