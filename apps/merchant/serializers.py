@@ -26,3 +26,14 @@ class InformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Information
         fields = "__all__"
+
+
+class OrderStatusUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ["status"]
+
+    def update(self, instance, validated_data):
+        instance.status = validated_data.get("status", instance.status)
+        instance.save()
+        return instance

@@ -5,13 +5,16 @@ from rest_framework.generics import (
     ListAPIView,
     RetrieveUpdateDestroyAPIView,
 )
-from django.shortcuts import render, redirect, HttpResponse
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.response import Response
 from .models import Order, OrderItem, Information
 from .serializers import (
     CustomPageNumberPagination,
     OrderItemSerializer,
     OrderSerializer,
     InformationSerializer,
+    OrderStatusUpdateSerializer,
 )
 
 # Create your views here.
@@ -57,4 +60,18 @@ class InformationListAPIView(ListAPIView):
     serializer_class = InformationSerializer
 
 
-
+class CheckoutView(APIView):
+    def post(self, request, order_id, *args, **kwargs):
+        try:
+            order = Order.objects.get(id=order_id, status="in_cart", user=request.user)
+            serializer = OrderStatusUpdateSerializer(order, data={"status": "pending"})
+            if serializer.is_valid():
+                serializer.save()
+                # Botga xabar yuborish logikasi
+                return Response({"status": "success", "order_id": order.id})
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Order.DoesNotExist:
+            return Response(
+                {"status": "error", "message": "Order not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
