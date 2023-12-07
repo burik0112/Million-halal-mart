@@ -30,6 +30,7 @@ class SubCategory(TimeStampedModel, models.Model):
     stock = models.IntegerField(default=0)
     bonus = models.IntegerField(default=0)
     active = models.BooleanField(default=True)
+
     def __str__(self) -> str:
         return self.name
 
@@ -156,7 +157,7 @@ class SoldProduct(TimeStampedModel, models.Model):
         ProductItem, on_delete=models.SET_NULL, null=True, related_name="sold_products"
     )
     user = models.ForeignKey("customer.Profile", on_delete=models.SET_NULL, null=True)
-    amount = models.DecimalField(decimal_places=2, default=0, max_digits=10)
+    amount = models.DecimalField(decimal_places=2, default=0, max_digits=20)
     quantity = models.PositiveIntegerField(default=0)
 
     def __int__(self) -> int:

@@ -17,9 +17,9 @@ class Order(TimeStampedModel, models.Model):
         "product.ProductItem", through="OrderItem", related_name="order"
     )
     comment = models.TextField(blank=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="in_cart")
 
-    total_amount = models.DecimalField(decimal_places=2, max_digits=12, default=0.00)
+    total_amount = models.DecimalField(decimal_places=2, max_digits=20, default=0.00)
 
     def update_total_amount(self):
         self.total_amount = sum(
