@@ -12,7 +12,7 @@ jobs:
         run: git -C /home/ubuntu/Million-halal-mart/ pull
 
       - name: Build docker containers
-        run: docker-compose -f /home/ubuntu/Million-halal-mart/docker-compose.prod.yml build
+        run: docker-compose -f /home/ubuntu/Million-halal-mart/docker-compose.prod.yml build --cache-from
 
       - name: Deploy changes
         run: docker-compose -f /home/ubuntu/Million-halal-mart/docker-compose.prod.yml up -d
