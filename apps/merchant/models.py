@@ -1,5 +1,6 @@
 from django.db import models
 from model_utils.models import TimeStampedModel
+from django.db.models import F
 
 
 class Order(TimeStampedModel, models.Model):
@@ -20,6 +21,21 @@ class Order(TimeStampedModel, models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="in_cart")
 
     total_amount = models.DecimalField(decimal_places=2, max_digits=20, default=0.00)
+
+    def save(self, *args, **kwargs):
+        # Agar yangi holat 'sent' bo'lsa va oldingi holat 'sent' emas bo'lsa
+        if self.status == "sent" and self.pk is not None:
+            old_status = Order.objects.get(pk=self.pk).status
+            if old_status != "sent":
+                self.update_product_stock()
+        super(Order, self).save(*args, **kwargs)
+
+    def update_product_stock(self):
+        # Bu yerda 'sent' holatidagi orderlar uchun ProductItem'larni yangilaymiz
+        for item in self.orderitem_set.all():
+            product_item = item.product
+            product_item.available_quantity = F("available_quantity") - item.quantity
+            product_item.save()
 
     def update_total_amount(self):
         total = 0
