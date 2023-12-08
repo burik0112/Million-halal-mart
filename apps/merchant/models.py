@@ -22,9 +22,11 @@ class Order(TimeStampedModel, models.Model):
     total_amount = models.DecimalField(decimal_places=2, max_digits=20, default=0.00)
 
     def update_total_amount(self):
-        self.total_amount = sum(
-            item.product.price * item.quantity for item in self.orderitem_set.all()
-        )
+        total = 0
+        for item in self.orderitem_set.all():
+            discounted_price = item.product.price * (1 - item.product.stock / 100)
+            total += discounted_price * item.quantity
+        self.total_amount = total
         self.save()
 
 
