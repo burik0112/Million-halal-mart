@@ -13,6 +13,10 @@ urlpatterns = [
     path("viewed/create/", views.ViewedNewsCreateAPIView.as_view()),
     path("viewed/list/", views.ViewedNewsCreateAPIView.as_view()),
     path("favorite/create/", views.FavoriteCreateAPIView.as_view()),
+    path(
+        "remove_from_favorites/<int:product_id>/",
+        views.RemoveFromFavoritesView.as_view(),
+    ),
     path("favorite/list/", views.FavoriteListAPIView.as_view()),
     path("favorite/<int:pk>/retriev/", views.FavoriteRetrieveUpdateDelete.as_view()),
     path("register/", views.RegisterView.as_view(), name="send_otp"),

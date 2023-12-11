@@ -105,6 +105,21 @@ class FavoriteCreateAPIView(CreateAPIView):
         serializer.save(user=self.request.user.profile)
 
 
+class RemoveFromFavoritesView(APIView):
+    def post(self, request, product_id, *args, **kwargs):
+        user = request.user
+
+        try:
+            favorite = Favorite.objects.get(user=user, product_id=product_id)
+            favorite.delete()
+            return Response({"status": "success"}, status=status.HTTP_204_NO_CONTENT)
+        except Favorite.DoesNotExist:
+            return Response(
+                {"error": "Item not found in favorites"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+
 class FavoriteListAPIView(ListAPIView):
     permission_class = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Favorite.objects.all().order_by("-pk")

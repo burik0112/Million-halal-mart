@@ -17,8 +17,7 @@ class Profile(TimeStampedModel, models.Model):
 
 
 class Location(TimeStampedModel, models.Model):
-    user = models.ForeignKey(
-        Profile, on_delete=models.CASCADE, related_name="location")
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="location")
     address = models.CharField(max_length=510)
 
 
@@ -33,9 +32,9 @@ class News(TimeStampedModel, models.Model):
 
 class ViewedNews(TimeStampedModel, models.Model):
     user = models.ForeignKey(
-        Profile, on_delete=models.CASCADE, related_name="viewednews")
-    news = models.ForeignKey(
-        News, on_delete=models.CASCADE, related_name="viewednews")
+        Profile, on_delete=models.CASCADE, related_name="viewednews"
+    )
+    news = models.ForeignKey(News, on_delete=models.CASCADE, related_name="viewednews")
 
     def __str__(self) -> str:
         return self.user.full_name
@@ -47,10 +46,16 @@ class Favorite(TimeStampedModel, models.Model):
         "product.ProductItem", on_delete=models.CASCADE, related_name="favorite"
     )
 
+    class Meta:
+        unique_together = ("user", "product")
+
+    def __str__(self) -> str:
+        return f"{self.user.username} - {self.product.desc}"
+
 
 class Banner(TimeStampedModel, models.Model):
     title = models.CharField(max_length=255, blank=True, null=True)
-    image = models.ImageField(upload_to='media/banner')
+    image = models.ImageField(upload_to="media/banner")
     active = models.BooleanField(default=True)
 
     def __str__(self) -> str:
