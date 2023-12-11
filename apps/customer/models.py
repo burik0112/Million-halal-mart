@@ -50,7 +50,7 @@ class Favorite(TimeStampedModel, models.Model):
         unique_together = ("user", "product")
 
     def __str__(self) -> str:
-        return f"{self.user.username} - {self.product.desc}"
+        return f"{self.user.origin.username} - {self.product.desc}"
 
 
 class Banner(TimeStampedModel, models.Model):
