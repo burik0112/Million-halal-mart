@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
-from apps.product.models import ProductItem, Good, Phone, Ticket
+from apps.product.models import ProductItem, Good, Phone, Ticket, Image
 from .models import Favorite, Location, News, Profile, ViewedNews, Banner
 
 
@@ -125,10 +125,17 @@ class GoodFavouriteSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class ImageForProductItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Image
+        fields = ["image", "name"]
+
+
 class ProductItemForFavouriteSerializer(serializers.ModelSerializer):
     tickets = TicketForFavouriteSerializer(read_only=True)
     phones = PhoneFavouriteSerializer(read_only=True)
     goods = GoodFavouriteSerializer(read_only=True)
+    images = ImageForProductItemSerializer(many=True, read_only=True, source="images")
 
     class Meta:
         model = ProductItem
