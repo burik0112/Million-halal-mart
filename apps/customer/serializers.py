@@ -135,7 +135,7 @@ class ProductItemForFavouriteSerializer(serializers.ModelSerializer):
     tickets = TicketForFavouriteSerializer(read_only=True)
     phones = PhoneFavouriteSerializer(read_only=True)
     goods = GoodFavouriteSerializer(read_only=True)
-    images = ImageForProductItemSerializer(many=True, read_only=True, source="images")
+    images = ImageForProductItemSerializer(many=True, read_only=True)
 
     class Meta:
         model = ProductItem
