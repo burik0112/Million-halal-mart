@@ -7,6 +7,7 @@ from rest_framework.generics import (
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, status, permissions
+from django.db import IntegrityError
 from twilio.rest import Client
 from django.conf import settings
 from rest_framework.response import Response
@@ -104,13 +105,31 @@ class FavoriteCreateAPIView(CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user.profile)
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(
+                serializer.data, status=status.HTTP_201_CREATED, headers=headers
+            )
+        except IntegrityError:
+            return Response(
+                {"message": "This favorite item already exists."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class RemoveFromFavoritesView(APIView):
     def post(self, request, product_id, *args, **kwargs):
         user = request.user
 
         try:
-            favorite = Favorite.objects.get(user=user, product_id=product_id)
+            favorite = Favorite.objects.get(user=user.profile, product_id=product_id)
             favorite.delete()
             return Response({"status": "success"}, status=status.HTTP_204_NO_CONTENT)
         except Favorite.DoesNotExist:
