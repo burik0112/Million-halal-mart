@@ -59,6 +59,7 @@ class InformationListAPIView(ListAPIView):
     queryset = Information.objects.all().order_by("-pk")
     serializer_class = InformationSerializer
 
+from apps.dashboard.main import bot
 
 class CheckoutView(APIView):
     def post(self, request, order_id, *args, **kwargs):
@@ -68,6 +69,7 @@ class CheckoutView(APIView):
             if serializer.is_valid():
                 serializer.save()
                 # Botga xabar yuborish logikasi
+                bot(order)
                 return Response({"status": "success", "order_id": order.id})
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Order.DoesNotExist:
