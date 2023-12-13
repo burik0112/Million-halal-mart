@@ -10,4 +10,5 @@ urlpatterns = [
     path("item/list", views.OrderItemListAPIView.as_view()),
     path("item/<int:pk>/retriev", views.OrderItemRetrieveUpdateDelete.as_view()),
     path("checkout/<int:order_id>/", views.CheckoutView.as_view(), name="checkout"),
+    path('information/', views.InformationListAPIView.as_view(), name='info')
 ]
