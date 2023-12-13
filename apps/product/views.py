@@ -140,6 +140,7 @@ class NewGoodsListView(ListAPIView):
 
 class TicketsOnSaleListView(ListAPIView):
     serializer_class = TicketSerializer
+    pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
         queryset = Ticket.objects.filter(
@@ -150,6 +151,7 @@ class TicketsOnSaleListView(ListAPIView):
 
 class PhonesOnSaleListView(ListAPIView):
     serializer_class = PhoneSerializer
+    pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
         queryset = Phone.objects.filter(
@@ -160,6 +162,7 @@ class PhonesOnSaleListView(ListAPIView):
 
 class GoodsOnSaleListView(ListAPIView):
     serializer_class = GoodSerializer
+    pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
         queryset = Good.objects.filter(
