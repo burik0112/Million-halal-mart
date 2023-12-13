@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
-
+from apps.product.serializers import ProductItemSerializer
 from .models import Order, OrderItem, Information
 
 
@@ -11,6 +11,7 @@ class CustomPageNumberPagination(PageNumberPagination):
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    products = ProductItemSerializer(read_only=True, many=True)
     class Meta:
         model = Order
         fields = "__all__"
