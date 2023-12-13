@@ -49,6 +49,7 @@ class ProductItem(TimeStampedModel, models.Model):
     available_quantity = models.PositiveIntegerField(default=0)
     stock = models.IntegerField(default=0)
     bonus = models.IntegerField(default=0)
+    is_favorite=models.BooleanField(default=False)
     active = models.BooleanField(default=True)
 
     def __str__(self) -> str:
