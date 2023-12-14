@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 from apps.product.serializers import ProductItemSerializer
-from .models import Order, OrderItem, Information
+from .models import Order, OrderItem, Information, Service
 
 
 class CustomPageNumberPagination(PageNumberPagination):
@@ -38,3 +38,8 @@ class OrderStatusUpdateSerializer(serializers.ModelSerializer):
         instance.status = validated_data.get("status", instance.status)
         instance.save()
         return instance
+
+class ServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = "__all__"
