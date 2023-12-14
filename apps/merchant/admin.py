@@ -11,5 +11,10 @@ class InformationAdmin(admin.ModelAdmin):
                     'privacy_policy', 'about_us', 'support_center']
 
 
+class ServiceAdmin(admin.ModelAdmin):
+    list_display = ['delivery_fee']
+
+
 admin.site.register(Information, InformationAdmin)
 admin.site.register(OrderItem)
+admin.site.register(Service, ServiceAdmin)
