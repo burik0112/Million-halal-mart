@@ -8,14 +8,16 @@ from rest_framework.generics import (
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from .models import Order, OrderItem, Information
+from .models import Order, OrderItem, Information, Service
 from .serializers import (
     CustomPageNumberPagination,
     OrderItemSerializer,
     OrderSerializer,
     InformationSerializer,
     OrderStatusUpdateSerializer,
+    ServiceSerializer
 )
+from apps.dashboard.main import bot
 
 # Create your views here.
 
@@ -59,13 +61,14 @@ class InformationListAPIView(ListAPIView):
     queryset = Information.objects.all().order_by("-pk")
     serializer_class = InformationSerializer
 
-from apps.dashboard.main import bot
 
 class CheckoutView(APIView):
     def post(self, request, order_id, *args, **kwargs):
         try:
-            order = Order.objects.get(id=order_id, status="in_cart", user=request.user)
-            serializer = OrderStatusUpdateSerializer(order, data={"status": "pending"})
+            order = Order.objects.get(
+                id=order_id, status="in_cart", user=request.user)
+            serializer = OrderStatusUpdateSerializer(
+                order, data={"status": "pending"})
             if serializer.is_valid():
                 serializer.save()
                 # Botga xabar yuborish logikasi
@@ -77,3 +80,8 @@ class CheckoutView(APIView):
                 {"status": "error", "message": "Order not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+
+
+class ServiceListAPIView(ListAPIView):
+    queryset = Service.objects.all().order_by("-pk")
+    serializer_class = ServiceSerializer
