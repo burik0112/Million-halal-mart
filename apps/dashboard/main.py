@@ -14,8 +14,8 @@ def get_env_value(env_variable):
         raise ImproperlyConfigured(error_msg)
 
 
-CHANNEL = get_env_value('CHANNEL')
-BOT_TOKEN = get_env_value('BOT_TOKEN')
+CHANNEL = get_env_value("CHANNEL")
+BOT_TOKEN = get_env_value("BOT_TOKEN")
 
 
 def index(request):
