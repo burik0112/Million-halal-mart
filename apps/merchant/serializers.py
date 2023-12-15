@@ -11,7 +11,14 @@ class CustomPageNumberPagination(PageNumberPagination):
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = "__all__"
+
+
+class OrderListSerializer(serializers.ModelSerializer):
     products = ProductItemSerializer(read_only=True, many=True)
+
     class Meta:
         model = Order
         fields = "__all__"
@@ -38,6 +45,7 @@ class OrderStatusUpdateSerializer(serializers.ModelSerializer):
         instance.status = validated_data.get("status", instance.status)
         instance.save()
         return instance
+
 
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:

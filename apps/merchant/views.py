@@ -15,7 +15,8 @@ from .serializers import (
     OrderSerializer,
     InformationSerializer,
     OrderStatusUpdateSerializer,
-    ServiceSerializer
+    ServiceSerializer,
+    OrderListSerializer,
 )
 from apps.dashboard.main import bot
 
@@ -29,7 +30,7 @@ class OrderCreateAPIView(CreateAPIView):
 
 class OrderListAPIView(ListAPIView):
     queryset = Order.objects.all().order_by("-pk")
-    serializer_class = OrderSerializer
+    serializer_class = OrderListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ["user__full_name"]
     filterset_fields = ["user__full_name"]
@@ -65,10 +66,8 @@ class InformationListAPIView(ListAPIView):
 class CheckoutView(APIView):
     def post(self, request, order_id, *args, **kwargs):
         try:
-            order = Order.objects.get(
-                id=order_id, status="in_cart", user=request.user)
-            serializer = OrderStatusUpdateSerializer(
-                order, data={"status": "pending"})
+            order = Order.objects.get(id=order_id, status="in_cart", user=request.user)
+            serializer = OrderStatusUpdateSerializer(order, data={"status": "pending"})
             if serializer.is_valid():
                 serializer.save()
                 # Botga xabar yuborish logikasi
