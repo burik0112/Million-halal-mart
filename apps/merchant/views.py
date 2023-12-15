@@ -17,6 +17,7 @@ from .serializers import (
     OrderStatusUpdateSerializer,
     ServiceSerializer,
     OrderListSerializer,
+    OrderCreateSerializer,
 )
 from apps.dashboard.main import bot
 
@@ -25,7 +26,10 @@ from apps.dashboard.main import bot
 
 class OrderCreateAPIView(CreateAPIView):
     queryset = Order.objects.all()
-    serializer_class = OrderSerializer
+    serializer_class = OrderCreateSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class OrderListAPIView(ListAPIView):
