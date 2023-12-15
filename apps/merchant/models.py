@@ -1,6 +1,7 @@
 from django.db import models
 from model_utils.models import TimeStampedModel
 from django.db.models import F
+from ckeditor.fields import RichTextField
 
 
 class Order(TimeStampedModel, models.Model):
@@ -66,6 +67,7 @@ class Information(TimeStampedModel, models.Model):
     privacy_policy = models.TextField(blank=True)
     about_us = models.TextField(blank=True)
     support_center = models.TextField(blank=True)
+    payment_data = RichTextField(blank=True)
 
     def __str__(self) -> str:
         return str(self.created)

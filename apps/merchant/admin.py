@@ -8,7 +8,7 @@ admin.site.register(Order)
 
 class InformationAdmin(admin.ModelAdmin):
     list_display = ['reminder', 'agreement', 'shipment_terms',
-                    'privacy_policy', 'about_us', 'support_center']
+                    'privacy_policy', 'about_us', 'support_center', 'payment_data']
 
 
 class ServiceAdmin(admin.ModelAdmin):
