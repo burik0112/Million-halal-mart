@@ -31,13 +31,32 @@ class OrderCreateAPIView(CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        if (
+            serializer.validated_data.get("status") == "in_cart"
+            and Order.objects.filter(user=request.user, status="in_cart").exists()
+        ):
+            return Response(
+                {"detail": "You already have an in-cart order."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
+
 
 class OrderListAPIView(ListAPIView):
     queryset = Order.objects.all().order_by("-pk")
     serializer_class = OrderListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ["user__full_name"]
-    filterset_fields = ["user__full_name"]
+    filterset_fields = ["user__full_name", "status"]
     pagination_class = CustomPageNumberPagination
 
 
@@ -71,7 +90,12 @@ class CheckoutView(APIView):
     def post(self, request, order_id, *args, **kwargs):
         try:
             order = Order.objects.get(id=order_id, status="in_cart", user=request.user)
-            serializer = OrderStatusUpdateSerializer(order, data={"status": "pending"})
+
+            # Mijoz tomonidan yuborilgan ma'lumotlarni qabul qilish
+            update_data = request.data.copy()
+            update_data["status"] = "pending"  # Statusni 'pending'ga o'zgartirish
+
+            serializer = OrderStatusUpdateSerializer(order, data=update_data)
             if serializer.is_valid():
                 serializer.save()
                 # Botga xabar yuborish logikasi
