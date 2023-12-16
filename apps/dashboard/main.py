@@ -40,6 +40,6 @@ class InformationView(ListView):
 
 
 def bot(order):
-    text4channel = f"""Yangi buyurtma:\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzili: {order.user.locaton}\nMahsulotlar: {order.products}\nIzoh: {order.comment}\nJami: {order.total_amount}"""
+    text4channel = f"""Yangi buyurtma:\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzili: {order.user.profile.locaton}\nMahsulotlar: {order.products}\nIzoh: {order.comment}\nJami: {order.total_amount}"""
     url = f"https://api.telegram.org/{BOT_TOKEN}/sendMessage?chat_id={CHANNEL}&text={text4channel}"
     return url

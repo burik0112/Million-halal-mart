@@ -8,7 +8,7 @@ from rest_framework.generics import (
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from .models import Order, OrderItem, Information, Service
+from .models import Order, OrderItem, Information, Service, SecialMedia
 from .serializers import (
     CustomPageNumberPagination,
     OrderItemSerializer,
@@ -18,6 +18,7 @@ from .serializers import (
     ServiceSerializer,
     OrderListSerializer,
     OrderCreateSerializer,
+    SocialMediaSerializer,
 )
 from apps.dashboard.main import bot
 
@@ -95,7 +96,8 @@ class CheckoutView(APIView):
 
             # Mijoz tomonidan yuborilgan ma'lumotlarni qabul qilish
             update_data = request.data.copy()
-            update_data["status"] = "pending"  # Statusni 'pending'ga o'zgartirish
+            # Statusni 'pending'ga o'zgartirish
+            update_data["status"] = "pending"
 
             serializer = OrderStatusUpdateSerializer(order, data=update_data)
             if serializer.is_valid():
@@ -114,3 +116,8 @@ class CheckoutView(APIView):
 class ServiceListAPIView(ListAPIView):
     queryset = Service.objects.all().order_by("-pk")
     serializer_class = ServiceSerializer
+
+
+class SocialMeadiaAPIView(ListAPIView):
+    queryset = SecialMedia.objects.all().order_by("-pk")
+    serializer_class = SocialMediaSerializer

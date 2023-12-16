@@ -15,6 +15,12 @@ class ServiceAdmin(admin.ModelAdmin):
     list_display = ['delivery_fee']
 
 
+class SecialMediaAdmin(admin.ModelAdmin):
+    list_display = ['telegram', 'instagram',
+                    'whatsapp', 'phone_number', 'imo', 'kakao']
+
+
 admin.site.register(Information, InformationAdmin)
 admin.site.register(OrderItem)
 admin.site.register(Service, ServiceAdmin)
+admin.site.register(SecialMedia, SecialMediaAdmin)

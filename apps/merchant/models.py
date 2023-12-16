@@ -19,9 +19,11 @@ class Order(TimeStampedModel, models.Model):
         "product.ProductItem", through="OrderItem", related_name="order"
     )
     comment = models.TextField(blank=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="in_cart")
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default="in_cart")
 
-    total_amount = models.DecimalField(decimal_places=2, max_digits=20, default=0.00)
+    total_amount = models.DecimalField(
+        decimal_places=2, max_digits=20, default=0.00)
 
     def save(self, *args, **kwargs):
         # Agar yangi holat 'sent' bo'lsa va oldingi holat 'sent' emas bo'lsa
@@ -35,20 +37,23 @@ class Order(TimeStampedModel, models.Model):
         # Bu yerda 'sent' holatidagi orderlar uchun ProductItem'larni yangilaymiz
         for item in self.orderitem_set.all():
             product_item = item.product
-            product_item.available_quantity = F("available_quantity") - item.quantity
+            product_item.available_quantity = F(
+                "available_quantity") - item.quantity
             product_item.save()
 
     def update_total_amount(self):
         total = 0
         for item in self.orderitem_set.all():
-            discounted_price = item.product.price * (1 - item.product.stock / 100)
+            discounted_price = item.product.price * \
+                (1 - item.product.stock / 100)
             total += discounted_price * item.quantity
         self.total_amount = total
         self.save()
 
 
 class OrderItem(TimeStampedModel, models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="orderitem")
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name="orderitem")
     product = models.ForeignKey(
         "product.ProductItem", on_delete=models.CASCADE, related_name="orderitem"
     )
@@ -56,20 +61,33 @@ class OrderItem(TimeStampedModel, models.Model):
 
 
 class Information(TimeStampedModel, models.Model):
-    reminder = models.TextField(blank=True)
-    agreement = models.TextField(blank=True)
-    shipment_terms = models.TextField(blank=True)
-    privacy_policy = models.TextField(blank=True)
-    about_us = models.TextField(blank=True)
-    support_center = models.TextField(blank=True)
-    payment_data = RichTextField(blank=True)
+    reminder = RichTextField(blank=True, null=True)
+    agreement = RichTextField(blank=True, null=True)
+    shipment_terms = RichTextField(blank=True, null=True)
+    privacy_policy = RichTextField(blank=True, null=True)
+    about_us = RichTextField(blank=True, null=True)
+    support_center = RichTextField(blank=True, null=True)
+    payment_data = RichTextField(blank=True, null=True)
 
     def __str__(self) -> str:
         return str(self.created)
 
 
+class SecialMedia(TimeStampedModel, models.Model):
+    telegram = models.URLField(blank=True, null=True)
+    instagram = models.URLField(blank=True, null=True)
+    whatsapp = models.URLField(blank=True, null=True)
+    phone_number = models.CharField(blank=True, null=True)
+    imo = models.URLField(blank=True, null=True)
+    kakao = models.URLField(blank=True, null=True)
+
+    def __str__(self) -> str:
+        return 'SocialMedias'
+
+
 class Service(TimeStampedModel, models.Model):
-    delivery_fee = models.DecimalField(max_digits=10, decimal_places=1, default=0)
+    delivery_fee = models.DecimalField(
+        max_digits=10, decimal_places=1, default=0)
 
     def __str__(self) -> str:
         return "Service"
