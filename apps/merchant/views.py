@@ -89,7 +89,7 @@ class InformationListAPIView(ListAPIView):
 class CheckoutView(APIView):
     def post(self, request, order_id, *args, **kwargs):
         try:
-            order = Order.objects.get(id=order_id, status="in_cart", user=request.user)
+            order = Order.objects.get(id=order_id, status="in_cart", user=request.user.profile)
 
             # Mijoz tomonidan yuborilgan ma'lumotlarni qabul qilish
             update_data = request.data.copy()
