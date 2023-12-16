@@ -16,3 +16,4 @@ drf-yasg==1.21.6
 coreapi
 django-twilio
 django-modeltranslation
+django-ckeditor
