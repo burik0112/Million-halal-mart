@@ -46,7 +46,7 @@ class InformationSerializer(serializers.ModelSerializer):
 class OrderStatusUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ["status"]
+        fields = ["status", "comment"]
 
     def update(self, instance, validated_data):
         instance.status = validated_data.get("status", instance.status)
