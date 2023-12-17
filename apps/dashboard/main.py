@@ -31,7 +31,7 @@ def dashboard(request):
 
 class InformationView(ListView):
     model = Information
-    template_name = "dashboard/info_list.html"  # your template name
+    template_name = "dashboard/info_list.html"  
     context_object_name = "infos"
 
     def get_queryset(self):
@@ -61,6 +61,8 @@ def bot(order):
     }
     encoded_reply_markup = urllib.parse.quote(json.dumps(reply_markup))
     url = f"""https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id=419717087&text={text4channel}&reply_markup={encoded_reply_markup}"""
+    # 419717087
+    # 542470747
     try:
         response = requests.get(url)
         response.raise_for_status()

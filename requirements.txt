@@ -17,3 +17,4 @@ coreapi
 django-twilio
 django-modeltranslation
 django-ckeditor
+telebot

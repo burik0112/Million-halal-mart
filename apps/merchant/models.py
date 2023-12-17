@@ -35,7 +35,7 @@ class Order(TimeStampedModel, models.Model):
 
     def update_product_stock(self):
         # Bu yerda 'sent' holatidagi orderlar uchun ProductItem'larni yangilaymiz
-        for item in self.orderitem_set.all():
+        for item in self.orderitem.all():
             product_item = item.product
             product_item.available_quantity = F(
                 "available_quantity") - item.quantity
@@ -43,7 +43,7 @@ class Order(TimeStampedModel, models.Model):
 
     def update_total_amount(self):
         total = 0
-        for item in self.orderitem_set.all():
+        for item in self.orderitem.all():
             discounted_price = item.product.price * \
                 (1 - item.product.stock / 100)
             total += discounted_price * item.quantity
