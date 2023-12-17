@@ -20,6 +20,7 @@ from .product import (
 )
 from .users import (UserListView, UserOrdersView)
 from .main import (dashboard, InformationView)
+from .bot import index
 urlpatterns = [
     path("", dashboard, name="dashboard"),
     path("product/create-phone/", PhoneCreateView.as_view(), name="create_phone"),
@@ -57,6 +58,9 @@ urlpatterns = [
     path("users/<int:pk>/order", UserOrdersView.as_view(), name="user-orders-list"),
 
     path('info/list/', InformationView.as_view(), name='info-list'),
+
+    path('bot/', index, name='bot'),
+
 
 
 ]
