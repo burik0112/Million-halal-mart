@@ -17,7 +17,8 @@ class Profile(TimeStampedModel, models.Model):
 
 
 class Location(TimeStampedModel, models.Model):
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="location")
+    user = models.ForeignKey(
+        Profile, on_delete=models.CASCADE, related_name="location")
     address = models.CharField(max_length=510)
     active = models.BooleanField(default=False)
 
@@ -35,7 +36,8 @@ class ViewedNews(TimeStampedModel, models.Model):
     user = models.ForeignKey(
         Profile, on_delete=models.CASCADE, related_name="viewednews"
     )
-    news = models.ForeignKey(News, on_delete=models.CASCADE, related_name="viewednews")
+    news = models.ForeignKey(
+        News, on_delete=models.CASCADE, related_name="viewednews")
 
     def __str__(self) -> str:
         return self.user.full_name

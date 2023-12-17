@@ -1,9 +1,11 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render
 from apps.merchant.models import Information
 from django.views.generic import ListView
-from django.views import View
 from decouple import config
 from django.core.exceptions import ImproperlyConfigured
+import requests
+import urllib.parse
+import json
 
 
 def get_env_value(env_variable):
@@ -14,8 +16,9 @@ def get_env_value(env_variable):
         raise ImproperlyConfigured(error_msg)
 
 
-CHANNEL = get_env_value("CHANNEL")
+CHANNEL = int(get_env_value("CHANNEL"))
 BOT_TOKEN = get_env_value("BOT_TOKEN")
+CHANNEL_USERNAME = '@openai_chat_gpt_robot'
 
 
 def index(request):
@@ -40,6 +43,27 @@ class InformationView(ListView):
 
 
 def bot(order):
-    text4channel = f"""Yangi buyurtma:\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzili: {order.user.profile.locaton}\nMahsulotlar: {order.products}\nIzoh: {order.comment}\nJami: {order.total_amount}"""
-    url = f"https://api.telegram.org/{BOT_TOKEN}/sendMessage?chat_id={CHANNEL}&text={text4channel}"
-    return url
+    text4channel = f"""Yangi buyurtma:\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
+    for location in order.user.location.all():
+        text4channel += f"  - {location.address}\n"
+
+    text4channel += f"Mahsulotlar: {order.products}\nIzoh: {order.comment}\nJami: {order.total_amount}"
+    inline_keyboard = [
+        [{"text": "Yes", "callback_data": f"yes|{order.id}"},
+            {"text": "No", "callback_data": f"no|{order.id}"}]
+    ]
+    reply_markup = {
+        "inline_keyboard": inline_keyboard,
+        "resize_keyboard": True,
+        "one_time_keyboard": False,
+        "selective": False,
+        "row_width": 2
+    }
+    encoded_reply_markup = urllib.parse.quote(json.dumps(reply_markup))
+    url = f"""https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id=419717087&text={text4channel}&reply_markup={encoded_reply_markup}"""
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.text
+    except Exception as e:
+        return f"Error: {e}"

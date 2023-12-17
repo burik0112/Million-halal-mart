@@ -6,11 +6,11 @@ from ckeditor.fields import RichTextField
 
 class Order(TimeStampedModel, models.Model):
     STATUS_CHOICES = (
-        ("in_cart", "In Cart"),
-        ("pending", "Pending"),
-        ("approved", "Approved"),
-        ("sent", "Sent"),
-        ("cancelled", "Cancelled"),
+        ("in_cart", "Savatchada"),
+        ("pending", "Kutilmoqda"),
+        ("approved", "To'lov tasdiqlandi"),
+        ("sent", "Yuborildi"),
+        ("cancelled", "Bekor qilindi"),
     )
     user = models.ForeignKey(
         "customer.Profile", on_delete=models.CASCADE, related_name="order"
