@@ -36,6 +36,15 @@ class OrderItemSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = "__all__"
 
+    def perform_create(self, serializer):
+        user = self.request.user
+        try:
+            order = Order.objects.get(user=user, status="in_cart")
+        except Order.DoesNotExist:
+            order = Order.objects.create(user=user, status="in_cart")
+
+        serializer.save(order=order)
+
 
 class InformationSerializer(serializers.ModelSerializer):
     class Meta:
