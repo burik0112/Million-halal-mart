@@ -70,6 +70,15 @@ class OrderItemCreateAPIView(CreateAPIView):
     queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
 
+    def perform_create(self, serializer):
+        user = self.request.user
+        try:
+            order = Order.objects.get(user=user, status="in_cart")
+        except Order.DoesNotExist:
+            order = Order.objects.create(user=user, status="in_cart")
+
+        serializer.save(order=order)
+
 
 class OrderItemListAPIView(ListAPIView):
     queryset = OrderItem.objects.all().order_by("-pk")
