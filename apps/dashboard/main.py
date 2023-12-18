@@ -31,7 +31,7 @@ def dashboard(request):
 
 class InformationView(ListView):
     model = Information
-    template_name = "dashboard/info_list.html"  
+    template_name = "dashboard/info_list.html"
     context_object_name = "infos"
 
     def get_queryset(self):
@@ -43,10 +43,9 @@ class InformationView(ListView):
 
 
 def bot(order):
-    text4channel = f"""Yangi buyurtma:\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
+    text4channel = f"""🔰Yangi buyurtma:\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
     for location in order.user.location.all():
         text4channel += f"  - {location.address}\n"
-
     text4channel += f"Mahsulotlar: {order.products}\nIzoh: {order.comment}\nJami: {order.total_amount}"
     inline_keyboard = [
         [{"text": "Yes", "callback_data": f"yes|{order.id}"},
