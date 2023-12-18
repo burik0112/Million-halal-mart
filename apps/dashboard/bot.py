@@ -49,7 +49,7 @@ def handle_callback_query(call):
     order = Order.objects.get(id=int(call.data[-1]))
     order.status = 'approved'
     order.save()
-    text4channel = f"""Yangi buyurtma:\nHolati: {order.status}\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
+    text4channel = f"""✅Buyurtma {order.get_status_display_value()}\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
     for location in order.user.location.all():
         text4channel += f"  - {location.address}\n"
 
@@ -70,7 +70,7 @@ def handle_callback_query(call):
     order = Order.objects.get(id=int(call.data[-1]))
     order.status = 'cancelled'
     order.save()
-    text4channel = f"""Yangi buyurtma:\nHolati: {order.status}\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
+    text4channel = f"""❌Buyurtma {order.get_status_display_value()}\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
     for location in order.user.location.all():
         text4channel += f"  - {location.address}\n"
 
@@ -83,26 +83,23 @@ def handle_callback_query(call):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("sent|"))
 def handle_callback_query(call):
-
     order_id = int(call.data[-1])
-    print(f"Attempting to retrieve order with ID: {order_id}")
-
     try:
         order = Order.objects.get(id=order_id)
-        print(f"Order status before update: {order.status}")
-
         order.status = 'sent'
-        print(f"Order status after update: {order.status}")
-
         order.save()
-        text4channel = f"""Yangi buyurtma:\nHolati:{order.status}\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
+        text4channel = f"""🚚Buyurtma {order.get_status_display_value()}\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
         for location in order.user.location.filter(active=True):
             text4channel += f"  - {location.address}\n"
         text4channel += f"Mahsulotlar: {order.products}\nIzoh: {order.comment}\nJami: {order.total_amount}"
+        bot.delete_message(call.from_user.id, call.message.message_id)
+
         bot.send_message(
-            call.from_user.id, '№{order.id} buyurtma yuborildi!',
+            call.from_user.id, text4channel,
         )
     except ObjectDoesNotExist:
-        print(f"Order with ID {order_id} does not exist.")
+        bot.send_message(
+            call.from_user.id, f"Order with ID {order_id} does not exist.")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        bot.send_message(
+            call.from_user.id, f"An error occurred: {e}")

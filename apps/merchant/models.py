@@ -2,6 +2,9 @@ from django.db import models
 from model_utils.models import TimeStampedModel
 from django.db.models import F
 from ckeditor.fields import RichTextField
+from rest_framework.response import Response
+from rest_framework import status
+from django.db.models import F, fields, ExpressionWrapper
 
 
 class Order(TimeStampedModel, models.Model):
@@ -37,8 +40,22 @@ class Order(TimeStampedModel, models.Model):
         # Bu yerda 'sent' holatidagi orderlar uchun ProductItem'larni yangilaymiz
         for item in self.orderitem.all():
             product_item = item.product
-            product_item.available_quantity = F(
-                "available_quantity") - item.quantity
+
+            # Calculate the new value of available_quantity using annotate
+            new_quantity = F("available_quantity") - item.quantity
+            product_item_with_updated_quantity = product_item.__class__.objects.filter(
+                id=product_item.id
+            ).annotate(
+                new_available_quantity=ExpressionWrapper(
+                    new_quantity, output_field=fields.PositiveIntegerField())
+            ).values("new_available_quantity").get()
+
+            if product_item_with_updated_quantity["new_available_quantity"] < 0:
+                response_data = {'error': 'Not enough product'}
+                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+            product_item.available_quantity = product_item_with_updated_quantity[
+                "new_available_quantity"]
             product_item.save()
 
     def update_total_amount(self):
@@ -49,6 +66,12 @@ class Order(TimeStampedModel, models.Model):
             total += discounted_price * item.quantity
         self.total_amount = total
         self.save()
+
+    def get_status_display_value(self):
+        """
+        Returns the human-readable value for the status.
+        """
+        return dict(self.STATUS_CHOICES).get(self.status, "Unknown")
 
 
 class OrderItem(TimeStampedModel, models.Model):
