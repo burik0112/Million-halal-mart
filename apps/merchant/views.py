@@ -97,7 +97,7 @@ class CheckoutView(APIView):
             # Mijoz tomonidan yuborilgan ma'lumotlarni qabul qilish
             update_data = request.data.copy()
             # Statusni 'pending'ga o'zgartirish
-            # update_data["status"] = "pending"
+            update_data["status"] = "pending"
 
             serializer = OrderStatusUpdateSerializer(order, data=update_data)
             if serializer.is_valid():

@@ -50,6 +50,7 @@ class OrderStatusUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.status = validated_data.get("status", instance.status)
+        instance.comment = validated_data.get("comment", instance.comment)
         instance.save()
         return instance
 
