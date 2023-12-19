@@ -32,9 +32,17 @@ class OrderListSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    order = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = OrderItem
         fields = "__all__"
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+        order, created = Order.objects.get_or_create(user=user.profile, status="in_cart")
+        validated_data["order"] = order
+        return super().create(validated_data)
 
 
 class InformationSerializer(serializers.ModelSerializer):
