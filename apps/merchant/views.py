@@ -70,14 +70,13 @@ class OrderItemCreateAPIView(CreateAPIView):
     queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
 
-    def perform_create(self, serializer):
-        user = self.request.user
-        try:
-            order = Order.objects.get(user=user, status="in_cart")
-        except Order.DoesNotExist:
-            order = Order.objects.create(user=user, status="in_cart")
-
-        serializer.save(order=order)
+    def get_serializer_context(self):
+        """
+        Bu metod serializerga qo'shimcha kontekstni o'tkazish uchun ishlatiladi.
+        """
+        context = super(OrderItemCreateAPIView, self).get_serializer_context()
+        context["request"] = self.request
+        return context
 
 
 class OrderItemListAPIView(ListAPIView):
