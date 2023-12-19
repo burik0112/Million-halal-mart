@@ -33,7 +33,7 @@ class OrderListSerializer(serializers.ModelSerializer):
 
 class OrderItemSerializer(serializers.ModelSerializer):
     order = serializers.PrimaryKeyRelatedField(read_only=True)
-
+    product = ProductItemSerializer(read_only=True)
     class Meta:
         model = OrderItem
         fields = "__all__"
