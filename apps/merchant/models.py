@@ -22,13 +22,19 @@ class Order(TimeStampedModel, models.Model):
         "product.ProductItem", through="OrderItem", related_name="order"
     )
     comment = models.TextField(blank=True)
-    status = models.CharField(
-        max_length=10, choices=STATUS_CHOICES, default="in_cart")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="in_cart")
 
-    total_amount = models.DecimalField(
-        decimal_places=2, max_digits=20, default=0.00)
+    total_amount = models.DecimalField(decimal_places=2, max_digits=20, default=0.00)
 
     def save(self, *args, **kwargs):
+        if self.status == "in_cart":
+            existing_order = Order.objects.filter(
+                user=self.user, status="in_cart"
+            ).exclude(pk=self.pk)
+            if existing_order.exists():
+                raise ValueError(
+                    "Foydalanuvchi allaqachon 'in_cart' statusidagi Orderga ega"
+                )
         # Agar yangi holat 'sent' bo'lsa va oldingi holat 'sent' emas bo'lsa
         if self.status == "sent" and self.pk is not None:
             old_status = Order.objects.get(pk=self.pk).status
@@ -43,26 +49,30 @@ class Order(TimeStampedModel, models.Model):
 
             # Calculate the new value of available_quantity using annotate
             new_quantity = F("available_quantity") - item.quantity
-            product_item_with_updated_quantity = product_item.__class__.objects.filter(
-                id=product_item.id
-            ).annotate(
-                new_available_quantity=ExpressionWrapper(
-                    new_quantity, output_field=fields.PositiveIntegerField())
-            ).values("new_available_quantity").get()
+            product_item_with_updated_quantity = (
+                product_item.__class__.objects.filter(id=product_item.id)
+                .annotate(
+                    new_available_quantity=ExpressionWrapper(
+                        new_quantity, output_field=fields.PositiveIntegerField()
+                    )
+                )
+                .values("new_available_quantity")
+                .get()
+            )
 
             if product_item_with_updated_quantity["new_available_quantity"] < 0:
-                response_data = {'error': 'Not enough product'}
+                response_data = {"error": "Not enough product"}
                 return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
             product_item.available_quantity = product_item_with_updated_quantity[
-                "new_available_quantity"]
+                "new_available_quantity"
+            ]
             product_item.save()
 
     def update_total_amount(self):
         total = 0
         for item in self.orderitem.all():
-            discounted_price = item.product.price * \
-                (1 - item.product.stock / 100)
+            discounted_price = item.product.price * (1 - item.product.stock / 100)
             total += discounted_price * item.quantity
         self.total_amount = total
         self.save()
@@ -75,8 +85,7 @@ class Order(TimeStampedModel, models.Model):
 
 
 class OrderItem(TimeStampedModel, models.Model):
-    order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name="orderitem")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="orderitem")
     product = models.ForeignKey(
         "product.ProductItem", on_delete=models.CASCADE, related_name="orderitem"
     )
@@ -105,12 +114,11 @@ class SecialMedia(TimeStampedModel, models.Model):
     kakao = models.URLField(blank=True, null=True)
 
     def __str__(self) -> str:
-        return 'SocialMedias'
+        return "SocialMedias"
 
 
 class Service(TimeStampedModel, models.Model):
-    delivery_fee = models.DecimalField(
-        max_digits=10, decimal_places=1, default=0)
+    delivery_fee = models.DecimalField(max_digits=10, decimal_places=1, default=0)
 
     def __str__(self) -> str:
         return "Service"
