@@ -6,7 +6,7 @@ from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
 )
 from rest_framework.views import APIView
-from rest_framework import status
+from rest_framework import status, permissions
 from rest_framework.response import Response
 from .models import Order, OrderItem, Information, Service, SecialMedia
 from .serializers import (
@@ -69,6 +69,7 @@ class OrderRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
 class OrderItemCreateAPIView(CreateAPIView):
     queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_serializer_context(self):
         """
