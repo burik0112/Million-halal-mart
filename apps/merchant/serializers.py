@@ -40,7 +40,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context["request"].user
-        order, created = Order.objects.get_or_create(user=user, status="in_cart")
+        order, created = Order.objects.get_or_create(user=user.profile, status="in_cart")
         validated_data["order"] = order
         return super().create(validated_data)
 
