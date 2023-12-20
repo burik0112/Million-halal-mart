@@ -75,7 +75,7 @@ class OrderItemListSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = (
-            "__all__"  # Boshqa maydonlaringiz bilan birga 'product_type' ham qo'shiling
+            "__all__"  
         )
 
     def get_product_type(self, obj):
