@@ -10,6 +10,7 @@ urlpatterns = [
     path("item/list/", views.OrderItemListAPIView.as_view()),
     path("item/<int:pk>/retriev/", views.OrderItemRetrieveUpdateDelete.as_view()),
     path("checkout/<int:order_id>/", views.CheckoutView.as_view(), name="checkout"),
-    path('information/', views.InformationListAPIView.as_view(), name='info'),
-    path('service/', views.ServiceListAPIView.as_view(), name='service'),
+    path("information/", views.InformationListAPIView.as_view(), name="info"),
+    path("service/", views.ServiceListAPIView.as_view(), name="service"),
+    path("social-media-urls/", views.SocialMeadiaAPIView.as_view()),
 ]
