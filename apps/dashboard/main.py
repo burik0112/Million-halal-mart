@@ -1,11 +1,18 @@
 from django.shortcuts import render
-from apps.merchant.models import Information
+from apps.merchant.models import Information, Service
 from django.views.generic import ListView
 from decouple import config
 from django.core.exceptions import ImproperlyConfigured
 import requests
 import urllib.parse
 import json
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic import ListView
+from apps.product.models import Phone, Ticket, Good, Category, SubCategory
+from apps.customer.models import News
+from django.views import View
+from .forms import ServiceEditForm, InformationEditForm
 
 
 def get_env_value(env_variable):
@@ -40,6 +47,55 @@ class InformationView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
+
+
+class InformationEditView(View):
+    template_name = 'dashboard/edit_info.html'
+
+    def get(self, request, pk):
+        info = get_object_or_404(Information, pk=pk)
+        form = InformationEditForm(instance=info)
+        return render(request, self.template_name, {'form': form, 'info': info})
+
+    def post(self, request, pk):
+        info = get_object_or_404(Information, pk=pk)
+        if 'edit' in request.POST:
+            form = InformationEditForm(request.POST, instance=info)
+            if form.is_valid():
+                form.save()
+                return redirect('info-list')
+        return render(request, self.template_name, {'form': form, 'info': info})
+
+
+class ServiceView(ListView):
+    model = Service
+    template_name = "dashboard/service_list.html"
+    context_object_name = "services"
+
+    def get_queryset(self):
+        return Service.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class ServiceEditView(View):
+    template_name = 'dashboard/edit_service.html'
+
+    def get(self, request, pk):
+        service = get_object_or_404(Service, pk=pk)
+        form = ServiceEditForm(instance=service)
+        return render(request, self.template_name, {'form': form, 'service': service})
+
+    def post(self, request, pk):
+        service = get_object_or_404(Service, pk=pk)
+        if 'edit' in request.POST:
+            form = ServiceEditForm(request.POST, instance=service)
+            if form.is_valid():
+                form.save()
+                return redirect('service-list')
+        return render(request, self.template_name, {'form': form, 'service': service})
 
 
 def bot(order):

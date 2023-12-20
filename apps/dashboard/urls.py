@@ -19,7 +19,7 @@ from .product import (
     GoodDeleteView,
 )
 from .users import (UserListView, UserOrdersView)
-from .main import (dashboard, InformationView)
+from .main import (dashboard, InformationView, InformationEditView, ServiceView, ServiceEditView)
 from .bot import index
 urlpatterns = [
     path("", dashboard, name="dashboard"),
@@ -58,6 +58,11 @@ urlpatterns = [
     path("users/<int:pk>/order", UserOrdersView.as_view(), name="user-orders-list"),
 
     path('info/list/', InformationView.as_view(), name='info-list'),
+    path('info/edit/<int:pk>/',
+         InformationEditView.as_view(), name='edit_info'),
+    path('service/list', ServiceView.as_view(), name='service-list'),
+    path('service/edit/<int:pk>/',
+         ServiceEditView.as_view(), name='edit_service'),
 
     path('bot/', index, name='bot'),
 
