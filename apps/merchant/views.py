@@ -12,6 +12,7 @@ from .models import Order, OrderItem, Information, Service, SecialMedia
 from .serializers import (
     CustomPageNumberPagination,
     OrderItemSerializer,
+    OrderItemListSerializer,
     OrderSerializer,
     InformationSerializer,
     OrderStatusUpdateSerializer,
@@ -82,7 +83,7 @@ class OrderItemCreateAPIView(CreateAPIView):
 
 class OrderItemListAPIView(ListAPIView):
     queryset = OrderItem.objects.all().order_by("-pk")
-    serializer_class = OrderItemSerializer
+    serializer_class = OrderItemListSerializer
     pagination_class = CustomPageNumberPagination
 
 

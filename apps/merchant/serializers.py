@@ -1,6 +1,11 @@
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
-from apps.product.serializers import ProductItemSerializer
+from apps.product.serializers import (
+    ProductItemSerializer,
+    PhoneSerializer,
+    TicketSerializer,
+    GoodSerializer,
+)
 from .models import Order, OrderItem, Information, Service, SecialMedia
 
 
@@ -33,16 +38,45 @@ class OrderListSerializer(serializers.ModelSerializer):
 
 class OrderItemSerializer(serializers.ModelSerializer):
     order = serializers.PrimaryKeyRelatedField(read_only=True)
-    product = ProductItemSerializer(read_only=True)
+
     class Meta:
         model = OrderItem
         fields = "__all__"
 
     def create(self, validated_data):
         user = self.context["request"].user
-        order, created = Order.objects.get_or_create(user=user.profile, status="in_cart")
+        order, created = Order.objects.get_or_create(
+            user=user.profile, status="in_cart"
+        )
         validated_data["order"] = order
         return super().create(validated_data)
+
+
+class OrderItemListSerializer(serializers.ModelSerializer):
+    product = ProductItemSerializer(read_only=True)
+    product_type = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OrderItem
+        fields = (
+            "__all__"  # Boshqa maydonlaringiz bilan birga 'product_type' ham qo'shiling
+        )
+
+    def get_product_type(self, obj):
+        product_item = obj.product
+        if hasattr(product_item, "phones"):
+            return {
+                "type": "Phone",
+                "details": PhoneSerializer(product_item.phones).data,
+            }
+        elif hasattr(product_item, "tickets"):
+            return {
+                "type": "Ticket",
+                "details": TicketSerializer(product_item.tickets).data,
+            }
+        elif hasattr(product_item, "goods"):
+            return {"type": "Good", "details": GoodSerializer(product_item.goods).data}
+        return None
 
 
 class InformationSerializer(serializers.ModelSerializer):
