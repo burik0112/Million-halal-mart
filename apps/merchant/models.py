@@ -22,9 +22,11 @@ class Order(TimeStampedModel, models.Model):
         "product.ProductItem", through="OrderItem", related_name="order"
     )
     comment = models.TextField(blank=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="in_cart")
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default="in_cart")
 
-    total_amount = models.DecimalField(decimal_places=2, max_digits=20, default=0.00)
+    total_amount = models.DecimalField(
+        decimal_places=2, max_digits=20, default=0.00)
 
     def save(self, *args, **kwargs):
         if self.status == "in_cart":
@@ -72,7 +74,8 @@ class Order(TimeStampedModel, models.Model):
     def update_total_amount(self):
         total = 0
         for item in self.orderitem.all():
-            discounted_price = item.product.price * (1 - item.product.stock / 100)
+            discounted_price = item.product.price * \
+                (1 - item.product.stock / 100)
             total += discounted_price * item.quantity
         self.total_amount = total
         self.save()
@@ -85,7 +88,8 @@ class Order(TimeStampedModel, models.Model):
 
 
 class OrderItem(TimeStampedModel, models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="orderitem")
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name="orderitem")
     product = models.ForeignKey(
         "product.ProductItem", on_delete=models.CASCADE, related_name="orderitem"
     )
@@ -118,7 +122,8 @@ class SecialMedia(TimeStampedModel, models.Model):
 
 
 class Service(TimeStampedModel, models.Model):
-    delivery_fee = models.DecimalField(max_digits=10, decimal_places=1, default=0)
+    delivery_fee = models.DecimalField(
+        max_digits=10, decimal_places=0, default=0)
 
     def __str__(self) -> str:
         return "Service"

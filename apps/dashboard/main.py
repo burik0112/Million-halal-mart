@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from apps.merchant.models import Information
+from apps.merchant.models import Information, Service
 from django.views.generic import ListView
 from decouple import config
 from django.core.exceptions import ImproperlyConfigured
@@ -36,6 +36,19 @@ class InformationView(ListView):
 
     def get_queryset(self):
         return Information.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class ServiceView(ListView):
+    model = Service
+    template_name = "dashboard/service_list.html"
+    context_object_name = "services"
+
+    def get_queryset(self):
+        return Service.objects.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
