@@ -2,10 +2,8 @@ from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 from apps.product.serializers import (
     ProductItemSerializer,
-    PhoneSerializer,
-    TicketSerializer,
-    GoodSerializer,
 )
+from apps.product.models import Phone, Ticket, Good
 from .models import Order, OrderItem, Information, Service, SecialMedia
 
 
@@ -50,6 +48,24 @@ class OrderItemSerializer(serializers.ModelSerializer):
         )
         validated_data["order"] = order
         return super().create(validated_data)
+
+
+class PhoneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Phone
+        fields = "__all__"
+
+
+class TicketSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = "__all__"
+
+
+class GoodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Good
+        fields = "__all__"
 
 
 class OrderItemListSerializer(serializers.ModelSerializer):
