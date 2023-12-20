@@ -24,6 +24,8 @@
 
                 <div class="card-body">
                   <h5 class="card-title">Information</h5>
+                  {% for info in infos%}
+                  <a href="{% url 'edit_info' info.id %}" class="btn btn-primary btn-sm">Edit texts</a>
                   <table class="table">
                       <thead>
                           <tr>
@@ -33,7 +35,6 @@
                           </tr>
                       </thead>
                       <tbody>
-                        {% for info in infos%}
                           <tr>
                               <th scope="row">1</th>
                               <td colspan="3">Reminder</td>

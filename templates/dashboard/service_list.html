@@ -24,6 +24,12 @@
 
                 <div class="card-body">
                   <h5 class="card-title">Information</h5>
+                  <td class="text-center">
+                    {% for service in services%}
+                    <a href="{% url 'edit_service' service.id %}" class="btn btn-primary btn-sm">Edit price</a>
+                    
+                  </td>
+                </tr>
                   <table class="table">
                       <thead>
                           <tr>
@@ -33,7 +39,6 @@
                           </tr>
                       </thead>
                       <tbody>
-                        {% for service in services%}
                           <tr>
                               <th scope="row">1</th>
                               <td colspan="3">Delivery fee</td>
