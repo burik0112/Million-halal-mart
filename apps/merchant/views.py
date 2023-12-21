@@ -7,12 +7,12 @@ from rest_framework.generics import (
 )
 from rest_framework.views import APIView
 from rest_framework import status, permissions
+from django.db import transaction
 from rest_framework.response import Response
 from .models import Order, OrderItem, Information, Service, SecialMedia
 from .serializers import (
     CustomPageNumberPagination,
     OrderItemSerializer,
-    OrderItemListSerializer,
     OrderSerializer,
     InformationSerializer,
     OrderStatusUpdateSerializer,
@@ -83,7 +83,7 @@ class OrderItemCreateAPIView(CreateAPIView):
 
 class OrderItemListAPIView(ListAPIView):
     queryset = OrderItem.objects.all().order_by("-pk")
-    serializer_class = OrderItemListSerializer
+    serializer_class = OrderItemSerializer
     pagination_class = CustomPageNumberPagination
 
 
@@ -99,26 +99,44 @@ class InformationListAPIView(ListAPIView):
 
 class CheckoutView(APIView):
     def post(self, request, order_id, *args, **kwargs):
-        try:
-            order = Order.objects.get(id=order_id, user=request.user.profile)
+        with transaction.atomic():
+            try:
+                # Avvalgi Order tekshiriladi
+                original_order = Order.objects.get(
+                    id=order_id, user=request.user.profile
+                )
 
-            # Mijoz tomonidan yuborilgan ma'lumotlarni qabul qilish
-            update_data = request.data.copy()
-            # Statusni 'pending'ga o'zgartirish
-            update_data["status"] = "pending"
+                # Agar Order to'langan yoki qabul qilingan bo'lsa, yangi Order yaratiladi
+                if original_order.status in ["approved", "sent", "cancelled"]:
+                    new_order = Order.objects.create(
+                        user=request.user.profile, status="pending"
+                    )
+                    for item in original_order.orderitem_set.all():
+                        OrderItem.objects.create(
+                            order=new_order,
+                            product=item.product,
+                            quantity=item.quantity,
+                        )
+                    order = new_order
+                else:
+                    order = original_order
 
-            serializer = OrderStatusUpdateSerializer(order, data=update_data)
-            if serializer.is_valid():
-                serializer.save()
-                # Botga xabar yuborish logikasi
-                bot(order)
-                return Response({"status": "success", "order_id": order.id})
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Order.DoesNotExist:
-            return Response(
-                {"status": "error", "message": "Order not found"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+                # Mijoz tomonidan yuborilgan ma'lumotlarni qabul qilish
+                update_data = request.data.copy()
+                update_data["status"] = "pending"
+
+                serializer = OrderStatusUpdateSerializer(order, data=update_data)
+                if serializer.is_valid():
+                    serializer.save()
+                    # Botga xabar yuborish logikasi
+                    bot(order)
+                    return Response({"status": "success", "order_id": order.id})
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            except Order.DoesNotExist:
+                return Response(
+                    {"status": "error", "message": "Order not found"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
 
 class ServiceListAPIView(ListAPIView):
