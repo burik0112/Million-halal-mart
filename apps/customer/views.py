@@ -170,8 +170,8 @@ class RegisterView(APIView):
         serializer.is_valid(raise_exception=True)
         phone_number = serializer.validated_data["phone_number"]
         full_name = serializer.validated_data.get("full_name", "")
-        if phone_number=='+821021424342':
-            otp=5555
+        if phone_number == "+821021424342":
+            otp = 5555
         else:
             otp = generate_otp()
             send_otp_sms(phone_number, otp)
@@ -180,7 +180,6 @@ class RegisterView(APIView):
             origin=user,
             defaults={"phone_number": phone_number, "full_name": full_name, "otp": otp},
         )
-
 
         return Response(
             {
@@ -251,3 +250,13 @@ class BannerListAPIView(ListAPIView):
     queryset = Banner.objects.all().order_by("-pk")
     serializer_class = BannerSerializer
     pagination_class = CustomPageNumberPagination
+
+
+class ProfileEditAPIView(generics.UpdateAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        # Foydalanuvchining profili olindi, agar yo'q bo'lsa, 404 xato qaytariladi
+        profile = Profile.objects.get(origin=self.request.user)
+        return profile

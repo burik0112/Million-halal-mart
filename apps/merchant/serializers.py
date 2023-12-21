@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
-from apps.product.serializers import ProductItemSerializer
+from apps.product.serializers import (
+    ProductItemSerializer,
+)
+from apps.product.models import Phone, Ticket, Good
 from .models import Order, OrderItem, Information, Service, SecialMedia
 
 
@@ -40,9 +43,63 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context["request"].user
-        order, created = Order.objects.get_or_create(user=user.profile, status="in_cart")
+        product = validated_data.get("product")
+        order, created = Order.objects.get_or_create(
+            user=user.profile, status="in_cart"
+        )
         validated_data["order"] = order
-        return super().create(validated_data)
+
+        order_item, item_created = OrderItem.objects.get_or_create(
+            order=order,
+            product=product,
+        )
+        if not item_created:
+            order_item.quantity += validated_data.get("quantity", 0)
+            order_item.save()
+        return order_item
+
+
+class PhoneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Phone
+        fields = "__all__"
+
+
+class TicketSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = "__all__"
+
+
+class GoodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Good
+        fields = "__all__"
+
+
+class OrderItemListSerializer(serializers.ModelSerializer):
+    product = ProductItemSerializer(read_only=True)
+    product_type = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OrderItem
+        fields = "__all__"
+
+    def get_product_type(self, obj):
+        product_item = obj.product
+        if hasattr(product_item, "phones"):
+            return {
+                "type": "Phone",
+                "details": PhoneSerializer(product_item.phones).data,
+            }
+        elif hasattr(product_item, "tickets"):
+            return {
+                "type": "Ticket",
+                "details": TicketSerializer(product_item.tickets).data,
+            }
+        elif hasattr(product_item, "goods"):
+            return {"type": "Good", "details": GoodSerializer(product_item.goods).data}
+        return None
 
 
 class InformationSerializer(serializers.ModelSerializer):

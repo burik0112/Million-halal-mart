@@ -3,6 +3,7 @@ from django.forms import ClearableFileInput
 from apps.product.models import Phone, ProductItem, SubCategory, Image, Ticket, Good, Category
 
 from apps.customer.models import News
+from apps.merchant.models import Information, Service
 
 
 class MultipleFileInput(forms.ClearableFileInput):
@@ -36,7 +37,8 @@ class MultipleFileField(forms.ImageField):
 class PhoneProductItemForm(forms.ModelForm):
     class Meta:
         model = Phone
-        fields = ["model_name", "ram", "storage", "category", "color", "condition"]
+        fields = ["model_name", "ram", "storage",
+                  "category", "color", "condition"]
         widgets = {
             "model_name": forms.TextInput(attrs={"class": "form-control"}),
             "ram": forms.Select(attrs={"class": "form-control"}),
@@ -153,7 +155,8 @@ class TicketProductItemForm(forms.ModelForm):
     )
     event_date = forms.DateTimeField(
         input_formats=["%Y-%m-%d"],  # Adjust the format as needed
-        widget=forms.DateTimeInput(attrs={"type": "date", "class": "form-control"}),
+        widget=forms.DateTimeInput(
+            attrs={"type": "date", "class": "form-control"}),
     )
     desc = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
@@ -289,7 +292,8 @@ class GoodProductItemForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
     measure = forms.ChoiceField(
-        choices=ProductItem.CHOICES, widget=forms.Select(attrs={"class": "form-select"})
+        choices=ProductItem.CHOICES, widget=forms.Select(
+            attrs={"class": "form-select"})
     )
     available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
@@ -308,7 +312,8 @@ class GoodProductItemForm(forms.ModelForm):
     )  # New field for multiple images # New field for multiple images
     expire_date = forms.DateTimeField(
         input_formats=["%Y-%m-%d"],  # Adjust the format as needed
-        widget=forms.DateTimeInput(attrs={"type": "date", "class": "form-control"}),
+        widget=forms.DateTimeInput(
+            attrs={"type": "date", "class": "form-control"}),
     )
 
     def save(self, commit=True):
@@ -353,7 +358,8 @@ class PhoneEditForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
     product_measure = forms.ChoiceField(
-        choices=ProductItem.CHOICES, widget=forms.Select(attrs={"class": "form-select"})
+        choices=ProductItem.CHOICES, widget=forms.Select(
+            attrs={"class": "form-select"})
     )
     product_available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
@@ -505,7 +511,8 @@ class TicketEditForm(forms.ModelForm):
 
 class GoodEditForm(forms.ModelForm):
     # Fields for the Good model
-    name = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
+    name = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "form-control"}))
     ingredients = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
@@ -594,3 +601,77 @@ class NewsForm(forms.ModelForm):
         "start_date": forms.TextInput(attrs={"type": "datetime-local"}),
         "end_date": forms.TextInput(attrs={"type": "datetime-local"}),
     }
+
+
+class ServiceEditForm(forms.ModelForm):
+
+    delivery_fee = forms.DecimalField(
+        decimal_places=0,
+        max_digits=10,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
+
+    class Meta:
+        model = Service
+        fields = [
+            "delivery_fee",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(ServiceEditForm, self).__init__(*args, **kwargs)
+        if self.instance:
+            self.fields["delivery_fee"].initial = self.instance.delivery_fee
+
+    def save(self, commit=True):
+        service = super(ServiceEditForm, self).save(commit=False)
+        if commit:
+            service.save()
+        return service
+
+
+class InformationEditForm(forms.ModelForm):
+
+    reminder = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    agreement = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    shipment_terms = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    privacy_policy = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    about_us = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    support_center = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    payment_data = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+
+    class Meta:
+        model = Information
+        fields = [
+            "reminder", "agreement", "shipment_terms", "privacy_policy", "about_us", "support_center", "payment_data",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(InformationEditForm, self).__init__(*args, **kwargs)
+        if self.instance:
+            self.fields["reminder"].initial = self.instance.reminder
+            self.fields["agreement"].initial = self.instance.agreement
+            self.fields["shipment_terms"].initial = self.instance.shipment_terms
+            self.fields["privacy_policy"].initial = self.instance.privacy_policy
+            self.fields["about_us"].initial = self.instance.about_us
+            self.fields["support_center"].initial = self.instance.support_center
+            self.fields["payment_data"].initial = self.instance.payment_data
+
+    def save(self, commit=True):
+        information = super(InformationEditForm, self).save(commit=False)
+        if commit:
+            information.save()
+        return information

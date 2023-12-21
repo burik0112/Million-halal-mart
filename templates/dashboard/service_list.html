@@ -24,47 +24,26 @@
 
                 <div class="card-body">
                   <h5 class="card-title">Information</h5>
-                  {% for info in infos%}
-                  <a href="{% url 'edit_info' info.id %}" class="btn btn-primary btn-sm">Edit texts</a>
+                  <td class="text-center">
+                    {% for service in services%}
+                    <a href="{% url 'edit_service' service.id %}" class="btn btn-primary btn-sm">Edit price</a>
+                    
+                  </td>
+                </tr>
                   <table class="table">
                       <thead>
                           <tr>
                               <th scope="col" rowspan="1" style="width: 50px; min-width: 50px;">#</th>
                               <th scope="col" colspan="3" style="width: 100px; min-width: 100px;">Name</th>
-                              <th scope="col" colspan="8" style="width: 200px; min-width: 200px;">Description</th>
+                              <th scope="col" colspan="8" style="width: 200px; min-width: 200px;">Price</th>
                           </tr>
                       </thead>
                       <tbody>
                           <tr>
                               <th scope="row">1</th>
-                              <td colspan="3">Reminder</td>
-                              <td colspan="8">{{info.reminder}}</td>
+                              <td colspan="3">Delivery fee</td>
+                              <td colspan="8">{{service.delivery_fee}} ₩</td>
                           </tr>
-                          <tr>
-                              <th scope="row">2</th>
-                              <td colspan="3">Agreement</td>
-                              <td colspan="8">{{info.agreement}}</td>
-                          </tr>
-                          <tr>
-                              <th scope="row">3</th>
-                              <td colspan="3">Shipment terms</td>
-                              <td colspan="8">{{info.shipment_terms}}</td>
-                          </tr>
-                          <tr>
-                            <th scope="row">4</th>
-                            <td colspan="3">Privacy & Policy</td>
-                            <td colspan="8">{{info.privacy_policy}}</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">5</th>
-                          <td colspan="3">About Us</td>
-                          <td colspan="8">{{info.about_us}}</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">6</th>
-                        <td colspan="3">Support Center</td>
-                        <td colspan="8">{{info.support_center}}</td>
-                    </tr>
                     {% endfor %}
                       </tbody>
                   </table>
