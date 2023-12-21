@@ -30,6 +30,15 @@ class LoginSerializer(serializers.Serializer):
         raise serializers.ValidationError("Invalid phone number or password")
 
 
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = [
+            "full_name",
+            "phone_number",
+        ]
+
+
 class RegisterSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=17)
     full_name = serializers.CharField(max_length=255, required=False, allow_blank=True)
