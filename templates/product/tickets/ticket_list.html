@@ -15,7 +15,6 @@
               <th scope="col" class="text-center">#</th>
               <th scope="col" class="text-center">Event</th>
               <th scope="col" class="text-center">Image</th>
-
               <th scope="col" class="text-center">Description</th>
               <th scope="col" class="text-center">Date</th>
               <th scope="col" class="text-center">Price</th>
@@ -38,7 +37,7 @@
               </td>
               <td class="text-center">{{ ticket.product.desc }}</td>
               <td class="text-center">{{ ticket.event_date }}</td>
-              <td class="text-center">₩{{ ticket.product.price }}</td>
+              <td class="text-center">{{ ticket.product.price }} ₩</td>
               <td class="text-center">{{ ticket.product.available_quantity }}</td>
               <td class="text-center">{{ ticket.product.stock }} %</td>
               <td class="text-center">{{ ticket.product.bonus }} %</td>
