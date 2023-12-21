@@ -7,12 +7,10 @@ import requests
 import urllib.parse
 import json
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse_lazy
 from django.views.generic import ListView
-from apps.product.models import Phone, Ticket, Good, Category, SubCategory
-from apps.customer.models import News
 from django.views import View
 from .forms import ServiceEditForm, InformationEditForm
+from apps.product.models import Phone, Ticket, Good
 
 
 def get_env_value(env_variable):
@@ -100,8 +98,13 @@ class ServiceEditView(View):
 
 def bot(order):
     text4channel = f"""🔰Yangi buyurtma:\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
+    products = ''
     for location in order.user.location.all():
         text4channel += f"  - {location.address}\n"
+    for i in order.orderitem.all():
+        product_type = get_product_type(i)
+        print(product_type, '*'*20)
+        # products+=f"""{product_type['details']}"""
     text4channel += f"Mahsulotlar: {order.products}\nIzoh: {order.comment}\nJami: {order.total_amount}"
     inline_keyboard = [
         [{"text": "Yes", "callback_data": f"yes|{order.id}"},
@@ -124,3 +127,20 @@ def bot(order):
         return response.text
     except Exception as e:
         return f"Error: {e}"
+
+
+def get_product_type(obj):
+    product_item = obj.product
+    if hasattr(product_item, "phones"):
+        return {
+            "type": "Phone",
+            "details": Phone(product_item.phones),
+        }
+    elif hasattr(product_item, "tickets"):
+        return {
+            "type": "Ticket",
+            "details": Ticket(product_item.tickets),
+        }
+    elif hasattr(product_item, "goods"):
+        return {"type": "Good", "details": Good(product_item.goods)}
+    return None
