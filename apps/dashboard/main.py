@@ -23,7 +23,7 @@ def get_env_value(env_variable):
 
 CHANNEL = int(get_env_value("CHANNEL"))
 BOT_TOKEN = get_env_value("BOT_TOKEN")
-CHANNEL_USERNAME = '@openai_chat_gpt_robot'
+CHANNEL_USERNAME = "@openai_chat_gpt_robot"
 
 
 def index(request):
@@ -48,21 +48,21 @@ class InformationView(ListView):
 
 
 class InformationEditView(View):
-    template_name = 'dashboard/edit_info.html'
+    template_name = "dashboard/edit_info.html"
 
     def get(self, request, pk):
         info = get_object_or_404(Information, pk=pk)
         form = InformationEditForm(instance=info)
-        return render(request, self.template_name, {'form': form, 'info': info})
+        return render(request, self.template_name, {"form": form, "info": info})
 
     def post(self, request, pk):
         info = get_object_or_404(Information, pk=pk)
-        if 'edit' in request.POST:
+        if "edit" in request.POST:
             form = InformationEditForm(request.POST, instance=info)
             if form.is_valid():
                 form.save()
-                return redirect('info-list')
-        return render(request, self.template_name, {'form': form, 'info': info})
+                return redirect("info-list")
+        return render(request, self.template_name, {"form": form, "info": info})
 
 
 class ServiceView(ListView):
@@ -79,21 +79,21 @@ class ServiceView(ListView):
 
 
 class ServiceEditView(View):
-    template_name = 'dashboard/edit_service.html'
+    template_name = "dashboard/edit_service.html"
 
     def get(self, request, pk):
         service = get_object_or_404(Service, pk=pk)
         form = ServiceEditForm(instance=service)
-        return render(request, self.template_name, {'form': form, 'service': service})
+        return render(request, self.template_name, {"form": form, "service": service})
 
     def post(self, request, pk):
         service = get_object_or_404(Service, pk=pk)
-        if 'edit' in request.POST:
+        if "edit" in request.POST:
             form = ServiceEditForm(request.POST, instance=service)
             if form.is_valid():
                 form.save()
-                return redirect('service-list')
-        return render(request, self.template_name, {'form': form, 'service': service})
+                return redirect("service-list")
+        return render(request, self.template_name, {"form": form, "service": service})
 
 
 def bot(order):
@@ -101,24 +101,26 @@ def bot(order):
     products = ''
     for location in order.user.location.all():
         text4channel += f"  - {location.address}\n"
-    for i in order.orderitem.all():
-        product_type = get_product_type(i)
-        print(product_type, '*'*20)
-        # products+=f"""{product_type['details']}"""
+
+    for product_item in order.products.all():
+        product_details = order.get_product_details(product_item)
+        text4channel += f"Maxsulot:\n- {product_details}"
     text4channel += f"Mahsulotlar: {order.products}\nIzoh: {order.comment}\nJami: {order.total_amount}"
     inline_keyboard = [
-        [{"text": "Yes", "callback_data": f"yes|{order.id}"},
-            {"text": "No", "callback_data": f"no|{order.id}"}]
+        [
+            {"text": "Yes", "callback_data": f"yes|{order.id}"},
+            {"text": "No", "callback_data": f"no|{order.id}"},
+        ]
     ]
     reply_markup = {
         "inline_keyboard": inline_keyboard,
         "resize_keyboard": True,
         "one_time_keyboard": False,
         "selective": False,
-        "row_width": 2
+        "row_width": 2,
     }
     encoded_reply_markup = urllib.parse.quote(json.dumps(reply_markup))
-    url = f"""https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id=419717087&text={text4channel}&reply_markup={encoded_reply_markup}"""
+    url = f"""https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id=542470747&text={text4channel}&reply_markup={encoded_reply_markup}"""
     # 419717087
     # 542470747
     try:
