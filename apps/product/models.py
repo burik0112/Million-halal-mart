@@ -45,7 +45,7 @@ class ProductItem(TimeStampedModel, models.Model):
     )
 
     desc = models.TextField()
-    price = models.DecimalField(decimal_places=1, max_digits=10, default=0)
+    price = models.DecimalField(decimal_places=0, max_digits=10, default=0)
     measure = models.IntegerField(choices=CHOICES, default=0)
     available_quantity = models.PositiveIntegerField(default=0)
     stock = models.IntegerField(default=0)
@@ -128,6 +128,18 @@ class Phone(models.Model):
         Category, on_delete=models.SET_NULL, null=True, related_name="phones"
     )
 
+    def get_ram_display(self):
+        return dict(self.RAM).get(self.ram, "Unknown")
+
+    def get_storage_display(self):
+        return dict(self.STORAGE).get(self.storage, "Unknown")
+
+    def get_color_display(self):
+        return dict(self.COLOR_CHOICES).get(self.color, "Unknown")
+
+    def get_condition_display(self):
+        return dict(self.CONDITION).get(self.condition, "Unknown")
+
     def __str__(self) -> str:
         return self.model_name
 
@@ -164,7 +176,7 @@ class SoldProduct(TimeStampedModel, models.Model):
     )
     user = models.ForeignKey(
         "customer.Profile", on_delete=models.SET_NULL, null=True)
-    amount = models.DecimalField(decimal_places=2, default=0, max_digits=20)
+    amount = models.DecimalField(decimal_places=0, default=0, max_digits=20)
     quantity = models.PositiveIntegerField(default=0)
 
     def __int__(self) -> int:

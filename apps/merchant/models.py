@@ -26,18 +26,19 @@ class Order(TimeStampedModel, models.Model):
         max_length=10, choices=STATUS_CHOICES, default="in_cart")
 
     total_amount = models.DecimalField(
-        decimal_places=2, max_digits=20, default=0.00)
+        decimal_places=0, max_digits=20, default=0.00)
 
     def get_product_details(self, product_item, order_item):
-        if product_item.stock == 0 or product_item.stock == None:
-            product_item.stock = 1
-        total_amount = product_item.price * order_item.quantity * product_item.stock
+        
+        total_amount = product_item.price * order_item.quantity - product_item.price*product_item.stock/100
+        print(total_amount)
+
         if hasattr(product_item, "goods"):
             return f"{product_item.goods.name} x {order_item.quantity} {product_item.get_measure_display()} = {total_amount} ₩"
         elif hasattr(product_item, "tickets"):
             return f"{product_item.tickets.event_name} x {order_item.quantity} {product_item.get_measure_display()} = {total_amount} ₩"
         elif hasattr(product_item, "phones"):
-            return f"{product_item.phones.model_name}/{product_item.phones.ram}/{product_item.phones.memory}x {order_item.quantity} {product_item.get_measure_display()} = {total_amount} ₩"
+            return f"{product_item.phones.model_name}/{product_item.phones.get_ram_display()}/{product_item.phones.get_storage_display()} x {order_item.quantity} {product_item.get_measure_display()} = {total_amount} ₩"
         return "Mahsulot tafsiloti mavjud emas"
 
     def save(self, *args, **kwargs):
