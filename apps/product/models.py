@@ -8,7 +8,8 @@ from django.utils import timezone
 # Create your models here.
 class Category(TimeStampedModel, models.Model):
     PRODUCT_TYPE = (("f", "Food"), ("p", "Phone"), ("t", "Ticket"))
-    main_type = models.CharField(max_length=1, choices=PRODUCT_TYPE, default="f")
+    main_type = models.CharField(
+        max_length=1, choices=PRODUCT_TYPE, default="f")
     name = models.CharField(max_length=255)
     image = models.ImageField(upload_to="category")
     desc = models.TextField()
@@ -49,11 +50,15 @@ class ProductItem(TimeStampedModel, models.Model):
     available_quantity = models.PositiveIntegerField(default=0)
     stock = models.IntegerField(default=0)
     bonus = models.IntegerField(default=0)
-    is_favorite=models.BooleanField(default=False)
+    is_favorite = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
 
     def __str__(self) -> str:
         return self.desc
+
+    def get_measure_display(self):
+        """Get the human-readable measure label."""
+        return dict(self.CHOICES).get(self.measure, "Unknown")
 
 
 class Ticket(models.Model):
@@ -157,7 +162,8 @@ class SoldProduct(TimeStampedModel, models.Model):
     product = models.ForeignKey(
         ProductItem, on_delete=models.SET_NULL, null=True, related_name="sold_products"
     )
-    user = models.ForeignKey("customer.Profile", on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(
+        "customer.Profile", on_delete=models.SET_NULL, null=True)
     amount = models.DecimalField(decimal_places=2, default=0, max_digits=20)
     quantity = models.PositiveIntegerField(default=0)
 

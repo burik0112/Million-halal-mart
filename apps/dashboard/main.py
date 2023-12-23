@@ -22,6 +22,7 @@ def get_env_value(env_variable):
 
 
 CHANNEL = int(get_env_value("CHANNEL"))
+CHAT_ID = int(get_env_value("CHAT_ID"))
 BOT_TOKEN = get_env_value("BOT_TOKEN")
 CHANNEL_USERNAME = "@openai_chat_gpt_robot"
 
@@ -97,15 +98,14 @@ class ServiceEditView(View):
 
 
 def bot(order):
-    text4channel = f"""🔰Yangi buyurtma:\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
-    products = ''
+    text4channel = f"""🔰Yangi buyurtma:\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzil:\n"""
     for location in order.user.location.all():
         text4channel += f"  - {location.address}\n"
 
-    for product_item in order.products.all():
-        product_details = order.get_product_details(product_item)
-        text4channel += f"Maxsulot:\n- {product_details}"
-    text4channel += f"Mahsulotlar: {order.products}\nIzoh: {order.comment}\nJami: {order.total_amount}"
+    for order_item in order.get_order_items():
+        product_details = order.get_product_details(order_item.product, order_item)
+        text4channel += f"Maxsulotlar:\n {product_details}\n"
+    text4channel += f"Izoh: {order.comment}\nJami: {order.total_amount}"
     inline_keyboard = [
         [
             {"text": "Yes", "callback_data": f"yes|{order.id}"},
@@ -120,9 +120,7 @@ def bot(order):
         "row_width": 2,
     }
     encoded_reply_markup = urllib.parse.quote(json.dumps(reply_markup))
-    url = f"""https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id=542470747&text={text4channel}&reply_markup={encoded_reply_markup}"""
-    # 419717087
-    # 542470747
+    url = f"""https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id={CHAT_ID}&text={text4channel}&reply_markup={encoded_reply_markup}"""
     try:
         response = requests.get(url)
         response.raise_for_status()
