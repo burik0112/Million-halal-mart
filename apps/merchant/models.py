@@ -93,6 +93,12 @@ class Order(TimeStampedModel, models.Model):
         """
         return dict(self.STATUS_CHOICES).get(self.status, "Unknown")
 
+    def get_order_items(self):
+        """
+        Order bilan bog'liq barcha OrderItem'larni qaytaradi.
+        """
+        return self.orderitem.all()
+
 
 class OrderItem(TimeStampedModel, models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="orderitem")
