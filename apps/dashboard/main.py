@@ -1,6 +1,4 @@
-from django.shortcuts import render
 from apps.merchant.models import Information, Service
-from django.views.generic import ListView
 from decouple import config
 from django.core.exceptions import ImproperlyConfigured
 import requests
@@ -10,7 +8,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView
 from django.views import View
 from .forms import ServiceEditForm, InformationEditForm
-from apps.product.models import Phone, Ticket, Good
 
 
 def get_env_value(env_variable):
@@ -98,18 +95,19 @@ class ServiceEditView(View):
 
 
 def bot(order):
-    text4channel = f"""🔰Yangi buyurtma:\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzil:\n"""
+    text4channel = f"""🔰 <b>Buyurtma holati:</b> #<i>YANGI</i>\n\n 🔢 <b>Buyurtma raqami:</b> <i>{order.id}</i>\n👤 <b>Mijoz ismi:</b> <i>{order.user.full_name}</i>\n📞 <b>Tel raqami:</b> <i>{order.user.phone_number}</i>\n🏠 <b>Manzili:</b> """
     for location in order.user.location.all():
-        text4channel += f"  - {location.address}\n"
-    text4channel +='Mahsulotlar: \n'
+        text4channel += f"{location.address}\n"
+    text4channel += '🛒 <b>Mahsulotlar:</b> \n'
     for order_item in order.get_order_items():
-        product_details = order.get_product_details(order_item.product, order_item)
-        text4channel += f"{product_details}\n"
-    text4channel += f"Izoh: {order.comment}\nJami: {order.total_amount}"
+        product_details = order.get_product_details(
+            order_item.product, order_item)
+        text4channel += f" 🟢 <i>{product_details}</i>\n"
+    text4channel += f"📝 <b>Izoh:</b> <i>{order.comment}</i>\n📅 <b>Sana:</b> <i>{order.created.strftime('%Y-%m-%d %H:%M')}</i>\n💸 <b>Jami:</b> <i>{order.total_amount} ₩</i>\n\n⁉️ <u>To`lov amalga oshirilganligini tasdiqlaysizmi?</u>"
     inline_keyboard = [
         [
-            {"text": "Yes", "callback_data": f"yes|{order.id}"},
-            {"text": "No", "callback_data": f"no|{order.id}"},
+            {"text": "✅ Ha", "callback_data": f"yes|{order.id}"},
+            {"text": "❌ Yo'q", "callback_data": f"no|{order.id}"},
         ]
     ]
     reply_markup = {
@@ -120,11 +118,11 @@ def bot(order):
         "row_width": 2,
     }
     encoded_reply_markup = urllib.parse.quote(json.dumps(reply_markup))
-    url = f"""https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id={CHAT_ID}&text={text4channel}&reply_markup={encoded_reply_markup}"""
+    encoded_text4channel = urllib.parse.quote(text4channel)
+    url = f"""https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id={CHAT_ID}&text={encoded_text4channel}&reply_markup={encoded_reply_markup}&parse_mode=HTML"""
     try:
         response = requests.get(url)
         response.raise_for_status()
         return response.text
     except Exception as e:
         return f"Error: {e}"
-

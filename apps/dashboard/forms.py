@@ -58,7 +58,7 @@ class PhoneProductItemForm(forms.ModelForm):
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
     price = forms.DecimalField(
-        decimal_places=1,
+        decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
@@ -162,7 +162,7 @@ class TicketProductItemForm(forms.ModelForm):
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
     price = forms.DecimalField(
-        decimal_places=1,
+        decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
@@ -287,7 +287,7 @@ class GoodProductItemForm(forms.ModelForm):
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
     price = forms.DecimalField(
-        decimal_places=1,
+        decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
@@ -353,7 +353,7 @@ class PhoneEditForm(forms.ModelForm):
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
     product_price = forms.DecimalField(
-        decimal_places=1,
+        decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
@@ -439,7 +439,7 @@ class TicketEditForm(forms.ModelForm):
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
     product_price = forms.DecimalField(
-        decimal_places=1,
+        decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
@@ -525,7 +525,7 @@ class GoodEditForm(forms.ModelForm):
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
     product_price = forms.DecimalField(
-        decimal_places=2,
+        decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )

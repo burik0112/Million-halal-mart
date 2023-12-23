@@ -49,17 +49,20 @@ def handle_callback_query(call):
     order = Order.objects.get(id=int(call.data[-1]))
     order.status = "approved"
     order.save()
-    text4channel = f"""✅Buyurtma {order.get_status_display_value()}\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzil:\n"""
-    for location in order.user.location.all():
-        text4channel += f"  - {location.address}\n"
 
+    text4channel = f"""✅ <b>Buyurtma holati:</b> #<i>{order.get_status_display_value()[-11::].upper()}</i>\n\n 🔢 <b>Buyurtma raqami:</b> <i>{order.id}</i>\n👤 <b>Mijoz ismi:</b> <i>{order.user.full_name}</i>\n📞 <b>Tel raqami:</b> <i>{order.user.phone_number}</i>\n🏠 <b>Manzili:</b> """
+    for location in order.user.location.all():
+        text4channel += f"{location.address}\n"
+    text4channel += '🛒 <b>Mahsulotlar:</b> \n'
     for order_item in order.get_order_items():
-        product_details = order.get_product_details(order_item.product, order_item)
-        text4channel += f"Maxsulotlar:\n {product_details}\n"
-    text4channel += f"Izoh: {order.comment}\nJami: {order.total_amount}"
+        product_details = order.get_product_details(
+            order_item.product, order_item)
+        text4channel += f" 🟢 <i>{product_details}</i>\n"
+    text4channel += f"📝 <b>Izoh:</b> <i>{order.comment}</i>\n📅 <b>Sana:</b> <i>{order.created.strftime('%Y-%m-%d %H:%M')}</i>\n💸 <b>Jami:</b> <i>{order.total_amount} ₩</i>\n\n⁉️ <u>Buyurtma yuborildimi?</u>"
 
     markup = types.InlineKeyboardMarkup(row_width=2)
-    b1 = types.InlineKeyboardButton(text="Yuborildi", callback_data=f"sent|{order.id}")
+    b1 = types.InlineKeyboardButton(
+        text="🚚 Yuborildi", callback_data=f"sent|{order.id}")
     markup.add(b1)
     bot.delete_message(call.from_user.id, call.message.message_id)
     bot.send_message(
@@ -74,13 +77,15 @@ def handle_callback_query(call):
     order = Order.objects.get(id=int(call.data[-1]))
     order.status = "cancelled"
     order.save()
-    text4channel = f"""❌Buyurtma {order.get_status_display_value()}\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
+    text4channel = f"""❌ <b>Buyurtma holati:</b> #<i>{order.get_status_display_value()[:5].upper()}</i>\n\n 🔢 <b>Buyurtma raqami:</b> <i>{order.id}</i>\n👤 <b>Mijoz ismi:</b> <i>{order.user.full_name}</i>\n📞 <b>Tel raqami:</b> <i>{order.user.phone_number}</i>\n🏠 <b>Manzili:</b> """
     for location in order.user.location.all():
-        text4channel += f"  - {location.address}\n"
-
+        text4channel += f"{location.address}\n"
+    text4channel += '🛒 <b>Mahsulotlar:</b> \n'
     for order_item in order.get_order_items():
-        product_details = order.get_product_details(order_item.product, order_item)
-        text4channel += f"Maxsulotlar:\n {product_details}\n"
+        product_details = order.get_product_details(
+            order_item.product, order_item)
+        text4channel += f" 🟢 <i>{product_details}</i>\n"
+    text4channel += f"📝 <b>Izoh:</b> <i>{order.comment}</i>\n📅 <b>Sana:</b> <i>{order.created.strftime('%Y-%m-%d %H:%M')}</i>\n💸 <b>Jami:</b> <i>{order.total_amount} ₩</i>\n\n"
     bot.delete_message(call.from_user.id, call.message.message_id)
     bot.send_message(
         call.from_user.id,
@@ -95,13 +100,15 @@ def handle_callback_query(call):
         order = Order.objects.get(id=order_id)
         order.status = "sent"
         order.save()
-        text4channel = f"""🚚Buyurtma {order.get_status_display_value()}\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
+        text4channel = f"""🚚 <b>Buyurtma holati:</b> #<i>{order.get_status_display_value().upper()}</i>\n\n 🔢 <b>Buyurtma raqami:</b> <i>{order.id}</i>\n👤 <b>Mijoz ismi:</b> <i>{order.user.full_name}</i>\n📞 <b>Tel raqami:</b> <i>{order.user.phone_number}</i>\n🏠 <b>Manzili:</b> """
         for location in order.user.location.all():
-            text4channel += f"  - {location.address}\n"
-
+            text4channel += f"{location.address}\n"
+        text4channel += '🛒 <b>Mahsulotlar:</b> \n'
         for order_item in order.get_order_items():
-            product_details = order.get_product_details(order_item.product, order_item)
-            text4channel += f"Maxsulotlar:\n {product_details}\n"
+            product_details = order.get_product_details(
+                order_item.product, order_item)
+            text4channel += f" 🟢 <i>{product_details}</i>\n"
+        text4channel += f"📝 <b>Izoh:</b> <i>{order.comment}</i>\n📅 <b>Sana:</b> <i>{order.created.strftime('%Y-%m-%d %H:%M')}</i>\n💸 <b>Jami:</b> <i>{order.total_amount} ₩</i>"
         bot.delete_message(call.from_user.id, call.message.message_id)
 
         bot.send_message(
@@ -109,6 +116,7 @@ def handle_callback_query(call):
             text4channel,
         )
     except ObjectDoesNotExist:
-        bot.send_message(call.from_user.id, f"Order with ID {order_id} does not exist.")
+        bot.send_message(call.from_user.id,
+                         f"Order with ID {order_id} does not exist.")
     except Exception as e:
         bot.send_message(call.from_user.id, f"An error occurred: {e}")
