@@ -32,14 +32,12 @@ class Order(TimeStampedModel, models.Model):
         if product_item.stock == 0 or product_item.stock == None:
             product_item.stock = 1
         total_amount = product_item.price * order_item.quantity * product_item.stock
-        if hasattr(product_item, "goods"):  
+        if hasattr(product_item, "goods"):
             return f"{product_item.goods.name} x {order_item.quantity} {product_item.get_measure_display()} = {total_amount} ₩"
         elif hasattr(product_item, "tickets"):
-            print(123123213213123)
-            return f"Bilet nomi: {product_item.tickets.event_name}, Sana: {product_item.tickets.event_date}"
+            return f"{product_item.tickets.event_name} x {order_item.quantity} {product_item.get_measure_display()} = {total_amount} ₩"
         elif hasattr(product_item, "phones"):
-            return f"Telefon modeli: {product_item.phones.model_name}, RAM: {product_item.phones.ram}"
-
+            return f"{product_item.phones.model_name}/{product_item.phones.ram}/{product_item.phones.memory}x {order_item.quantity} {product_item.get_measure_display()} = {total_amount} ₩"
         return "Mahsulot tafsiloti mavjud emas"
 
     def save(self, *args, **kwargs):
@@ -75,7 +73,7 @@ class Order(TimeStampedModel, models.Model):
                 .values("new_available_quantity")
                 .get()
             )
-            
+
             if product_item_with_updated_quantity["new_available_quantity"] < 0:
                 response_data = {"error": "Not enough product"}
                 return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
