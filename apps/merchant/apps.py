@@ -2,5 +2,8 @@ from django.apps import AppConfig
 
 
 class MerchantConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.merchant'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.merchant"
+
+    def ready(self):
+        import apps.merchant.signals
