@@ -19,7 +19,7 @@ def get_env_value(env_variable):
 
 CHANNEL = int(get_env_value("CHANNEL"))
 BOT_TOKEN = get_env_value("BOT_TOKEN")
-CHANNEL_USERNAME = '@openai_chat_gpt_robot'
+CHANNEL_USERNAME = "@openai_chat_gpt_robot"
 
 bot = telebot.telebot.TeleBot(BOT_TOKEN, parse_mode="HTML")
 
@@ -47,20 +47,24 @@ def start(message: types.Message):
 @bot.callback_query_handler(func=lambda call: call.data.startswith("yes|"))
 def handle_callback_query(call):
     order = Order.objects.get(id=int(call.data[-1]))
-    order.status = 'approved'
+    order.status = "approved"
     order.save()
     text4channel = f"""✅Buyurtma {order.get_status_display_value()}\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
     for location in order.user.location.all():
         text4channel += f"  - {location.address}\n"
 
-    text4channel += f"Mahsulotlar: {order.products}\nIzoh: {order.comment}\nJami: {order.total_amount}"
+    for product_item in order.products.all():
+        product_details = order.get_product_details(product_item)
+        text4channel += f"Maxsulot:\n- {product_details}"
+
+    text4channel += f"\nIzoh: {order.comment}\nJami: {order.total_amount}"
     markup = types.InlineKeyboardMarkup(row_width=2)
-    b1 = types.InlineKeyboardButton(
-        text="Yuborildi", callback_data=f"sent|{order.id}")
+    b1 = types.InlineKeyboardButton(text="Yuborildi", callback_data=f"sent|{order.id}")
     markup.add(b1)
     bot.delete_message(call.from_user.id, call.message.message_id)
     bot.send_message(
-        call.from_user.id, text4channel,
+        call.from_user.id,
+        text4channel,
         reply_markup=markup,
     )
 
@@ -68,7 +72,7 @@ def handle_callback_query(call):
 @bot.callback_query_handler(func=lambda call: call.data.startswith("no|"))
 def handle_callback_query(call):
     order = Order.objects.get(id=int(call.data[-1]))
-    order.status = 'cancelled'
+    order.status = "cancelled"
     order.save()
     text4channel = f"""❌Buyurtma {order.get_status_display_value()}\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
     for location in order.user.location.all():
@@ -77,7 +81,8 @@ def handle_callback_query(call):
     text4channel += f"Mahsulotlar: {order.products}\nIzoh: {order.comment}\nJami: {order.total_amount}"
     bot.delete_message(call.from_user.id, call.message.message_id)
     bot.send_message(
-        call.from_user.id, text4channel,
+        call.from_user.id,
+        text4channel,
     )
 
 
@@ -86,20 +91,24 @@ def handle_callback_query(call):
     order_id = int(call.data[-1])
     try:
         order = Order.objects.get(id=order_id)
-        order.status = 'sent'
+        order.status = "sent"
         order.save()
         text4channel = f"""🚚Buyurtma {order.get_status_display_value()}\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
         for location in order.user.location.filter(active=True):
             text4channel += f"  - {location.address}\n"
+
+        for product_item in order.products.all():
+            product_details = order.get_product_details(product_item)
+            text4channel += f"Maxsulot:\n- {product_details}"
+
         text4channel += f"Mahsulotlar: {order.products}\nIzoh: {order.comment}\nJami: {order.total_amount}"
         bot.delete_message(call.from_user.id, call.message.message_id)
 
         bot.send_message(
-            call.from_user.id, text4channel,
+            call.from_user.id,
+            text4channel,
         )
     except ObjectDoesNotExist:
-        bot.send_message(
-            call.from_user.id, f"Order with ID {order_id} does not exist.")
+        bot.send_message(call.from_user.id, f"Order with ID {order_id} does not exist.")
     except Exception as e:
-        bot.send_message(
-            call.from_user.id, f"An error occurred: {e}")
+        bot.send_message(call.from_user.id, f"An error occurred: {e}")
