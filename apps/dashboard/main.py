@@ -101,10 +101,10 @@ def bot(order):
     text4channel = f"""🔰Yangi buyurtma:\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzil:\n"""
     for location in order.user.location.all():
         text4channel += f"  - {location.address}\n"
-
+    text4channel +='Mahsulotlar: \n'
     for order_item in order.get_order_items():
         product_details = order.get_product_details(order_item.product, order_item)
-        text4channel += f"Maxsulotlar:\n {product_details}\n"
+        text4channel += f"{product_details}\n"
     text4channel += f"Izoh: {order.comment}\nJami: {order.total_amount}"
     inline_keyboard = [
         [
@@ -128,19 +128,3 @@ def bot(order):
     except Exception as e:
         return f"Error: {e}"
 
-
-def get_product_type(obj):
-    product_item = obj.product
-    if hasattr(product_item, "phones"):
-        return {
-            "type": "Phone",
-            "details": Phone(product_item.phones),
-        }
-    elif hasattr(product_item, "tickets"):
-        return {
-            "type": "Ticket",
-            "details": Ticket(product_item.tickets),
-        }
-    elif hasattr(product_item, "goods"):
-        return {"type": "Good", "details": Good(product_item.goods)}
-    return None

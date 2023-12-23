@@ -29,12 +29,13 @@ class Order(TimeStampedModel, models.Model):
         decimal_places=2, max_digits=20, default=0.00)
 
     def get_product_details(self, product_item, order_item):
-        if hasattr(product_item, "goods"):  # mol gosh x 8 kg = 65000W
-            if product_item.stock == 0 or product_item.stock == None:
-                product_item.stock = 1
-            total_amount = product_item.price * order_item.quantity * product_item.stock
+        if product_item.stock == 0 or product_item.stock == None:
+            product_item.stock = 1
+        total_amount = product_item.price * order_item.quantity * product_item.stock
+        if hasattr(product_item, "goods"):  
             return f"{product_item.goods.name} x {order_item.quantity} {product_item.get_measure_display()} = {total_amount} ₩"
         elif hasattr(product_item, "tickets"):
+            print(123123213213123)
             return f"Bilet nomi: {product_item.tickets.event_name}, Sana: {product_item.tickets.event_date}"
         elif hasattr(product_item, "phones"):
             return f"Telefon modeli: {product_item.phones.model_name}, RAM: {product_item.phones.ram}"
@@ -91,6 +92,7 @@ class Order(TimeStampedModel, models.Model):
                 (1 - item.product.stock / 100)
             total += discounted_price * item.quantity
         self.total_amount = total
+        print(total, '*'*20)
         self.save()
 
     def get_status_display_value(self):
