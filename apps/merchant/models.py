@@ -22,14 +22,20 @@ class Order(TimeStampedModel, models.Model):
         "product.ProductItem", through="OrderItem", related_name="order"
     )
     comment = models.TextField(blank=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="in_cart")
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default="in_cart")
 
-    total_amount = models.DecimalField(decimal_places=2, max_digits=20, default=0.00)
+    total_amount = models.DecimalField(
+        decimal_places=2, max_digits=20, default=0.00)
 
-    def get_product_details(self, product_item):
-        if hasattr(product_item, "goods"):
-            return f"Mahsulot nomi: {product_item.goods.name}, Tarkibi: {product_item.goods.ingredients}"
+    def get_product_details(self, product_item, order_item):
+        if product_item.stock == 0 or product_item.stock == None:
+            product_item.stock = 1
+        total_amount = product_item.price * order_item.quantity * product_item.stock
+        if hasattr(product_item, "goods"):  
+            return f"{product_item.goods.name} x {order_item.quantity} {product_item.get_measure_display()} = {total_amount} ₩"
         elif hasattr(product_item, "tickets"):
+            print(123123213213123)
             return f"Bilet nomi: {product_item.tickets.event_name}, Sana: {product_item.tickets.event_date}"
         elif hasattr(product_item, "phones"):
             return f"Telefon modeli: {product_item.phones.model_name}, RAM: {product_item.phones.ram}"
@@ -69,7 +75,7 @@ class Order(TimeStampedModel, models.Model):
                 .values("new_available_quantity")
                 .get()
             )
-
+            
             if product_item_with_updated_quantity["new_available_quantity"] < 0:
                 response_data = {"error": "Not enough product"}
                 return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
@@ -82,9 +88,11 @@ class Order(TimeStampedModel, models.Model):
     def update_total_amount(self):
         total = 0
         for item in self.orderitem.all():
-            discounted_price = item.product.price * (1 - item.product.stock / 100)
+            discounted_price = item.product.price * \
+                (1 - item.product.stock / 100)
             total += discounted_price * item.quantity
         self.total_amount = total
+        print(total, '*'*20)
         self.save()
 
     def get_status_display_value(self):
@@ -101,7 +109,8 @@ class Order(TimeStampedModel, models.Model):
 
 
 class OrderItem(TimeStampedModel, models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="orderitem")
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name="orderitem")
     product = models.ForeignKey(
         "product.ProductItem", on_delete=models.CASCADE, related_name="orderitem"
     )
@@ -134,7 +143,8 @@ class SecialMedia(TimeStampedModel, models.Model):
 
 
 class Service(TimeStampedModel, models.Model):
-    delivery_fee = models.DecimalField(max_digits=10, decimal_places=0, default=0)
+    delivery_fee = models.DecimalField(
+        max_digits=10, decimal_places=0, default=0)
 
     def __str__(self) -> str:
         return "Service"

@@ -49,15 +49,15 @@ def handle_callback_query(call):
     order = Order.objects.get(id=int(call.data[-1]))
     order.status = "approved"
     order.save()
-    text4channel = f"""✅Buyurtma {order.get_status_display_value()}\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
+    text4channel = f"""✅Buyurtma {order.get_status_display_value()}\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzil:\n"""
     for location in order.user.location.all():
         text4channel += f"  - {location.address}\n"
 
-    for product_item in order.products.all():
-        product_details = order.get_product_details(product_item)
-        text4channel += f"Maxsulot:\n- {product_details}"
+    for order_item in order.get_order_items():
+        product_details = order.get_product_details(order_item.product, order_item)
+        text4channel += f"Maxsulotlar:\n {product_details}\n"
+    text4channel += f"Izoh: {order.comment}\nJami: {order.total_amount}"
 
-    text4channel += f"\nIzoh: {order.comment}\nJami: {order.total_amount}"
     markup = types.InlineKeyboardMarkup(row_width=2)
     b1 = types.InlineKeyboardButton(text="Yuborildi", callback_data=f"sent|{order.id}")
     markup.add(b1)
@@ -78,7 +78,9 @@ def handle_callback_query(call):
     for location in order.user.location.all():
         text4channel += f"  - {location.address}\n"
 
-    text4channel += f"Mahsulotlar: {order.products}\nIzoh: {order.comment}\nJami: {order.total_amount}"
+    for order_item in order.get_order_items():
+        product_details = order.get_product_details(order_item.product, order_item)
+        text4channel += f"Maxsulotlar:\n {product_details}\n"
     bot.delete_message(call.from_user.id, call.message.message_id)
     bot.send_message(
         call.from_user.id,
@@ -94,14 +96,12 @@ def handle_callback_query(call):
         order.status = "sent"
         order.save()
         text4channel = f"""🚚Buyurtma {order.get_status_display_value()}\nBuyurtma raqami: {order.id}\nFoydalanuvchi: {order.user.full_name}\nTel raqami: {order.user.phone_number}\nManzillar:\n"""
-        for location in order.user.location.filter(active=True):
+        for location in order.user.location.all():
             text4channel += f"  - {location.address}\n"
 
-        for product_item in order.products.all():
-            product_details = order.get_product_details(product_item)
-            text4channel += f"Maxsulot:\n- {product_details}"
-
-        text4channel += f"Mahsulotlar: {order.products}\nIzoh: {order.comment}\nJami: {order.total_amount}"
+        for order_item in order.get_order_items():
+            product_details = order.get_product_details(order_item.product, order_item)
+            text4channel += f"Maxsulotlar:\n {product_details}\n"
         bot.delete_message(call.from_user.id, call.message.message_id)
 
         bot.send_message(
