@@ -31,7 +31,7 @@ class Order(TimeStampedModel, models.Model):
     def get_product_details(self, product_item, order_item):
         
         total_amount = product_item.price * order_item.quantity - product_item.price*product_item.stock/100
-        print(total_amount)
+        # print(total_amount)
 
         if hasattr(product_item, "goods"):
             return f"{product_item.goods.name} x {order_item.quantity} {product_item.get_measure_display()} = {total_amount} ₩"

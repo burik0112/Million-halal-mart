@@ -28,12 +28,27 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class OrderItemDetailsSerializer(serializers.ModelSerializer):
     product = ProductItemSerializer(read_only=True)
-    id = serializers.IntegerField(read_only=True)
-    quantity = serializers.IntegerField()
+    product_type = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderItem
-        fields = ["id", "product", "quantity"]
+        fields = "__all__"
+
+    def get_product_type(self, obj):
+        product_item = obj.product
+        if hasattr(product_item, "phones"):
+            return {
+                "type": "Phone",
+                "details": PhoneSerializer(product_item.phones).data,
+            }
+        elif hasattr(product_item, "tickets"):
+            return {
+                "type": "Ticket",
+                "details": TicketSerializer(product_item.tickets).data,
+            }
+        elif hasattr(product_item, "goods"):
+            return {"type": "Good", "details": GoodSerializer(product_item.goods).data}
+        return None
 
 
 class OrderListSerializer(serializers.ModelSerializer):
