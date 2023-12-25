@@ -88,7 +88,7 @@ class Order(TimeStampedModel, models.Model):
     def update_total_amount(self):
         total = 0
         for item in self.orderitem.all():
-            discounted_price = item.product.price * (1 - item.product.stock / 100)
+            # discounted_price = item.product.price * (1 - item.product.stock / 100)
             total += item.product.price * item.quantity
         self.total_amount = total
 
