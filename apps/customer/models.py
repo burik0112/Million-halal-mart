@@ -21,6 +21,14 @@ class Location(TimeStampedModel, models.Model):
     address = models.CharField(max_length=510)
     active = models.BooleanField(default=False)
 
+    def save(self, *args, **kwargs):
+        if self.active:
+            Location.objects.filter(user=self.user).exclude(id=self.id).update(
+                active=False
+            )
+
+        super(Location, self).save(*args, **kwargs)
+
 
 class News(TimeStampedModel, models.Model):
     title = models.CharField(max_length=255, blank=True, null=True)
