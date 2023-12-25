@@ -26,8 +26,21 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class OrderItemDetailsSerializer(serializers.ModelSerializer):
+    product = ProductItemSerializer(read_only=True)
+    id = serializers.IntegerField(read_only=True)
+    quantity = serializers.IntegerField()
+
+    class Meta:
+        model = OrderItem
+        fields = ["id", "product", "quantity"]
+
+
 class OrderListSerializer(serializers.ModelSerializer):
-    products = ProductItemSerializer(read_only=True, many=True)
+    # products = ProductItemSerializer(read_only=True, many=True)
+    orderitem = OrderItemDetailsSerializer(
+        many=True, read_only=True, source="get_order_items"
+    )
 
     class Meta:
         model = Order
