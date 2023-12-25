@@ -22,15 +22,15 @@ class Order(TimeStampedModel, models.Model):
         "product.ProductItem", through="OrderItem", related_name="order"
     )
     comment = models.TextField(blank=True)
-    status = models.CharField(
-        max_length=10, choices=STATUS_CHOICES, default="in_cart")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="in_cart")
 
-    total_amount = models.DecimalField(
-        decimal_places=0, max_digits=20, default=0.00)
+    total_amount = models.DecimalField(decimal_places=0, max_digits=20, default=0.00)
 
     def get_product_details(self, product_item, order_item):
-        
-        total_amount = product_item.price * order_item.quantity - product_item.price*product_item.stock/100
+        total_amount = (
+            product_item.price * order_item.quantity
+            - product_item.price * product_item.stock / 100
+        )
         # print(total_amount)
 
         if hasattr(product_item, "goods"):
@@ -42,6 +42,7 @@ class Order(TimeStampedModel, models.Model):
         return "Mahsulot tafsiloti mavjud emas"
 
     def save(self, *args, **kwargs):
+        self.update_total_amount()
         if self.status == "in_cart":
             existing_order = Order.objects.filter(
                 user=self.user, status="in_cart"
@@ -87,12 +88,9 @@ class Order(TimeStampedModel, models.Model):
     def update_total_amount(self):
         total = 0
         for item in self.orderitem.all():
-            discounted_price = item.product.price * \
-                (1 - item.product.stock / 100)
-            total += discounted_price * item.quantity
+            discounted_price = item.product.price * (1 - item.product.stock / 100)
+            total += item.product.price * item.quantity
         self.total_amount = total
-        print(total, '*'*20)
-        self.save()
 
     def get_status_display_value(self):
         """
@@ -108,8 +106,7 @@ class Order(TimeStampedModel, models.Model):
 
 
 class OrderItem(TimeStampedModel, models.Model):
-    order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name="orderitem")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="orderitem")
     product = models.ForeignKey(
         "product.ProductItem", on_delete=models.CASCADE, related_name="orderitem"
     )
@@ -142,8 +139,7 @@ class SecialMedia(TimeStampedModel, models.Model):
 
 
 class Service(TimeStampedModel, models.Model):
-    delivery_fee = models.DecimalField(
-        max_digits=10, decimal_places=0, default=0)
+    delivery_fee = models.DecimalField(max_digits=10, decimal_places=0, default=0)
 
     def __str__(self) -> str:
         return "Service"
