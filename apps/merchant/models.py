@@ -58,7 +58,6 @@ class Order(TimeStampedModel, models.Model):
                 self.update_product_stock()
         super(Order, self).save(*args, **kwargs)
 
-        # if self.status != "in_cart":
         self.update_total_amount()
 
     def update_product_stock(self):
