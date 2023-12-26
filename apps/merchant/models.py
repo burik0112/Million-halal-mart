@@ -42,7 +42,7 @@ class Order(TimeStampedModel, models.Model):
         return "Mahsulot tafsiloti mavjud emas"
 
     def save(self, *args, **kwargs):
-        self.update_total_amount()
+        # self.update_total_amount()
         if self.status == "in_cart":
             existing_order = Order.objects.filter(
                 user=self.user, status="in_cart"
@@ -57,6 +57,9 @@ class Order(TimeStampedModel, models.Model):
             if old_status != "sent":
                 self.update_product_stock()
         super(Order, self).save(*args, **kwargs)
+
+        # if self.status != "in_cart":
+        self.update_total_amount()
 
     def update_product_stock(self):
         # Bu yerda 'sent' holatidagi orderlar uchun ProductItem'larni yangilaymiz
