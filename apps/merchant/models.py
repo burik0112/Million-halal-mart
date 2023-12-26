@@ -110,7 +110,7 @@ class Order(TimeStampedModel, models.Model):
 class OrderItem(TimeStampedModel, models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="orderitem")
     product = models.ForeignKey(
-        "product.ProductItem", on_delete=models.CASCADE, related_name="orderitem"
+        "product.ProductItem", on_delete=models.CASCADE, related_name="orderitem", null=True
     )
     quantity = models.IntegerField(default=0)
 
