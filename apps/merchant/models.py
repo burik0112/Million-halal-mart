@@ -56,9 +56,8 @@ class Order(TimeStampedModel, models.Model):
             old_status = Order.objects.get(pk=self.pk).status
             if old_status != "sent":
                 self.update_product_stock()
-        super(Order, self).save(*args, **kwargs)
-
         self.update_total_amount()
+        super(Order, self).save(*args, **kwargs)
 
     def update_product_stock(self):
         # Bu yerda 'sent' holatidagi orderlar uchun ProductItem'larni yangilaymiz
@@ -91,6 +90,8 @@ class Order(TimeStampedModel, models.Model):
         total = 0
         for item in self.orderitem.all():
             # discounted_price = item.product.price * (1 - item.product.stock / 100)
+            print(item, "item")
+            print(item.product, "product")
             total += item.product.price * item.quantity
         self.total_amount = total
 
