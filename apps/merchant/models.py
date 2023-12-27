@@ -56,7 +56,7 @@ class Order(TimeStampedModel, models.Model):
             old_status = Order.objects.get(pk=self.pk).status
             if old_status != "sent":
                 self.update_product_stock()
-        self.update_total_amount()
+        # self.update_total_amount()
         super(Order, self).save(*args, **kwargs)
 
     def update_product_stock(self):
@@ -89,11 +89,9 @@ class Order(TimeStampedModel, models.Model):
     def update_total_amount(self):
         total = 0
         for item in self.orderitem.all():
-            # discounted_price = item.product.price * (1 - item.product.stock / 100)
-            print(item, "item")
-            print(item.product, "product")
             total += item.product.price * item.quantity
         self.total_amount = total
+        self.save(update_fields=["total_amount"])
 
     def get_status_display_value(self):
         """
@@ -111,7 +109,10 @@ class Order(TimeStampedModel, models.Model):
 class OrderItem(TimeStampedModel, models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="orderitem")
     product = models.ForeignKey(
-        "product.ProductItem", on_delete=models.CASCADE, related_name="orderitem", null=True
+        "product.ProductItem",
+        on_delete=models.CASCADE,
+        related_name="orderitem",
+        null=True,
     )
     quantity = models.IntegerField(default=0)
 

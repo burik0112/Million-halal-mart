@@ -80,10 +80,12 @@ class OrderItemSerializer(serializers.ModelSerializer):
         order_item, item_created = OrderItem.objects.get_or_create(
             order=order,
             product=product,
+            defaults={"quantity": validated_data.get("quantity", 0)},
         )
         if not item_created:
             order_item.quantity += validated_data.get("quantity", 0)
             order_item.save()
+        order.update_total_amount()
         return order_item
 
 
