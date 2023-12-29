@@ -8,13 +8,12 @@ from django.utils import timezone
 # Create your models here.
 class Category(TimeStampedModel, models.Model):
     PRODUCT_TYPE = (("f", "Food"), ("p", "Phone"), ("t", "Ticket"))
-    main_type = models.CharField(
-        max_length=1, choices=PRODUCT_TYPE, default="f")
+    main_type = models.CharField(max_length=1, choices=PRODUCT_TYPE, default="f")
     name = models.CharField(max_length=255)
     image = models.ImageField(upload_to="category")
     desc = models.TextField()
-    stock = models.IntegerField(default=0)
-    bonus = models.IntegerField(default=0)
+    # stock = models.IntegerField(default=0)
+    # bonus = models.IntegerField(default=0)
     active = models.BooleanField(default=True)
 
     def __str__(self) -> str:
@@ -28,8 +27,8 @@ class SubCategory(TimeStampedModel, models.Model):
     name = models.CharField(max_length=255)
     image = models.ImageField(upload_to="subcategory")
     desc = models.TextField()
-    stock = models.IntegerField(default=0)
-    bonus = models.IntegerField(default=0)
+    # stock = models.IntegerField(default=0)
+    # bonus = models.IntegerField(default=0)
     active = models.BooleanField(default=True)
 
     def __str__(self) -> str:
@@ -45,13 +44,26 @@ class ProductItem(TimeStampedModel, models.Model):
     )
 
     desc = models.TextField()
-    price = models.DecimalField(decimal_places=0, max_digits=10, default=0)
+    # price = models.DecimalField(decimal_places=0, max_digits=10, default=0)
+    old_price = models.DecimalField(
+        decimal_places=2, max_digits=10, null=True, blank=True, default=0
+    )
+    new_price = models.DecimalField(
+        decimal_places=2, max_digits=10, null=True, blank=True, default=0
+    )
     measure = models.IntegerField(choices=CHOICES, default=0)
     available_quantity = models.PositiveIntegerField(default=0)
-    stock = models.IntegerField(default=0)
+    # stock = models.IntegerField(default=0)
     bonus = models.IntegerField(default=0)
     is_favorite = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
+
+    @property
+    def price_reduction_percentage(self):
+        """Agar yangi narx eski narxdan past bo'lsa, foizni qaytaradi."""
+        if self.old_price and self.new_price < self.old_price:
+            return round((1 - self.new_price / self.old_price) * 100, 2)
+        return 0
 
     def __str__(self) -> str:
         return self.desc
@@ -174,8 +186,7 @@ class SoldProduct(TimeStampedModel, models.Model):
     product = models.ForeignKey(
         ProductItem, on_delete=models.SET_NULL, null=True, related_name="sold_products"
     )
-    user = models.ForeignKey(
-        "customer.Profile", on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey("customer.Profile", on_delete=models.SET_NULL, null=True)
     amount = models.DecimalField(decimal_places=0, default=0, max_digits=20)
     quantity = models.PositiveIntegerField(default=0)
 

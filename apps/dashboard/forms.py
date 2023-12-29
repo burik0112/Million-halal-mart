@@ -1,6 +1,14 @@
 from django import forms
 from django.forms import ClearableFileInput
-from apps.product.models import Phone, ProductItem, SubCategory, Image, Ticket, Good, Category
+from apps.product.models import (
+    Phone,
+    ProductItem,
+    SubCategory,
+    Image,
+    Ticket,
+    Good,
+    Category,
+)
 
 from apps.customer.models import News
 from apps.merchant.models import Information, Service
@@ -37,8 +45,7 @@ class MultipleFileField(forms.ImageField):
 class PhoneProductItemForm(forms.ModelForm):
     class Meta:
         model = Phone
-        fields = ["model_name", "ram", "storage",
-                  "category", "color", "condition"]
+        fields = ["model_name", "ram", "storage", "category", "color", "condition"]
         widgets = {
             "model_name": forms.TextInput(attrs={"class": "form-control"}),
             "ram": forms.Select(attrs={"class": "form-control"}),
@@ -57,24 +64,33 @@ class PhoneProductItemForm(forms.ModelForm):
     desc = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
-    price = forms.DecimalField(
-        decimal_places=0,
+    new_price = forms.DecimalField(
+        decimal_places=2,
         max_digits=10,
+        required=False,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
+
+    # Eski narx maydoni (agar kerak bo'lsa)
+    old_price = forms.DecimalField(
+        decimal_places=2,
+        max_digits=10,
+        required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
     available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
     )
-    stock = forms.IntegerField(
-        widget=forms.NumberInput(attrs={"class": "form-control"}),
-        required=False,
-        initial=0,
-    )
-    bonus = forms.IntegerField(
-        widget=forms.NumberInput(attrs={"class": "form-control"}),
-        required=False,
-        initial=0,
-    )
+    # stock = forms.IntegerField(
+    #     widget=forms.NumberInput(attrs={"class": "form-control"}),
+    #     required=False,
+    #     initial=0,
+    # )
+    # bonus = forms.IntegerField(
+    #     widget=forms.NumberInput(attrs={"class": "form-control"}),
+    #     required=False,
+    #     initial=0,
+    # )
     active = forms.BooleanField(
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}), initial=True
     )
@@ -86,10 +102,11 @@ class PhoneProductItemForm(forms.ModelForm):
         phone = super().save(commit=False)
         product_item = ProductItem(
             desc=self.cleaned_data["desc"],
-            price=self.cleaned_data["price"],
+            new_price=self.cleaned_data["new_price"],
+            old_price=self.cleaned_data.get("old_price"),
             available_quantity=self.cleaned_data["available_quantity"],
-            stock=self.cleaned_data["stock"],
-            bonus=self.cleaned_data["bonus"],
+            # stock=self.cleaned_data["stock"],
+            # bonus=self.cleaned_data["bonus"],
             active=self.cleaned_data["active"],
         )
         if commit:
@@ -113,14 +130,14 @@ class PhoneProductItemForm(forms.ModelForm):
 class PhoneCategoryCreateForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ["name", "image", "desc", "stock", "bonus", "active"]
+        fields = "__all__"
         widgets = {
             # 'main_type': forms.Select(attrs={'class': 'form-control'}),
             "name": forms.TextInput(attrs={"class": "form-control"}),
             "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
             "desc": forms.Textarea(attrs={"class": "form-control"}),
-            "stock": forms.NumberInput(attrs={"class": "form-control"}),
-            "bonus": forms.NumberInput(attrs={"class": "form-control"}),
+            # "stock": forms.NumberInput(attrs={"class": "form-control"}),
+            # "bonus": forms.NumberInput(attrs={"class": "form-control"}),
             "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
@@ -128,14 +145,14 @@ class PhoneCategoryCreateForm(forms.ModelForm):
 class TicketCategoryCreateForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ["name", "image", "desc", "stock", "bonus", "active"]
+        fields = ["name", "image", "desc", "active"]
         widgets = {
             # 'main_type': forms.Select(attrs={'class': 'form-control'}),
             "name": forms.TextInput(attrs={"class": "form-control"}),
             "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
             "desc": forms.Textarea(attrs={"class": "form-control"}),
-            "stock": forms.NumberInput(attrs={"class": "form-control"}),
-            "bonus": forms.NumberInput(attrs={"class": "form-control"}),
+            # "stock": forms.NumberInput(attrs={"class": "form-control"}),
+            # "bonus": forms.NumberInput(attrs={"class": "form-control"}),
             "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
@@ -155,27 +172,35 @@ class TicketProductItemForm(forms.ModelForm):
     )
     event_date = forms.DateTimeField(
         input_formats=["%Y-%m-%d"],  # Adjust the format as needed
-        widget=forms.DateTimeInput(
-            attrs={"type": "date", "class": "form-control"}),
+        widget=forms.DateTimeInput(attrs={"type": "date", "class": "form-control"}),
     )
     desc = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
-    price = forms.DecimalField(
-        decimal_places=0,
+    new_price = forms.DecimalField(
+        decimal_places=2,
         max_digits=10,
+        required=False,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
+
+    # Eski narx maydoni (agar kerak bo'lsa)
+    old_price = forms.DecimalField(
+        decimal_places=2,
+        max_digits=10,
+        required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
 
     available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
     )
-    stock = forms.IntegerField(
-        widget=forms.NumberInput(attrs={"class": "form-control"}), initial=0
-    )
-    bonus = forms.IntegerField(
-        widget=forms.NumberInput(attrs={"class": "form-control"}), initial=0
-    )
+    # stock = forms.IntegerField(
+    #     widget=forms.NumberInput(attrs={"class": "form-control"}), initial=0
+    # )
+    # bonus = forms.IntegerField(
+    #     widget=forms.NumberInput(attrs={"class": "form-control"}), initial=0
+    # )
     active = forms.BooleanField(
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}), initial=True
     )
@@ -187,10 +212,11 @@ class TicketProductItemForm(forms.ModelForm):
         ticket = super().save(commit=False)
         product_item = ProductItem(
             desc=self.cleaned_data["desc"],
-            price=self.cleaned_data["price"],
+            new_price=self.cleaned_data["new_price"],
+            old_price=self.cleaned_data.get("old_price"),
             available_quantity=self.cleaned_data["available_quantity"],
-            stock=self.cleaned_data["stock"],
-            bonus=self.cleaned_data["bonus"],
+            # stock=self.cleaned_data["stock"],
+            # bonus=self.cleaned_data["bonus"],
             active=self.cleaned_data["active"],
         )
         if commit:
@@ -214,13 +240,13 @@ class TicketProductItemForm(forms.ModelForm):
 class GoodCategoryCreateForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ["name", "image", "desc", "stock", "bonus", "active"]
+        fields = ["name", "image", "desc", "active"]
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
             "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
             "desc": forms.Textarea(attrs={"class": "form-control"}),
-            "stock": forms.NumberInput(attrs={"class": "form-control"}),
-            "bonus": forms.NumberInput(attrs={"class": "form-control"}),
+            # "stock": forms.NumberInput(attrs={"class": "form-control"}),
+            # "bonus": forms.NumberInput(attrs={"class": "form-control"}),
             "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
@@ -286,24 +312,31 @@ class GoodProductItemForm(forms.ModelForm):
     desc = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
-    price = forms.DecimalField(
-        decimal_places=0,
+    new_price = forms.DecimalField(
+        decimal_places=2,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
+
+    # Eski narx maydoni (agar kerak bo'lsa)
+    old_price = forms.DecimalField(
+        decimal_places=2,
+        max_digits=10,
+        required=False,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
     measure = forms.ChoiceField(
-        choices=ProductItem.CHOICES, widget=forms.Select(
-            attrs={"class": "form-select"})
+        choices=ProductItem.CHOICES, widget=forms.Select(attrs={"class": "form-select"})
     )
     available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
     )
-    stock = forms.IntegerField(
-        widget=forms.NumberInput(attrs={"class": "form-control"})
-    )
-    bonus = forms.IntegerField(
-        widget=forms.NumberInput(attrs={"class": "form-control"})
-    )
+    # stock = forms.IntegerField(
+    #     widget=forms.NumberInput(attrs={"class": "form-control"})
+    # )
+    # bonus = forms.IntegerField(
+    #     widget=forms.NumberInput(attrs={"class": "form-control"})
+    # )
     active = forms.BooleanField(
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
     )
@@ -312,8 +345,7 @@ class GoodProductItemForm(forms.ModelForm):
     )  # New field for multiple images # New field for multiple images
     expire_date = forms.DateTimeField(
         input_formats=["%Y-%m-%d"],  # Adjust the format as needed
-        widget=forms.DateTimeInput(
-            attrs={"type": "date", "class": "form-control"}),
+        widget=forms.DateTimeInput(attrs={"type": "date", "class": "form-control"}),
     )
 
     def save(self, commit=True):
@@ -326,7 +358,8 @@ class GoodProductItemForm(forms.ModelForm):
         good.ingredients_ru = self.cleaned_data.get("ingredients_ru")
         product_item = ProductItem(
             desc=self.cleaned_data["desc"],
-            price=self.cleaned_data["price"],
+            new_price=self.cleaned_data["new_price"],
+            old_price=self.cleaned_data.get("old_price"),
             available_quantity=self.cleaned_data["available_quantity"],
             stock=self.cleaned_data["stock"],
             bonus=self.cleaned_data["bonus"],
@@ -352,14 +385,13 @@ class PhoneEditForm(forms.ModelForm):
     product_desc = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
-    product_price = forms.DecimalField(
+    product_new_price = forms.DecimalField(
         decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
     product_measure = forms.ChoiceField(
-        choices=ProductItem.CHOICES, widget=forms.Select(
-            attrs={"class": "form-select"})
+        choices=ProductItem.CHOICES, widget=forms.Select(attrs={"class": "form-select"})
     )
     product_available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
@@ -384,11 +416,11 @@ class PhoneEditForm(forms.ModelForm):
             "storage",
             "category",
             "product_desc",
-            "product_price",
+            "product_new_price",
             "product_measure",
             "product_available_quantity",
-            "product_stock",
-            "product_bonus",
+            # "product_stock",
+            # "product_bonus",
             "product_active",
         ]
         widgets = {
@@ -405,13 +437,14 @@ class PhoneEditForm(forms.ModelForm):
         if self.instance and self.instance.product:
             product = self.instance.product
             self.fields["product_desc"].initial = product.desc
-            self.fields["product_price"].initial = product.price
+            self.fields["product_old_price"].initial = product.old_price
+            self.fields["product_new_price"].initial = product.new_price
             self.fields["product_measure"].initial = product.measure
             self.fields[
                 "product_available_quantity"
             ].initial = product.available_quantity
-            self.fields["product_stock"].initial = product.stock
-            self.fields["product_bonus"].initial = product.bonus
+            # self.fields["product_stock"].initial = product.stock
+            # self.fields["product_bonus"].initial = product.bonus
             self.fields["product_active"].initial = product.active
 
     def save(self, commit=True):
@@ -420,13 +453,14 @@ class PhoneEditForm(forms.ModelForm):
             phone.product = ProductItem()
         product_item = phone.product
         product_item.desc = self.cleaned_data["product_desc"]
-        product_item.price = self.cleaned_data["product_price"]
+        product_item.old_price = self.cleaned_data["product_old_price"]
+        product_item.new_price = self.cleaned_data["product_new_price"]
         product_item.measure = self.cleaned_data["product_measure"]
         product_item.available_quantity = self.cleaned_data[
             "product_available_quantity"
         ]
-        product_item.stock = self.cleaned_data["product_stock"]
-        product_item.bonus = self.cleaned_data["product_bonus"]
+        # product_item.stock = self.cleaned_data["product_stock"]
+        # product_item.bonus = self.cleaned_data["product_bonus"]
         product_item.active = self.cleaned_data["product_active"]
         if commit:
             product_item.save()
@@ -438,8 +472,8 @@ class TicketEditForm(forms.ModelForm):
     product_desc = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
-    product_price = forms.DecimalField(
-        decimal_places=0,
+    product_new_price = forms.DecimalField(
+        decimal_places=2,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
@@ -447,12 +481,12 @@ class TicketEditForm(forms.ModelForm):
     product_available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
     )
-    product_stock = forms.IntegerField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
-    )
-    product_bonus = forms.IntegerField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
-    )
+    # product_stock = forms.IntegerField(
+    #     min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
+    # )
+    # product_bonus = forms.IntegerField(
+    #     min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
+    # )
     product_active = forms.BooleanField(
         required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
     )
@@ -465,10 +499,10 @@ class TicketEditForm(forms.ModelForm):
             "event_date",
             "category",
             "product_desc",
-            "product_price",
+            "product_new_price",
             "product_available_quantity",
-            "product_stock",
-            "product_bonus",
+            # "product_stock",
+            # "product_bonus",
             "product_active",
         ]
         widgets = {
@@ -482,12 +516,12 @@ class TicketEditForm(forms.ModelForm):
         if self.instance and self.instance.product:
             product = self.instance.product
             self.fields["product_desc"].initial = product.desc
-            self.fields["product_price"].initial = product.price
+            self.fields["product_new_price"].initial = product.new_price
             self.fields[
                 "product_available_quantity"
             ].initial = product.available_quantity
-            self.fields["product_stock"].initial = product.stock
-            self.fields["product_bonus"].initial = product.bonus
+            # self.fields["product_stock"].initial = product.stock
+            # self.fields["product_bonus"].initial = product.bonus
             self.fields["product_active"].initial = product.active
 
     def save(self, commit=True):
@@ -496,12 +530,12 @@ class TicketEditForm(forms.ModelForm):
             ticket.product = ProductItem()
         product_item = ticket.product
         product_item.desc = self.cleaned_data["product_desc"]
-        product_item.price = self.cleaned_data["product_price"]
+        product_item.new_price = self.cleaned_data["product_new_price"]
         product_item.available_quantity = self.cleaned_data[
             "product_available_quantity"
         ]
-        product_item.stock = self.cleaned_data["product_stock"]
-        product_item.bonus = self.cleaned_data["product_bonus"]
+        # product_item.stock = self.cleaned_data["product_stock"]
+        # product_item.bonus = self.cleaned_data["product_bonus"]
         product_item.active = self.cleaned_data["product_active"]
         if commit:
             product_item.save()
@@ -511,8 +545,7 @@ class TicketEditForm(forms.ModelForm):
 
 class GoodEditForm(forms.ModelForm):
     # Fields for the Good model
-    name = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}))
+    name = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
     ingredients = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
@@ -524,20 +557,20 @@ class GoodEditForm(forms.ModelForm):
     product_desc = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
-    product_price = forms.DecimalField(
-        decimal_places=0,
+    product_new_price = forms.DecimalField(
+        decimal_places=2,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
     product_available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
     )
-    product_stock = forms.IntegerField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
-    )
-    product_bonus = forms.IntegerField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
-    )
+    # product_stock = forms.IntegerField(
+    #     min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
+    # )
+    # product_bonus = forms.IntegerField(
+    #     min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
+    # )
     product_active = forms.BooleanField(
         required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
     )
@@ -550,10 +583,10 @@ class GoodEditForm(forms.ModelForm):
             "expire_date",
             "sub_cat",
             "product_desc",
-            "product_price",
+            "product_new_price",
             "product_available_quantity",
-            "product_stock",
-            "product_bonus",
+            # "product_stock",
+            # "product_bonus",
             "product_active",
         ]
         widgets = {
@@ -565,12 +598,12 @@ class GoodEditForm(forms.ModelForm):
         if self.instance and self.instance.product:
             product = self.instance.product
             self.fields["product_desc"].initial = product.desc
-            self.fields["product_price"].initial = product.price
+            self.fields["product_new_price"].initial = product.new_price
             self.fields[
                 "product_available_quantity"
             ].initial = product.available_quantity
-            self.fields["product_stock"].initial = product.stock
-            self.fields["product_bonus"].initial = product.bonus
+            # self.fields["product_stock"].initial = product.stock
+            # self.fields["product_bonus"].initial = product.bonus
             self.fields["product_active"].initial = product.active
 
     def save(self, commit=True):
@@ -579,12 +612,12 @@ class GoodEditForm(forms.ModelForm):
             good.product = ProductItem()
         product_item = good.product
         product_item.desc = self.cleaned_data["product_desc"]
-        product_item.price = self.cleaned_data["product_price"]
+        product_item.new_price = self.cleaned_data["product_new_price"]
         product_item.available_quantity = self.cleaned_data[
             "product_available_quantity"
         ]
-        product_item.stock = self.cleaned_data["product_stock"]
-        product_item.bonus = self.cleaned_data["product_bonus"]
+        # product_item.stock = self.cleaned_data["product_stock"]
+        # product_item.bonus = self.cleaned_data["product_bonus"]
         product_item.active = self.cleaned_data["product_active"]
         if commit:
             product_item.save()
@@ -604,7 +637,6 @@ class NewsForm(forms.ModelForm):
 
 
 class ServiceEditForm(forms.ModelForm):
-
     delivery_fee = forms.DecimalField(
         decimal_places=0,
         max_digits=10,
@@ -630,7 +662,6 @@ class ServiceEditForm(forms.ModelForm):
 
 
 class InformationEditForm(forms.ModelForm):
-
     reminder = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
@@ -656,7 +687,13 @@ class InformationEditForm(forms.ModelForm):
     class Meta:
         model = Information
         fields = [
-            "reminder", "agreement", "shipment_terms", "privacy_policy", "about_us", "support_center", "payment_data",
+            "reminder",
+            "agreement",
+            "shipment_terms",
+            "privacy_policy",
+            "about_us",
+            "support_center",
+            "payment_data",
         ]
 
     def __init__(self, *args, **kwargs):
