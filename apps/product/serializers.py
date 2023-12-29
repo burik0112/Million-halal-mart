@@ -1,8 +1,7 @@
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 
-from .models import (Category, Good, Image, Phone, ProductItem, SubCategory,
-                     Ticket)
+from .models import Category, Good, Image, Phone, ProductItem, SubCategory, Ticket
 from .utils import ProductItemCreatorMixin
 
 
@@ -31,11 +30,16 @@ class ImageSerializer(serializers.ModelSerializer):
 
 
 class ProductItemSerializer(serializers.ModelSerializer):
+    price_reduction_percentage = serializers.SerializerMethodField()
     images = ImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = ProductItem
         fields = "__all__"
+
+    def get_price_reduction_percentage(self, obj):
+        """ProductItem obyektining price_reduction_percentage xususiyatini qaytaradi."""
+        return obj.price_reduction_percentage
 
 
 class TicketSerializer(ProductItemCreatorMixin):
@@ -48,7 +52,6 @@ class TicketSerializer(ProductItemCreatorMixin):
     def create(self, validate_data):
         product = self.create_pruduct(validate_data)
         return Ticket.objects.create(**validate_data, product=product)
-
 
 
 class PhoneSerializer(ProductItemCreatorMixin):
@@ -69,7 +72,7 @@ class GoodSerializer(ProductItemCreatorMixin):
     class Meta:
         model = Good
         fields = "__all__"
-        read_only_fields = "images",
+        read_only_fields = ("images",)
 
     def create(self, validate_data):
         product = self.create_pruduct()
@@ -82,7 +85,7 @@ class TicketPopularSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ticket
-        fields = ['event_name', 'event_date', 'sold_count', 'product']
+        fields = ["event_name", "event_date", "sold_count", "product"]
 
 
 class PhonePopularSerializer(serializers.ModelSerializer):

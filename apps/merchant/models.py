@@ -89,7 +89,7 @@ class Order(TimeStampedModel, models.Model):
     def update_total_amount(self):
         total = 0
         for item in self.orderitem.all():
-            total += item.product.price * item.quantity
+            total += item.product.new_price * item.quantity
         self.total_amount = total
         self.save(update_fields=["total_amount"])
 
