@@ -385,6 +385,11 @@ class PhoneEditForm(forms.ModelForm):
     product_desc = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
+    product_old_price = forms.DecimalField(
+        decimal_places=0,
+        max_digits=10,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
     product_new_price = forms.DecimalField(
         decimal_places=0,
         max_digits=10,
@@ -416,6 +421,7 @@ class PhoneEditForm(forms.ModelForm):
             "storage",
             "category",
             "product_desc",
+            "product_old_price",
             "product_new_price",
             "product_measure",
             "product_available_quantity",
