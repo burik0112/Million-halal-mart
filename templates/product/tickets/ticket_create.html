@@ -16,8 +16,7 @@
           {{ form.event_name.label_tag }} {{ form.event_name }}
         </div>
         <div class="mb-3">{{ form.condition.label_tag }} {{ form.condition }}</div>
-        <div class="mb-3">{{ form.stock.label_tag }} {{ form.stock }}</div>
-        <div class="mb-3">{{ form.price.label_tag }} {{ form.price }}</div>
+        <div class="mb-3">{{ form.price.old_label_tag }} {{ form.old_price }}</div>
         <div class="mb-3">
           <label for="id_images">Images:</label>{{ form.images }}
         </div>
@@ -33,7 +32,8 @@
             <a href="{% url 'ticket_category' %}" class="btn btn-success btn-sm">Add category</a>
           </div>
         </div>
-        <div class="mb-3">{{ form.bonus.label_tag }} {{ form.bonus }}</div>
+        <div class="mb-3">{{ form.new_price.label_tag }} {{ form.new_price }}</div>
+
         <div class="mb-3">
           {{ form.available_quantity.label_tag }} {{ form.available_quantity }}
         </div>

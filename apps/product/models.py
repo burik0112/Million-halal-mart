@@ -8,13 +8,19 @@ from django.utils import timezone
 # Create your models here.
 class Category(TimeStampedModel, models.Model):
     PRODUCT_TYPE = (("f", "Food"), ("p", "Phone"), ("t", "Ticket"))
-    main_type = models.CharField(max_length=1, choices=PRODUCT_TYPE, default="f")
+    main_type = models.CharField(
+        max_length=1, choices=PRODUCT_TYPE, default="f")
     name = models.CharField(max_length=255)
     image = models.ImageField(upload_to="category")
     desc = models.TextField()
     # stock = models.IntegerField(default=0)
     # bonus = models.IntegerField(default=0)
     active = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        print("Save method called")
+        # ... your custom logic ...
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return self.name
@@ -186,7 +192,8 @@ class SoldProduct(TimeStampedModel, models.Model):
     product = models.ForeignKey(
         ProductItem, on_delete=models.SET_NULL, null=True, related_name="sold_products"
     )
-    user = models.ForeignKey("customer.Profile", on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(
+        "customer.Profile", on_delete=models.SET_NULL, null=True)
     amount = models.DecimalField(decimal_places=0, default=0, max_digits=20)
     quantity = models.PositiveIntegerField(default=0)
 
