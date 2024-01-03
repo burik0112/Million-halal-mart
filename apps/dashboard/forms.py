@@ -131,6 +131,7 @@ class PhoneCategoryCreateForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = "__all__"
+        exclude = ["main_type"]
         widgets = {
             # 'main_type': forms.Select(attrs={'class': 'form-control'}),
             "name": forms.TextInput(attrs={"class": "form-control"}),
