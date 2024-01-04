@@ -13,8 +13,7 @@
         
         <div class="mb-3">{{ form.condition.label_tag }} {{ form.condition }}</div>
         <div class="mb-3">{{ form.ram.label_tag }} {{ form.ram }}</div>
-        <div class="mb-3">{{ form.stock.label_tag }} {{ form.stock }}</div>
-        <div class="mb-3">{{ form.price.label_tag }} {{ form.price }}</div>
+        <div class="mb-3">{{ form.old_price.label_tag }} {{ form.old_price }}</div>
         <div class="mb-3">
           <label for="id_images">Images:</label>{{ form.images }}
         </div>
@@ -32,7 +31,8 @@
         </div>
         <div class="mb-3">{{ form.color.label_tag }} {{ form.color }}</div>
         <div class="mb-3">{{ form.storage.label_tag }} {{ form.storage }}</div>
-        <div class="mb-3">{{ form.bonus.label_tag }} {{ form.bonus }}</div>
+        <div class="mb-3">{{ form.new_price.label_tag }} {{ form.new_price }}</div>
+
         <div class="mb-3">
           {{ form.available_quantity.label_tag }} {{ form.available_quantity }}
         </div>
@@ -40,7 +40,10 @@
       
       
       <div class="col-md-12">
-        <div class="mb-3">{{ form.desc.label_tag }} {{ form.desc }}</div>
+        <div class="mb-3">{{ form.desc_uz.label_tag }} {{ form.desc_uz }}</div>
+        <div class="mb-3">{{ form.desc_ru.label_tag }} {{ form.desc_ru }}</div>
+        <div class="mb-3">{{ form.desc_en.label_tag }} {{ form.desc_en }}</div>
+        <div class="mb-3">{{ form.desc_kr.label_tag }} {{ form.desc_kr }}</div>
       </div>
       <div class="col-md-12">
         <div class="mb-3">{{ form.active }}Active </div>

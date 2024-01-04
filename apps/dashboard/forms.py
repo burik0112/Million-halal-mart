@@ -45,7 +45,8 @@ class MultipleFileField(forms.ImageField):
 class PhoneProductItemForm(forms.ModelForm):
     class Meta:
         model = Phone
-        fields = ["model_name", "ram", "storage", "category", "color", "condition"]
+        fields = ["model_name", "ram", "storage",
+                  "category", "color", "condition"]
         widgets = {
             "model_name": forms.TextInput(attrs={"class": "form-control"}),
             "ram": forms.Select(attrs={"class": "form-control"}),
@@ -61,7 +62,16 @@ class PhoneProductItemForm(forms.ModelForm):
         queryset=Category.objects.filter(main_type="p"),
         widget=forms.Select(attrs={"class": "form-control"}),
     )
-    desc = forms.CharField(
+    desc_uz = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    desc_ru = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    desc_en = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    desc_kr = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
     new_price = forms.DecimalField(
@@ -101,7 +111,10 @@ class PhoneProductItemForm(forms.ModelForm):
     def save(self, commit=True):
         phone = super().save(commit=False)
         product_item = ProductItem(
-            desc=self.cleaned_data["desc"],
+            desc_uz=self.cleaned_data["desc_uz"],
+            desc_ru=self.cleaned_data["desc_ru"],
+            desc_en=self.cleaned_data["desc_en"],
+            desc_kr=self.cleaned_data["desc_kr"],
             new_price=self.cleaned_data["new_price"],
             old_price=self.cleaned_data.get("old_price"),
             available_quantity=self.cleaned_data["available_quantity"],
@@ -134,9 +147,12 @@ class PhoneCategoryCreateForm(forms.ModelForm):
         exclude = ["main_type"]
         widgets = {
             # 'main_type': forms.Select(attrs={'class': 'form-control'}),
-            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "name_uz": forms.TextInput(attrs={"class": "form-control"}),
+            "name_ru": forms.TextInput(attrs={"class": "form-control"}),
+            "name_en": forms.TextInput(attrs={"class": "form-control"}),
+            "name_kr": forms.TextInput(attrs={"class": "form-control"}),
             "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
-            "desc": forms.Textarea(attrs={"class": "form-control"}),
+            # "desc": forms.Textarea(attrs={"class": "form-control"}),
             # "stock": forms.NumberInput(attrs={"class": "form-control"}),
             # "bonus": forms.NumberInput(attrs={"class": "form-control"}),
             "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
@@ -146,12 +162,15 @@ class PhoneCategoryCreateForm(forms.ModelForm):
 class TicketCategoryCreateForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ["name", "image", "desc", "active"]
+        fields = ["name_uz","name_ru","name_en","name_kr", "image", "desc", "active"]
         widgets = {
             # 'main_type': forms.Select(attrs={'class': 'form-control'}),
-            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "name_uz": forms.TextInput(attrs={"class": "form-control"}),
+            "name_ru": forms.TextInput(attrs={"class": "form-control"}),
+            "name_en": forms.TextInput(attrs={"class": "form-control"}),
+            "name_kr": forms.TextInput(attrs={"class": "form-control"}),
             "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
-            "desc": forms.Textarea(attrs={"class": "form-control"}),
+            # "desc": forms.Textarea(attrs={"class": "form-control"}),
             # "stock": forms.NumberInput(attrs={"class": "form-control"}),
             # "bonus": forms.NumberInput(attrs={"class": "form-control"}),
             "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
@@ -161,10 +180,13 @@ class TicketCategoryCreateForm(forms.ModelForm):
 class TicketProductItemForm(forms.ModelForm):
     class Meta:
         model = Ticket
-        fields = ["event_name"]
+        fields = ["event_name_uz","event_name_ru","event_name_en","event_name_kr"]
         widgets = {
             "category": forms.Select(attrs={"class": "form-control"}),
-            "event_name": forms.TextInput(attrs={"class": "form-control"}),
+            "event_name_uz": forms.TextInput(attrs={"class": "form-control"}),
+            "event_name_ru": forms.TextInput(attrs={"class": "form-control"}),
+            "event_name_en": forms.TextInput(attrs={"class": "form-control"}),
+            "event_name_kr": forms.TextInput(attrs={"class": "form-control"}),
         }
 
     category = forms.ModelChoiceField(
@@ -173,9 +195,19 @@ class TicketProductItemForm(forms.ModelForm):
     )
     event_date = forms.DateTimeField(
         input_formats=["%Y-%m-%d"],  # Adjust the format as needed
-        widget=forms.DateTimeInput(attrs={"type": "date", "class": "form-control"}),
+        widget=forms.DateTimeInput(
+            attrs={"type": "date", "class": "form-control"}),
     )
-    desc = forms.CharField(
+    desc_uz = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    desc_ru = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    desc_en = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    desc_kr = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
     new_price = forms.DecimalField(
@@ -212,7 +244,10 @@ class TicketProductItemForm(forms.ModelForm):
     def save(self, commit=True):
         ticket = super().save(commit=False)
         product_item = ProductItem(
-            desc=self.cleaned_data["desc"],
+            desc_uz=self.cleaned_data["desc_uz"],
+            desc_ru=self.cleaned_data["desc_ru"],
+            desc_en=self.cleaned_data["desc_en"],
+            desc_kr=self.cleaned_data["desc_kr"],
             new_price=self.cleaned_data["new_price"],
             old_price=self.cleaned_data.get("old_price"),
             available_quantity=self.cleaned_data["available_quantity"],
@@ -231,7 +266,7 @@ class TicketProductItemForm(forms.ModelForm):
             for img in self.files.getlist("images"):
                 image = Image(
                     image=img,
-                    name=f"{self.cleaned_data['event_name']}_{img.name}",
+                    name=f"{self.cleaned_data['event_name_uz']}_{img.name}",
                     product=product_item,
                 )
                 image.save()
@@ -327,7 +362,8 @@ class GoodProductItemForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
     measure = forms.ChoiceField(
-        choices=ProductItem.CHOICES, widget=forms.Select(attrs={"class": "form-select"})
+        choices=ProductItem.CHOICES, widget=forms.Select(
+            attrs={"class": "form-select"})
     )
     available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
@@ -346,7 +382,8 @@ class GoodProductItemForm(forms.ModelForm):
     )  # New field for multiple images # New field for multiple images
     expire_date = forms.DateTimeField(
         input_formats=["%Y-%m-%d"],  # Adjust the format as needed
-        widget=forms.DateTimeInput(attrs={"type": "date", "class": "form-control"}),
+        widget=forms.DateTimeInput(
+            attrs={"type": "date", "class": "form-control"}),
     )
 
     def save(self, commit=True):
@@ -383,7 +420,16 @@ class GoodProductItemForm(forms.ModelForm):
 
 
 class PhoneEditForm(forms.ModelForm):
-    product_desc = forms.CharField(
+    product_desc_uz = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    product_desc_ru = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    product_desc_en = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    product_desc_kr = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
     product_old_price = forms.DecimalField(
@@ -397,17 +443,15 @@ class PhoneEditForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
     product_measure = forms.ChoiceField(
-        choices=ProductItem.CHOICES, widget=forms.Select(attrs={"class": "form-select"})
+        choices=ProductItem.CHOICES, widget=forms.Select(
+            attrs={"class": "form-select"})
     )
     product_available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
     )
-    product_stock = forms.IntegerField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
-    )
-    product_bonus = forms.IntegerField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
-    )
+    # product_bonus = forms.IntegerField(
+    #     min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
+    # )
     product_active = forms.BooleanField(
         required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
     )
@@ -421,11 +465,14 @@ class PhoneEditForm(forms.ModelForm):
             "ram",
             "storage",
             "category",
-            "product_desc",
             "product_old_price",
             "product_new_price",
             "product_measure",
             "product_available_quantity",
+            "product_desc_uz",
+            "product_desc_ru",
+            "product_desc_en",
+            "product_desc_kr",
             # "product_stock",
             # "product_bonus",
             "product_active",
@@ -443,23 +490,26 @@ class PhoneEditForm(forms.ModelForm):
         super(PhoneEditForm, self).__init__(*args, **kwargs)
         if self.instance and self.instance.product:
             product = self.instance.product
-            self.fields["product_desc"].initial = product.desc
             self.fields["product_old_price"].initial = product.old_price
             self.fields["product_new_price"].initial = product.new_price
             self.fields["product_measure"].initial = product.measure
             self.fields[
                 "product_available_quantity"
             ].initial = product.available_quantity
+            self.fields["product_desc_uz"].initial = product.desc_uz
+            self.fields["product_desc_ru"].initial = product.desc_ru
+            self.fields["product_desc_en"].initial = product.desc_en
+            self.fields["product_desc_kr"].initial = product.desc_kr
             # self.fields["product_stock"].initial = product.stock
             # self.fields["product_bonus"].initial = product.bonus
             self.fields["product_active"].initial = product.active
+
 
     def save(self, commit=True):
         phone = super(PhoneEditForm, self).save(commit=False)
         if not phone.product_id:
             phone.product = ProductItem()
         product_item = phone.product
-        product_item.desc = self.cleaned_data["product_desc"]
         product_item.old_price = self.cleaned_data["product_old_price"]
         product_item.new_price = self.cleaned_data["product_new_price"]
         product_item.measure = self.cleaned_data["product_measure"]
@@ -468,6 +518,10 @@ class PhoneEditForm(forms.ModelForm):
         ]
         # product_item.stock = self.cleaned_data["product_stock"]
         # product_item.bonus = self.cleaned_data["product_bonus"]
+        product_item.desc = self.cleaned_data["product_desc_uz"]
+        product_item.desc = self.cleaned_data["product_desc_ru"]
+        product_item.desc = self.cleaned_data["product_desc_en"]
+        product_item.desc = self.cleaned_data["product_desc_kr"]
         product_item.active = self.cleaned_data["product_active"]
         if commit:
             product_item.save()
@@ -476,7 +530,16 @@ class PhoneEditForm(forms.ModelForm):
 
 
 class TicketEditForm(forms.ModelForm):
-    product_desc = forms.CharField(
+    product_desc_uz = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    product_desc_ru = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    product_desc_en = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    product_desc_kr = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
     product_new_price = forms.DecimalField(
@@ -502,18 +565,27 @@ class TicketEditForm(forms.ModelForm):
         model = Ticket
         exclude = ["event_date"]
         fields = [
-            "event_name",
+            "event_name_uz",
+            "event_name_ru",
+            "event_name_en",
+            "event_name_kr",
             "event_date",
             "category",
-            "product_desc",
             "product_new_price",
             "product_available_quantity",
+            "product_desc_uz",
+            "product_desc_ru",
+            "product_desc_en",
+            "product_desc_kr",
             # "product_stock",
             # "product_bonus",
             "product_active",
         ]
         widgets = {
-            "event_name": forms.TextInput(attrs={"class": "form-control"}),
+            "event_name_uz": forms.TextInput(attrs={"class": "form-control"}),
+            "event_name_en": forms.TextInput(attrs={"class": "form-control"}),
+            "event_name_ru": forms.TextInput(attrs={"class": "form-control"}),
+            "event_name_kr": forms.TextInput(attrs={"class": "form-control"}),
             "event_date": forms.Select(attrs={"class": "form-select"}),
             "category": forms.Select(attrs={"class": "form-select"}),
         }
@@ -522,7 +594,10 @@ class TicketEditForm(forms.ModelForm):
         super(TicketEditForm, self).__init__(*args, **kwargs)
         if self.instance and self.instance.product:
             product = self.instance.product
-            self.fields["product_desc"].initial = product.desc
+            self.fields["product_desc_uz"].initial = product.desc_uz
+            self.fields["product_desc_ru"].initial = product.desc_ru
+            self.fields["product_desc_en"].initial = product.desc_en
+            self.fields["product_desc_kr"].initial = product.desc_kr
             self.fields["product_new_price"].initial = product.new_price
             self.fields[
                 "product_available_quantity"
@@ -536,7 +611,10 @@ class TicketEditForm(forms.ModelForm):
         if not ticket.product_id:
             ticket.product = ProductItem()
         product_item = ticket.product
-        product_item.desc = self.cleaned_data["product_desc"]
+        product_item.desc = self.cleaned_data["product_desc_uz"]
+        product_item.desc = self.cleaned_data["product_desc_ru"]
+        product_item.desc = self.cleaned_data["product_desc_en"]
+        product_item.desc = self.cleaned_data["product_desc_kr"]
         product_item.new_price = self.cleaned_data["product_new_price"]
         product_item.available_quantity = self.cleaned_data[
             "product_available_quantity"
@@ -552,7 +630,8 @@ class TicketEditForm(forms.ModelForm):
 
 class GoodEditForm(forms.ModelForm):
     # Fields for the Good model
-    name = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
+    name = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "form-control"}))
     ingredients = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )

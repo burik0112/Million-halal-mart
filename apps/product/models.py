@@ -8,10 +8,11 @@ from django.utils import timezone
 # Create your models here.
 class Category(TimeStampedModel, models.Model):
     PRODUCT_TYPE = (("f", "Food"), ("p", "Phone"), ("t", "Ticket"))
-    main_type = models.CharField(max_length=1, choices=PRODUCT_TYPE, default="f")
-    name = models.CharField(max_length=255)
+    main_type = models.CharField(
+        max_length=1, choices=PRODUCT_TYPE, default="f")
+    name = models.CharField(blank=True, max_length=255)
     image = models.ImageField(upload_to="category")
-    desc = models.TextField()
+    desc = models.TextField(blank=True)
     # stock = models.IntegerField(default=0)
     # bonus = models.IntegerField(default=0)
     active = models.BooleanField(default=True)
@@ -24,9 +25,9 @@ class SubCategory(TimeStampedModel, models.Model):
     category = models.ForeignKey(
         Category, on_delete=models.CASCADE, related_name="subcategory"
     )
-    name = models.CharField(max_length=255)
+    name = models.CharField(blank=True, max_length=255)
     image = models.ImageField(upload_to="subcategory")
-    desc = models.TextField()
+    desc = models.TextField(blank=True, null=True)
     # stock = models.IntegerField(default=0)
     # bonus = models.IntegerField(default=0)
     active = models.BooleanField(default=True)
@@ -66,7 +67,7 @@ class ProductItem(TimeStampedModel, models.Model):
         return 0
 
     def __str__(self) -> str:
-        return self.desc
+        return str(self.created)
 
     def get_measure_display(self):
         """Get the human-readable measure label."""
@@ -186,7 +187,8 @@ class SoldProduct(TimeStampedModel, models.Model):
     product = models.ForeignKey(
         ProductItem, on_delete=models.SET_NULL, null=True, related_name="sold_products"
     )
-    user = models.ForeignKey("customer.Profile", on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(
+        "customer.Profile", on_delete=models.SET_NULL, null=True)
     amount = models.DecimalField(decimal_places=0, default=0, max_digits=20)
     quantity = models.PositiveIntegerField(default=0)
 

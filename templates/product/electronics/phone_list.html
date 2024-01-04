@@ -36,11 +36,10 @@
               <th scope="col" class="text-center">Storage</th>
               <th scope="col" class="text-center">Category</th>
               <th scope="col" class="text-center">Description</th>
-              <th scope="col" class="text-center">Price</th>
+              <th scope="col" class="text-center">Old price</th>
+              <th scope="col" class="text-center">New price</th>
               <th scope="col" class="text-center">Measure</th>
               <th scope="col" class="text-center">Available Quantity</th>
-              <th scope="col" class="text-center">Stock</th>
-              <th scope="col" class="text-center">Bonus</th>
               <th scope="col" class="text-center">Active</th>
               <th scope="col" class="text-center">Actions</th>
             </tr>
@@ -59,11 +58,10 @@
               <td class="text-center">{{ phone.get_storage_display }}</td>
               <td class="text-center">{{ phone.category }}</td>
               <td class="text-center">{{ phone.product.desc }}</td>
-              <td class="text-center">{{ phone.product.price }} ₩</td>
+              <td class="text-center">{{ phone.product.old_price }} ₩</td>
+              <td class="text-center">{{ phone.product.new_price }} ₩</td>
               <td class="text-center">{{ phone.product.get_measure_display }}</td>
               <td class="text-center">{{ phone.product.available_quantity }}</td>
-              <td class="text-center">{{ phone.product.stock }} %</td>
-              <td class="text-center">{{ phone.product.bonus }} %</td>
               {% if phone.product.active %}
               <td ><img src="{% static 'assets/img/check.png' %}" height="20" width="20" alt="Mavjud"></td>
             {% else %}
