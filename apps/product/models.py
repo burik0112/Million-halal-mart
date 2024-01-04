@@ -10,17 +10,12 @@ class Category(TimeStampedModel, models.Model):
     PRODUCT_TYPE = (("f", "Food"), ("p", "Phone"), ("t", "Ticket"))
     main_type = models.CharField(
         max_length=1, choices=PRODUCT_TYPE, default="f")
-    name = models.CharField(max_length=255)
+    name = models.CharField(blank=True, max_length=255)
     image = models.ImageField(upload_to="category")
-    desc = models.TextField()
+    desc = models.TextField(blank=True)
     # stock = models.IntegerField(default=0)
     # bonus = models.IntegerField(default=0)
     active = models.BooleanField(default=True)
-
-    def save(self, *args, **kwargs):
-        print("Save method called")
-        # ... your custom logic ...
-        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return self.name
@@ -30,9 +25,9 @@ class SubCategory(TimeStampedModel, models.Model):
     category = models.ForeignKey(
         Category, on_delete=models.CASCADE, related_name="subcategory"
     )
-    name = models.CharField(max_length=255)
+    name = models.CharField(blank=True, max_length=255)
     image = models.ImageField(upload_to="subcategory")
-    desc = models.TextField()
+    desc = models.TextField(blank=True, null=True)
     # stock = models.IntegerField(default=0)
     # bonus = models.IntegerField(default=0)
     active = models.BooleanField(default=True)
@@ -72,7 +67,7 @@ class ProductItem(TimeStampedModel, models.Model):
         return 0
 
     def __str__(self) -> str:
-        return self.desc
+        return str(self.created)
 
     def get_measure_display(self):
         """Get the human-readable measure label."""

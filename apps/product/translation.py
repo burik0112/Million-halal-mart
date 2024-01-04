@@ -17,6 +17,11 @@ class TicketTranslationOptions(TranslationOptions):
     fields = ('event_name',)
 
 
+@register(ProductItem)
+class ProductItemTranslationOptions(TranslationOptions):
+    fields = ('desc',)
+
+
 @register(Phone)
 class PhoneTranslationOptions(TranslationOptions):
     fields = ('model_name', )

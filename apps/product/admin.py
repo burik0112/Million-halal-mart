@@ -13,14 +13,14 @@ admin.site.register(Category, CategoryAdmin)
 
 
 class SubCategoryAdmin(admin.ModelAdmin):
-    list_display = ["category", "name", "desc"]
+    list_display = ["category", "name_uz", "desc"]
 
 
 admin.site.register(SubCategory, SubCategoryAdmin)
 
 
 class ProductItemAdmin(admin.ModelAdmin):
-    list_display = ["desc", "old_price", "new_price", "available_quantity", "measure"]
+    list_display = ["created", "desc_uz", "old_price", "new_price", "available_quantity", "measure"]
 
 
 admin.site.register(ProductItem, ProductItemAdmin)
