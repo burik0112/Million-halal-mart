@@ -24,6 +24,7 @@ class LoginSerializer(serializers.Serializer):
                 user = profile.origin
                 if user.check_password(password):
                     data["user"] = user
+                    data["profile"] = profile
                     return data
             except Profile.DoesNotExist:
                 pass
