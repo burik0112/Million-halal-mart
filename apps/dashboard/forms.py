@@ -75,7 +75,7 @@ class PhoneProductItemForm(forms.ModelForm):
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
     new_price = forms.DecimalField(
-        decimal_places=2,
+        decimal_places=0,
         max_digits=10,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
@@ -83,7 +83,7 @@ class PhoneProductItemForm(forms.ModelForm):
 
     # Eski narx maydoni (agar kerak bo'lsa)
     old_price = forms.DecimalField(
-        decimal_places=2,
+        decimal_places=0,
         max_digits=10,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
@@ -162,7 +162,8 @@ class PhoneCategoryCreateForm(forms.ModelForm):
 class TicketCategoryCreateForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ["name_uz","name_ru","name_en","name_kr", "image", "desc", "active"]
+        fields = ["name_uz", "name_ru", "name_en",
+                  "name_kr", "image", "desc", "active"]
         widgets = {
             # 'main_type': forms.Select(attrs={'class': 'form-control'}),
             "name_uz": forms.TextInput(attrs={"class": "form-control"}),
@@ -180,7 +181,8 @@ class TicketCategoryCreateForm(forms.ModelForm):
 class TicketProductItemForm(forms.ModelForm):
     class Meta:
         model = Ticket
-        fields = ["event_name_uz","event_name_ru","event_name_en","event_name_kr"]
+        fields = ["event_name_uz", "event_name_ru",
+                  "event_name_en", "event_name_kr"]
         widgets = {
             "category": forms.Select(attrs={"class": "form-control"}),
             "event_name_uz": forms.TextInput(attrs={"class": "form-control"}),
@@ -211,7 +213,7 @@ class TicketProductItemForm(forms.ModelForm):
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
     new_price = forms.DecimalField(
-        decimal_places=2,
+        decimal_places=0,
         max_digits=10,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
@@ -219,7 +221,7 @@ class TicketProductItemForm(forms.ModelForm):
 
     # Eski narx maydoni (agar kerak bo'lsa)
     old_price = forms.DecimalField(
-        decimal_places=2,
+        decimal_places=0,
         max_digits=10,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
@@ -275,24 +277,32 @@ class TicketProductItemForm(forms.ModelForm):
 
 class GoodCategoryCreateForm(forms.ModelForm):
     class Meta:
-        model = Category
-        fields = ["name", "image", "desc", "active"]
+        model = SubCategory
+        fields = ["name_uz", "name_ru", "name_en", "name_kr", "image", "active"]
         widgets = {
-            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "name_uz": forms.TextInput(attrs={"class": "form-control"}),
+            "name_ru": forms.TextInput(attrs={"class": "form-control"}),
+            "name_en": forms.TextInput(attrs={"class": "form-control"}),
+            "name_kr": forms.TextInput(attrs={"class": "form-control"}),
             "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
-            "desc": forms.Textarea(attrs={"class": "form-control"}),
             # "stock": forms.NumberInput(attrs={"class": "form-control"}),
             # "bonus": forms.NumberInput(attrs={"class": "form-control"}),
             "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
-
+        def __init__(self, *args, **kwargs):
+            super(GoodCategoryCreateForm, self).__init__(*args, **kwargs)
+            # Set default value for category_id based on main_type
+            if "category" in self.fields and "main_type" in self.fields["category"].queryset.model._meta.get_fields():
+                # Assuming "main_type" is a valid field in the Category model
+                x=self.fields["category"].queryset = Category.objects.filter(main_type="f")
+                print(x, '*'*20)
 
 class GoodProductItemForm(forms.ModelForm):
     class Meta:
         model = Good
         fields = [
             "category",
-            "name",
+            "name_kr",
             "name_uz",
             "name_en",
             "name_ru",
@@ -316,6 +326,11 @@ class GoodProductItemForm(forms.ModelForm):
         widget=forms.Select(attrs={"class": "form-control"}),
     )
     name_en = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    name_kr = forms.CharField(
         max_length=255,
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control"}),
@@ -345,18 +360,27 @@ class GoodProductItemForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
-    desc = forms.CharField(
+    desc_uz = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    desc_ru = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    desc_en = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    desc_kr = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
     new_price = forms.DecimalField(
-        decimal_places=2,
+        decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
 
     # Eski narx maydoni (agar kerak bo'lsa)
     old_price = forms.DecimalField(
-        decimal_places=2,
+        decimal_places=0,
         max_digits=10,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
@@ -391,16 +415,20 @@ class GoodProductItemForm(forms.ModelForm):
         good.name_en = self.cleaned_data.get("name_en")
         good.name_uz = self.cleaned_data.get("name_uz")
         good.name_ru = self.cleaned_data.get("name_ru")
+        good.name_kr = self.cleaned_data.get("name_kr")
         good.ingredients_en = self.cleaned_data.get("ingredients_en")
         good.ingredients_uz = self.cleaned_data.get("ingredients_uz")
         good.ingredients_ru = self.cleaned_data.get("ingredients_ru")
         product_item = ProductItem(
-            desc=self.cleaned_data["desc"],
+            desc_uz=self.cleaned_data["desc_uz"],
+            desc_ru=self.cleaned_data["desc_ru"],
+            desc_en=self.cleaned_data["desc_en"],
+            desc_kr=self.cleaned_data["desc_kr"],
             new_price=self.cleaned_data["new_price"],
             old_price=self.cleaned_data.get("old_price"),
             available_quantity=self.cleaned_data["available_quantity"],
-            stock=self.cleaned_data["stock"],
-            bonus=self.cleaned_data["bonus"],
+            # stock=self.cleaned_data["stock"],
+            # bonus=self.cleaned_data["bonus"],
             active=self.cleaned_data["active"],
         )
         if commit:
@@ -412,7 +440,7 @@ class GoodProductItemForm(forms.ModelForm):
             for img in self.files.getlist("images"):
                 image = Image(
                     image=img,
-                    name=f"{self.cleaned_data['name']}_{img.name}",
+                    name=f"{self.cleaned_data['name_uz']}_{img.name}",
                     product=product_item,
                 )
                 image.save()
@@ -504,7 +532,6 @@ class PhoneEditForm(forms.ModelForm):
             # self.fields["product_bonus"].initial = product.bonus
             self.fields["product_active"].initial = product.active
 
-
     def save(self, commit=True):
         phone = super(PhoneEditForm, self).save(commit=False)
         if not phone.product_id:
@@ -543,7 +570,7 @@ class TicketEditForm(forms.ModelForm):
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
     product_new_price = forms.DecimalField(
-        decimal_places=2,
+        decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
@@ -644,7 +671,7 @@ class GoodEditForm(forms.ModelForm):
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
     product_new_price = forms.DecimalField(
-        decimal_places=2,
+        decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )

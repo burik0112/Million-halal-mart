@@ -47,10 +47,10 @@ class ProductItem(TimeStampedModel, models.Model):
     desc = models.TextField()
     # price = models.DecimalField(decimal_places=0, max_digits=10, default=0)
     old_price = models.DecimalField(
-        decimal_places=2, max_digits=10, null=True, blank=True, default=0
+        decimal_places=0, max_digits=10, null=True, blank=True, default=0
     )
     new_price = models.DecimalField(
-        decimal_places=2, max_digits=10, null=True, blank=True, default=0
+        decimal_places=0, max_digits=10, null=True, blank=True, default=0
     )
     measure = models.IntegerField(choices=CHOICES, default=0)
     available_quantity = models.PositiveIntegerField(default=0)
