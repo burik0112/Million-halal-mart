@@ -17,6 +17,7 @@ from .product import (
     NewsListView,
     NewsCreateView,
     GoodDeleteView,
+    GoodMainCategoryCreateView
 )
 from .users import (UserListView, UserOrdersView)
 from .main import (dashboard, InformationView, InformationEditView, ServiceView, ServiceEditView)
@@ -43,7 +44,9 @@ urlpatterns = [
 
     path("product/good-create/", GoodCreateView.as_view(), name="good_create"),
     path("product/good-category/",
-         GoodCategoryCreateView.as_view(), name="good_category"),
+         GoodMainCategoryCreateView.as_view(), name="good_category"),
+     path("product/good-subcategory/",
+         GoodCategoryCreateView.as_view(), name="good_subcategory"),
     path("product/goods/", GoodListView.as_view(), name="good-list"),
     path("product/good/edit-delete/<int:pk>/",
          GoodEditDeleteView.as_view(), name='edit-delete-good'),

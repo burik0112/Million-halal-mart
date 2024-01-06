@@ -157,6 +157,26 @@ class PhoneCategoryCreateForm(forms.ModelForm):
             # "bonus": forms.NumberInput(attrs={"class": "form-control"}),
             "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
+        labels = {
+            "name_uz": "Name (Uzbek)",
+            "name_ru": "Name (Russian)",
+            "name_en": "Name (English)",
+            "name_kr": "Name (Korean)",
+        }
+        required = {
+            "name_uz": True,
+            "name_ru": True,
+            "name_en": True,
+            "name_kr": True,
+        }
+    def __init__(self, *args, **kwargs):
+        super(PhoneCategoryCreateForm, self).__init__(*args, **kwargs)
+
+        # Set required attribute for each field
+        self.fields["name_uz"].required = True
+        self.fields["name_ru"].required = True
+        self.fields["name_en"].required = True
+        self.fields["name_kr"].required = True
 
 
 class TicketCategoryCreateForm(forms.ModelForm):
@@ -176,7 +196,26 @@ class TicketCategoryCreateForm(forms.ModelForm):
             # "bonus": forms.NumberInput(attrs={"class": "form-control"}),
             "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
+        labels = {
+            "name_uz": "Name (Uzbek)",
+            "name_ru": "Name (Russian)",
+            "name_en": "Name (English)",
+            "name_kr": "Name (Korean)",
+        }
+        required = {
+            "name_uz": True,
+            "name_ru": True,
+            "name_en": True,
+            "name_kr": True,
+        }
+    def __init__(self, *args, **kwargs):
+        super(TicketCategoryCreateForm, self).__init__(*args, **kwargs)
 
+        # Set required attribute for each field
+        self.fields["name_uz"].required = True
+        self.fields["name_ru"].required = True
+        self.fields["name_en"].required = True
+        self.fields["name_kr"].required = True
 
 class TicketProductItemForm(forms.ModelForm):
     class Meta:
@@ -275,7 +314,7 @@ class TicketProductItemForm(forms.ModelForm):
         return ticket
 
 
-class GoodCategoryCreateForm(forms.ModelForm):
+class GoodMainCategoryCreateForm(forms.ModelForm):
     class Meta:
         model = SubCategory
         fields = ["name_uz", "name_ru", "name_en", "name_kr", "image", "active"]
@@ -289,13 +328,88 @@ class GoodCategoryCreateForm(forms.ModelForm):
             # "bonus": forms.NumberInput(attrs={"class": "form-control"}),
             "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
-        def __init__(self, *args, **kwargs):
-            super(GoodCategoryCreateForm, self).__init__(*args, **kwargs)
-            # Set default value for category_id based on main_type
-            if "category" in self.fields and "main_type" in self.fields["category"].queryset.model._meta.get_fields():
-                # Assuming "main_type" is a valid field in the Category model
-                x=self.fields["category"].queryset = Category.objects.filter(main_type="f")
-                print(x, '*'*20)
+        labels = {
+            "name_uz": "Name (Uzbek)",
+            "name_ru": "Name (Russian)",
+            "name_en": "Name (English)",
+            "name_kr": "Name (Korean)",
+        }
+        required = {
+            "name_uz": True,
+            "name_ru": True,
+            "name_en": True,
+            "name_kr": True,
+        }
+        
+    def __init__(self, *args, **kwargs):
+        super(GoodMainCategoryCreateForm, self).__init__(*args, **kwargs)
+
+        # Set required attribute for each field
+        self.fields["name_uz"].required = True
+        self.fields["name_ru"].required = True
+        self.fields["name_en"].required = True
+        self.fields["name_kr"].required = True
+
+        # Filter the category queryset to main_type='f'
+        if "category" in self.fields:
+            self.fields["category"].queryset = Category.objects.filter(main_type="f")
+
+    def save(self, commit=True):
+        # Save the category with main_type='f'
+        instance = super(GoodMainCategoryCreateForm, self).save(commit=False)
+        instance.main_type = "f"
+        if commit:
+            instance.save()
+        return instance
+            
+
+class GoodCategoryCreateForm(forms.ModelForm):
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.filter(main_type='f'),
+        widget=forms.Select(attrs={"class": "form-select"})
+    )
+    class Meta:
+        model = SubCategory
+        fields = ["name_uz", "name_ru", "name_en", "name_kr", "image", "category","active"]
+        widgets = {
+            "name_uz": forms.TextInput(attrs={"class": "form-control"}),
+            "name_ru": forms.TextInput(attrs={"class": "form-control"}),
+            "name_en": forms.TextInput(attrs={"class": "form-control"}),
+            "name_kr": forms.TextInput(attrs={"class": "form-control"}),
+            "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "category": forms.Select(attrs={"class": "form-control"}),
+            "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+        labels = {
+            "name_uz": "Name (Uzbek)",
+            "name_ru": "Name (Russian)",
+            "name_en": "Name (English)",
+            "name_kr": "Name (Korean)",
+        }
+        required = {
+            "name_uz": True,
+            "name_ru": True,
+            "name_en": True,
+            "name_kr": True,
+        }
+        
+    def __init__(self, *args, **kwargs):
+        super(GoodCategoryCreateForm, self).__init__(*args, **kwargs)
+
+        # Set required attribute for each field
+        self.fields["name_uz"].required = True
+        self.fields["name_ru"].required = True
+        self.fields["name_en"].required = True
+        self.fields["name_kr"].required = True
+
+    def save(self, commit=True):
+        instance = super(GoodCategoryCreateForm, self).save(commit=False)
+        instance.main_type = "f"
+
+        if commit:
+            instance.save()
+
+        return instance
 
 class GoodProductItemForm(forms.ModelForm):
     class Meta:
@@ -480,6 +594,10 @@ class PhoneEditForm(forms.ModelForm):
     # product_bonus = forms.IntegerField(
     #     min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
     # )
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.filter(main_type='p'),
+        widget=forms.Select(attrs={"class": "form-select"})
+    )
     product_active = forms.BooleanField(
         required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
     )
@@ -577,6 +695,10 @@ class TicketEditForm(forms.ModelForm):
 
     product_available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
+    )
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.filter(main_type='t'),
+        widget=forms.Select(attrs={"class": "form-select"})
     )
     # product_stock = forms.IntegerField(
     #     min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
@@ -677,6 +799,10 @@ class GoodEditForm(forms.ModelForm):
     )
     product_available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
+    )
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.filter(main_type='f'),
+        widget=forms.Select(attrs={"class": "form-select"})
     )
     # product_stock = forms.IntegerField(
     #     min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
