@@ -18,6 +18,7 @@ from .forms import (
     NewsForm,
     GoodEditForm,
     GoodMainCategoryCreateForm,
+    NewsEditForm,
 )
 
 
@@ -309,3 +310,23 @@ class NewsCreateView(View):
         else:
             print(form.errors)
             return render(request, self.template_name, {"form": form})
+
+class NewsEditView(View):
+    template_name = "customer/news/edit_delete_news.html"
+
+    def get(self, request, pk):
+        news = get_object_or_404(News, pk=pk)
+        form = NewsEditForm(instance=news)
+        return render(request, self.template_name, {"form": form, "news": news})
+
+    def post(self, request, pk):
+        news = get_object_or_404(News, pk=pk)
+        if "edit" in request.POST:
+            form = NewsEditForm(request.POST, instance=news)
+            if form.is_valid():
+                form.save()
+                return redirect("news-list")
+        elif "delete" in request.POST:
+            news.delete()  # Delete the Ticket instance
+            return redirect("news-list")  # Redirect to ticket list
+        return render(request, self.template_name, {"form": form, "news": news})

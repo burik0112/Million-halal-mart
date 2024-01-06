@@ -34,7 +34,7 @@ class News(TimeStampedModel, models.Model):
     title = models.CharField(max_length=255, blank=True, null=True)
     start_date = models.DateTimeField(auto_now=True)
     end_date = models.DateTimeField(auto_now=True)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     image = models.ImageField(upload_to="media/news")
     active = models.BooleanField(default=True)
 

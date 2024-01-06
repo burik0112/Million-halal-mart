@@ -4,7 +4,7 @@
 <!-- Form for Adding Phone and ProductItem -->
 {% block content %}
 <div class="container">
-  <h2>Create news</h2>
+  <h2>Create News</h2>
   <form method="post" enctype="multipart/form-data">
     <!-- Add enctype attribute -->
     {% csrf_token %}
@@ -13,29 +13,46 @@
       <!-- First Column -->
       <div class="col-md-6">
         <div class="mb-3">
-          {{ form.title.label_tag }} {{ form.title }}
+          {{ form.title_uz.label_tag }} {{ form.title_uz }}
         </div>
-        <div class="col-sm-10">
+        <div class="mb-3">
+          {{ form.title_ru.label_tag }} {{ form.title_ru }}
+        </div>
+        <div class="mb-3">
+          <label for="id_images">Image: </label> {{ form.image }}
+        </div>
+        <div class="mb-3">
           {{ form.start_date.label_tag }} {{ form.start_date }}
         </div>
-        <div class="col-sm-10">
-          {{ form.end_date.label_tag }} {{ form.end_date }}
-        </div>
-        <div class="mb-3">{{ form.description.label_tag }} {{ form.description }}</div>
-        <div class="mb-3">
-          <label for="id_images">Images:</label>{{ form.image }}
-        </div>
+        <div class="mb-3">{{ form.description_uz.label_tag }} {{ form.description_uz }}</div>
+        <div class="mb-3">{{ form.description_ru.label_tag }} {{ form.description_ru }}</div>
       </div>
 
       <!-- Second Column -->
       <div class="col-md-6">
         <div class="row">
-          <div class="col-md-9 mb-3">
+          <div class="mb-3">
+            {{ form.title_en.label_tag }} {{ form.title_en }}
+          </div>
+          <div class="mb-3">
+            {{ form.title_kr.label_tag }} {{ form.title_kr }}
           </div>
         </div>
+<br>
+<br>
+<br>
+        
+        
+        <div class="mb-3">
+          {{ form.end_date.label_tag }} {{ form.end_date }}
+        </div>
+        <div class="mb-3">{{ form.description_en.label_tag }} {{ form.description_en }}</div>
+        <div class="mb-3">{{ form.description_kr.label_tag }} {{ form.description_kr }}</div>
       </div>
+
+
       <div class="col-md-12">
-        <div class="mb-3">{{ form.active }}Active </div>
+        <div class="mb-3">{{ form.active }} Active </div>
       </div>
     </div>
     <!-- {{ form.as_p }} -->

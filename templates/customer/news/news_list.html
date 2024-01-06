@@ -29,7 +29,7 @@
               <td class="text-center">{{ good.title }}</td>
               <td class="text-center">{{ good.start_date }}</td>
               <td class="text-center">{{ good.end_date }}</td>
-              <td class="text-center">{{ good.description }}</td>
+              <td class="text-center">{{ good.description_uz }}</td>
               <td class="text-center">
                 <img src="{{ good.image.url }}" alt="{{ good.title }}" width="50" height="50" />
               </td>
@@ -39,7 +39,7 @@
                 <td ><img src="{% static 'assets/img/cancel.png' %}" height="20" width="20" alt="Mavjud emas"></td>
               {% endif %}
                 <td class="text-center">
-                  <a href="" class="btn btn-primary btn-sm">Edit</a>
+                  <a href="{% url 'edit_news' news.id %}" class="btn btn-primary btn-sm">Edit</a>
                 </td>
             </tr>
             {% endfor %}

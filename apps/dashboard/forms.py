@@ -1,3 +1,4 @@
+from typing import Any
 from django import forms
 from django.forms import ClearableFileInput
 from apps.product.models import (
@@ -169,6 +170,7 @@ class PhoneCategoryCreateForm(forms.ModelForm):
             "name_en": True,
             "name_kr": True,
         }
+
     def __init__(self, *args, **kwargs):
         super(PhoneCategoryCreateForm, self).__init__(*args, **kwargs)
 
@@ -208,6 +210,7 @@ class TicketCategoryCreateForm(forms.ModelForm):
             "name_en": True,
             "name_kr": True,
         }
+
     def __init__(self, *args, **kwargs):
         super(TicketCategoryCreateForm, self).__init__(*args, **kwargs)
 
@@ -216,6 +219,7 @@ class TicketCategoryCreateForm(forms.ModelForm):
         self.fields["name_ru"].required = True
         self.fields["name_en"].required = True
         self.fields["name_kr"].required = True
+
 
 class TicketProductItemForm(forms.ModelForm):
     class Meta:
@@ -317,7 +321,8 @@ class TicketProductItemForm(forms.ModelForm):
 class GoodMainCategoryCreateForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ["name_uz", "name_ru", "name_en", "name_kr", "image", "active"]
+        fields = ["name_uz", "name_ru", "name_en",
+                  "name_kr", "image", "active"]
         widgets = {
             "name_uz": forms.TextInput(attrs={"class": "form-control"}),
             "name_ru": forms.TextInput(attrs={"class": "form-control"}),
@@ -340,7 +345,7 @@ class GoodMainCategoryCreateForm(forms.ModelForm):
             "name_en": True,
             "name_kr": True,
         }
-        
+
     def __init__(self, *args, **kwargs):
         super(GoodMainCategoryCreateForm, self).__init__(*args, **kwargs)
 
@@ -352,7 +357,8 @@ class GoodMainCategoryCreateForm(forms.ModelForm):
 
         # Filter the category queryset to main_type='f'
         if "category" in self.fields:
-            self.fields["category"].queryset = Category.objects.filter(main_type="f")
+            self.fields["category"].queryset = Category.objects.filter(
+                main_type="f")
 
     def save(self, commit=True):
         # Save the category with main_type='f'
@@ -361,16 +367,18 @@ class GoodMainCategoryCreateForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
-            
+
 
 class GoodCategoryCreateForm(forms.ModelForm):
     category = forms.ModelChoiceField(
         queryset=Category.objects.filter(main_type='f'),
         widget=forms.Select(attrs={"class": "form-select"})
     )
+
     class Meta:
         model = SubCategory
-        fields = ["name_uz", "name_ru", "name_en", "name_kr", "image", "category","active"]
+        fields = ["name_uz", "name_ru", "name_en",
+                  "name_kr", "image", "category", "active"]
         widgets = {
             "name_uz": forms.TextInput(attrs={"class": "form-control"}),
             "name_ru": forms.TextInput(attrs={"class": "form-control"}),
@@ -392,7 +400,7 @@ class GoodCategoryCreateForm(forms.ModelForm):
             "name_en": True,
             "name_kr": True,
         }
-        
+
     def __init__(self, *args, **kwargs):
         super(GoodCategoryCreateForm, self).__init__(*args, **kwargs)
 
@@ -409,6 +417,7 @@ class GoodCategoryCreateForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
 
 class GoodProductItemForm(forms.ModelForm):
     class Meta:
@@ -454,21 +463,6 @@ class GoodProductItemForm(forms.ModelForm):
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
     name_ru = forms.CharField(
-        max_length=255,
-        required=False,
-        widget=forms.TextInput(attrs={"class": "form-control"}),
-    )
-    ingredients_en = forms.CharField(
-        max_length=255,
-        required=False,
-        widget=forms.TextInput(attrs={"class": "form-control"}),
-    )
-    ingredients_uz = forms.CharField(
-        max_length=255,
-        required=False,
-        widget=forms.TextInput(attrs={"class": "form-control"}),
-    )
-    ingredients_ru = forms.CharField(
         max_length=255,
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control"}),
@@ -815,12 +809,6 @@ class GoodEditForm(forms.ModelForm):
     available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
     )
-    # stock = forms.IntegerField(
-    #     min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
-    # )
-    # bonus = forms.IntegerField(
-    #     min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
-    # )
     active = forms.BooleanField(
         required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
     )
@@ -841,8 +829,6 @@ class GoodEditForm(forms.ModelForm):
             "desc_ru",
             "desc_en",
             "desc_kr",
-            # "stock",
-            # "bonus",
             "active",
         ]
         widgets = {
@@ -858,8 +844,6 @@ class GoodEditForm(forms.ModelForm):
             self.fields[
                 "available_quantity"
             ].initial = product.available_quantity
-            # self.fields["stock"].initial = product.stock
-            # self.fields["bonus"].initial = product.bonus
             self.fields["desc_uz"].initial = product.desc_uz
             self.fields["desc_ru"].initial = product.desc_ru
             self.fields["desc_en"].initial = product.desc_kr
@@ -879,8 +863,6 @@ class GoodEditForm(forms.ModelForm):
         product_item.available_quantity = self.cleaned_data[
             "available_quantity"
         ]
-        # product_item.stock = self.cleaned_data["product_stock"]
-        # product_item.bonus = self.cleaned_data["product_bonus"]
         product_item.active = self.cleaned_data["active"]
         if commit:
             product_item.save()
@@ -891,12 +873,99 @@ class GoodEditForm(forms.ModelForm):
 class NewsForm(forms.ModelForm):
     class Meta:
         model = News
-        fields = ["title", "description", "image", "active"]
+        fields = "__all__"
+        widgets = {
+            "title_uz": forms.TextInput(attrs={"class": "form-control"}),
+            "title_ru": forms.TextInput(attrs={"class": "form-control"}),
+            "title_en": forms.TextInput(attrs={"class": "form-control"}),
+            "title_kr": forms.TextInput(attrs={"class": "form-control"}),
+            "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "description_uz": forms.Textarea(attrs={"class": "form-control"}),
+            "description_ru": forms.Textarea(attrs={"class": "form-control"}),
+            "description_en": forms.Textarea(attrs={"class": "form-control"}),
+            "description_kr": forms.Textarea(attrs={"class": "form-control"}),
+            "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+        labels = {
+            "title_uz": "Title (Uzbek)",
+            "title_ru": "Title (Russian)",
+            "title_en": "Title (English)",
+            "title_kr": "Title (Korean)",
+        }
+        required = {
+            "title_uz": True,
+            "title_ru": True,
+            "title_en": True,
+            "title_kr": True,
+        }
+    start_date = forms.DateTimeField(
+        input_formats=["%Y-%m-%d"],  # Adjust the format as needed
+        widget=forms.DateTimeInput(
+            attrs={"type": "date", "class": "form-control"}),
+    )
+    end_date = forms.DateTimeField(
+        input_formats=["%Y-%m-%d"],  # Adjust the format as needed
+        widget=forms.DateTimeInput(
+            attrs={"type": "date", "class": "form-control"}),
+    )
 
-    widgets = {
-        "start_date": forms.TextInput(attrs={"type": "datetime-local"}),
-        "end_date": forms.TextInput(attrs={"type": "datetime-local"}),
-    }
+    def save(self, commit: bool = ...) -> Any:
+        news = super().save(commit)
+        if commit:
+            news.save()
+        return news
+
+
+class NewsEditForm(forms.ModelForm):
+    class Meta:
+        model = News
+        fields = "__all__"
+        widgets = {
+            "title_uz": forms.TextInput(attrs={"class": "form-control"}),
+            "title_ru": forms.TextInput(attrs={"class": "form-control"}),
+            "title_en": forms.TextInput(attrs={"class": "form-control"}),
+            "title_kr": forms.TextInput(attrs={"class": "form-control"}),
+            "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "description_uz": forms.Textarea(attrs={"class": "form-control"}),
+            "description_ru": forms.Textarea(attrs={"class": "form-control"}),
+            "description_en": forms.Textarea(attrs={"class": "form-control"}),
+            "description_kr": forms.Textarea(attrs={"class": "form-control"}),
+            "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+        labels = {
+            "title_uz": "Title (Uzbek)",
+            "title_ru": "Title (Russian)",
+            "title_en": "Title (English)",
+            "title_kr": "Title (Korean)",
+        }
+        required = {
+            "title_uz": True,
+            "title_ru": True,
+            "title_en": True,
+            "title_kr": True,
+        }
+    start_date = forms.DateTimeField(
+        input_formats=["%Y-%m-%d"],  # Adjust the format as needed
+        widget=forms.DateTimeInput(
+            attrs={"type": "date", "class": "form-control"}),
+    )
+    end_date = forms.DateTimeField(
+        input_formats=["%Y-%m-%d"],  # Adjust the format as needed
+        widget=forms.DateTimeInput(
+            attrs={"type": "date", "class": "form-control"}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(NewsEditForm, self).__init__(*args, **kwargs)
+        if self.instance:
+            self.fields["start_date"].initial = self.instance.start_date
+            self.fields["end_date"].initial = self.instance.end_date
+
+    def save(self, commit: bool = ...) -> Any:
+        news = super().save(commit)
+        if commit:
+            news.save()
+        return news
 
 
 class ServiceEditForm(forms.ModelForm):
