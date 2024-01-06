@@ -58,12 +58,6 @@
 
     <!-- Template Main CSS File -->
     <link href="{% static 'assets/css/style.css' %}" rel="stylesheet" />
-    <style>
-      .nav-link.active {
-          color: #4CAF50; 
-          background-color: #f4f4f4; 
-      }
-      </style>
   </head>
 
   <body>
@@ -271,7 +265,7 @@
           </a>
           <ul
             id="forms-nav"
-            class="nav-content {% if not 'dashboard/product' in request.path  %}collapse{% endif %}"
+            class="nav-content  {% if not 'dashboard/product' in request.path  %}collapse{% endif %}"
             data-bs-parent="#sidebar-nav"
           >
             <li>
