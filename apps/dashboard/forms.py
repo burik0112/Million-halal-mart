@@ -316,7 +316,7 @@ class TicketProductItemForm(forms.ModelForm):
 
 class GoodMainCategoryCreateForm(forms.ModelForm):
     class Meta:
-        model = SubCategory
+        model = Category
         fields = ["name_uz", "name_ru", "name_en", "name_kr", "image", "active"]
         widgets = {
             "name_uz": forms.TextInput(attrs={"class": "form-control"}),
@@ -408,7 +408,6 @@ class GoodCategoryCreateForm(forms.ModelForm):
 
         if commit:
             instance.save()
-
         return instance
 
 class GoodProductItemForm(forms.ModelForm):
@@ -513,7 +512,8 @@ class GoodProductItemForm(forms.ModelForm):
     #     widget=forms.NumberInput(attrs={"class": "form-control"})
     # )
     active = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        initial=True
     )
     images = (
         MultipleFileField()
@@ -779,54 +779,71 @@ class TicketEditForm(forms.ModelForm):
 
 class GoodEditForm(forms.ModelForm):
     # Fields for the Good model
-    name = forms.CharField(widget=forms.TextInput(
+    name_uz = forms.CharField(widget=forms.TextInput(
         attrs={"class": "form-control"}))
-    ingredients = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
-    )
+    name_ru = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "form-control"}))
+    name_en = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "form-control"}))
+    name_kr = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "form-control"}))
     expire_date = forms.DateField(
         widget=forms.DateInput(attrs={"class": "form-control", "type": "date"})
     )
-
-    # Fields for the related ProductItem
-    product_desc = forms.CharField(
+    desc_uz = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
-    product_new_price = forms.DecimalField(
+    desc_ru = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    desc_en = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    desc_kr = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    new_price = forms.DecimalField(
         decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
-    product_available_quantity = forms.IntegerField(
+    old_price = forms.DecimalField(
+        decimal_places=0,
+        max_digits=10,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
+    available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
     )
-    category = forms.ModelChoiceField(
-        queryset=Category.objects.filter(main_type='f'),
-        widget=forms.Select(attrs={"class": "form-select"})
-    )
-    # product_stock = forms.IntegerField(
+    # stock = forms.IntegerField(
     #     min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
     # )
-    # product_bonus = forms.IntegerField(
+    # bonus = forms.IntegerField(
     #     min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
     # )
-    product_active = forms.BooleanField(
+    active = forms.BooleanField(
         required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
     )
 
     class Meta:
         model = Good
         fields = [
-            "name",
-            "ingredients",
+            "name_uz",
+            "name_ru",
+            "name_kr",
+            "name_en",
             "expire_date",
             "sub_cat",
-            "product_desc",
-            "product_new_price",
-            "product_available_quantity",
-            # "product_stock",
-            # "product_bonus",
-            "product_active",
+            "old_price",
+            "new_price",
+            "available_quantity",
+            "desc_uz",
+            "desc_ru",
+            "desc_en",
+            "desc_kr",
+            # "stock",
+            # "bonus",
+            "active",
         ]
         widgets = {
             "sub_cat": forms.Select(attrs={"class": "form-select"}),
@@ -836,28 +853,35 @@ class GoodEditForm(forms.ModelForm):
         super(GoodEditForm, self).__init__(*args, **kwargs)
         if self.instance and self.instance.product:
             product = self.instance.product
-            self.fields["product_desc"].initial = product.desc
-            self.fields["product_new_price"].initial = product.new_price
+            self.fields["old_price"].initial = product.old_price
+            self.fields["new_price"].initial = product.new_price
             self.fields[
-                "product_available_quantity"
+                "available_quantity"
             ].initial = product.available_quantity
-            # self.fields["product_stock"].initial = product.stock
-            # self.fields["product_bonus"].initial = product.bonus
-            self.fields["product_active"].initial = product.active
+            # self.fields["stock"].initial = product.stock
+            # self.fields["bonus"].initial = product.bonus
+            self.fields["desc_uz"].initial = product.desc_uz
+            self.fields["desc_ru"].initial = product.desc_ru
+            self.fields["desc_en"].initial = product.desc_kr
+            self.fields["desc_kr"].initial = product.desc_en
+            self.fields["active"].initial = product.active
 
     def save(self, commit=True):
         good = super(GoodEditForm, self).save(commit=False)
         if not good.product_id:
             good.product = ProductItem()
         product_item = good.product
-        product_item.desc = self.cleaned_data["product_desc"]
-        product_item.new_price = self.cleaned_data["product_new_price"]
+        product_item.desc_uz = self.cleaned_data["desc_uz"]
+        product_item.desc_ru = self.cleaned_data["desc_ru"]
+        product_item.desc_kr = self.cleaned_data["desc_kr"]
+        product_item.desc_en = self.cleaned_data["desc_en"]
+        product_item.new_price = self.cleaned_data["new_price"]
         product_item.available_quantity = self.cleaned_data[
-            "product_available_quantity"
+            "available_quantity"
         ]
         # product_item.stock = self.cleaned_data["product_stock"]
         # product_item.bonus = self.cleaned_data["product_bonus"]
-        product_item.active = self.cleaned_data["product_active"]
+        product_item.active = self.cleaned_data["active"]
         if commit:
             product_item.save()
             good.save()

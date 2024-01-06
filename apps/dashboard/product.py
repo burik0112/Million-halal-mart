@@ -151,7 +151,7 @@ class GoodMainCategoryCreateView(CreateView):
     model = Category
     form_class = GoodMainCategoryCreateForm
     template_name = "product/category_create.html"
-    success_url = reverse_lazy("good_category")
+    success_url = reverse_lazy("good_subcategory")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
