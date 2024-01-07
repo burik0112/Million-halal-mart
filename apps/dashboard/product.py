@@ -308,8 +308,8 @@ class NewsCreateView(View):
             form.save()
             return redirect("news-list")
         else:
-            print(form.errors)
             return render(request, self.template_name, {"form": form})
+
 
 class NewsEditView(View):
     template_name = "customer/news/edit_delete_news.html"

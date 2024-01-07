@@ -915,11 +915,23 @@ class NewsForm(forms.ModelForm):
             news.save()
         return news
 
-
+from django.utils import timezone
 class NewsEditForm(forms.ModelForm):
     class Meta:
         model = News
-        fields = "__all__"
+        fields = [
+            "title_uz",
+            "title_ru",
+            "title_en",
+            "title_kr",
+            "image",
+            "description_uz",
+            "description_ru",
+            "description_en",
+            "description_kr",
+            "active",
+        ]
+
         widgets = {
             "title_uz": forms.TextInput(attrs={"class": "form-control"}),
             "title_ru": forms.TextInput(attrs={"class": "form-control"}),
@@ -937,34 +949,30 @@ class NewsEditForm(forms.ModelForm):
             "title_ru": "Title (Russian)",
             "title_en": "Title (English)",
             "title_kr": "Title (Korean)",
+            "description_uz": "Description (Uzbek)",
+            "description_ru": "Description (Russian)",
+            "description_en": "Description (English)",
+            "description_kr": "Description (Korean)",
         }
         required = {
             "title_uz": True,
             "title_ru": True,
             "title_en": True,
             "title_kr": True,
+            "description_uz": True,
+            "description_ru": True,
+            "description_en": True,
+            "description_kr": True,
         }
-    start_date = forms.DateTimeField(
-        input_formats=["%Y-%m-%d"],  # Adjust the format as needed
-        widget=forms.DateTimeInput(
-            attrs={"type": "date", "class": "form-control"}),
-    )
-    end_date = forms.DateTimeField(
-        input_formats=["%Y-%m-%d"],  # Adjust the format as needed
-        widget=forms.DateTimeInput(
-            attrs={"type": "date", "class": "form-control"}),
-    )
-
-    def __init__(self, *args, **kwargs):
-        super(NewsEditForm, self).__init__(*args, **kwargs)
-        if self.instance:
-            self.fields["start_date"].initial = self.instance.start_date
-            self.fields["end_date"].initial = self.instance.end_date
-
-    def save(self, commit: bool = ...) -> Any:
-        news = super().save(commit)
+    def save(self, commit=True):
+        news = super().save(commit=False)
+        if not news.start_date:
+            news.start_date = timezone.now()
+        if not news.end_date:
+            news.end_date = timezone.now()
         if commit:
             news.save()
+
         return news
 
 
