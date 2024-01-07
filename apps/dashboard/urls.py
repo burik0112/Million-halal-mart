@@ -17,9 +17,12 @@ from .product import (
     NewsListView,
     NewsCreateView,
     GoodDeleteView,
+    GoodMainCategoryCreateView,
+    NewsEditView,
 )
 from .users import (UserListView, UserOrdersView)
-from .main import (dashboard, InformationView, InformationEditView, ServiceView, ServiceEditView)
+from .main import (dashboard, InformationView,
+                   InformationEditView, ServiceView, ServiceEditView)
 from .bot import index
 urlpatterns = [
     path("", dashboard, name="dashboard"),
@@ -43,7 +46,9 @@ urlpatterns = [
 
     path("product/good-create/", GoodCreateView.as_view(), name="good_create"),
     path("product/good-category/",
-         GoodCategoryCreateView.as_view(), name="good_category"),
+         GoodMainCategoryCreateView.as_view(), name="good_category"),
+    path("product/good-subcategory/",
+         GoodCategoryCreateView.as_view(), name="good_subcategory"),
     path("product/goods/", GoodListView.as_view(), name="good-list"),
     path("product/good/edit-delete/<int:pk>/",
          GoodEditDeleteView.as_view(), name='edit-delete-good'),
@@ -53,6 +58,10 @@ urlpatterns = [
 
     path("product/news/", NewsListView.as_view(), name="news-list"),
     path("product/news-create/", NewsCreateView.as_view(), name="news-create"),
+    path('product/news/edit/<int:pk>/',
+         NewsEditView.as_view(), name='edit_news'),
+    path('product/news/<int:pk>/delete/',
+         TicketDeleteView.as_view(), name='delete_news'),
 
     path("users/", UserListView.as_view(), name="users-list"),
     path("users/<int:pk>/order", UserOrdersView.as_view(), name="user-orders-list"),

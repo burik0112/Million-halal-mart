@@ -90,9 +90,9 @@ class OrderItemCreateAPIView(CreateAPIView):
 
 
 class OrderItemListAPIView(ListAPIView):
-    queryset = OrderItem.objects.all().order_by("-pk")
+    queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
-    pagination_class = CustomPageNumberPagination
+    # pagination_class = CustomPageNumberPagination
 
 
 class OrderItemRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
