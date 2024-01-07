@@ -1,5 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 <form method="post">
+  <h1>News edit page</h1>
   {% csrf_token %} {{ form.as_p }}
   <button type="submit" class="btn btn-primary" name="edit">Save Changes</button>
   <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteConfirmModal" id="yourDeleteButtonId">
@@ -21,7 +22,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          <form method="post" action="{% url 'delete_news news.id %}">
+          <form method="post" action="{% url 'edit_delete_news' news.id %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger">Delete</button>
           </form>
