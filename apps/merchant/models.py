@@ -28,8 +28,8 @@ class Order(TimeStampedModel, models.Model):
 
     def get_product_details(self, product_item, order_item):
         total_amount = (
-            product_item.price * order_item.quantity
-            - product_item.price * product_item.stock / 100
+            product_item.new_price * order_item.quantity
+            - product_item.new_price * product_item.stock / 100
         )
         # print(total_amount)
 

@@ -6,6 +6,7 @@ from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
 )
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, permissions
 from django.db import transaction
 from rest_framework.response import Response
@@ -54,12 +55,19 @@ class OrderCreateAPIView(CreateAPIView):
 
 
 class OrderListAPIView(ListAPIView):
-    queryset = Order.objects.all().order_by("-pk")
     serializer_class = OrderListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ["user__full_name"]
     filterset_fields = ["user__full_name", "status"]
     pagination_class = CustomPageNumberPagination
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Bu metod faqat autentifikatsiya qilingan foydalanuvchiga tegishli orderlarni qaytaradi.
+        """
+        user = self.request.user
+        return Order.objects.filter(user=user.profile).order_by("-pk")
 
 
 class OrderRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
