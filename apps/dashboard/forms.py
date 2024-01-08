@@ -13,7 +13,7 @@ from apps.product.models import (
 
 from apps.customer.models import News
 from apps.merchant.models import Information, Service
-
+from django.utils import timezone
 
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
@@ -915,7 +915,7 @@ class NewsForm(forms.ModelForm):
             news.save()
         return news
 
-from django.utils import timezone
+
 class NewsEditForm(forms.ModelForm):
     class Meta:
         model = News

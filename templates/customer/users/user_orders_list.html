@@ -12,14 +12,14 @@
         <div class="col-12">
           <div class="card recent-sales overflow-auto">
             <div class="card-body">
-              <h5 class="card-title">Recent Sales <span>| Today</span></h5>
+              <h5 class="card-title">{{user.full_name}} buyurtmalari<span>| All</span></h5>
               <table class="table table-borderless datatable">
                 <thead>
                   <tr>
                     <th scope="col">#</th>
                     <th scope="col">Date</th>
                     <th scope="col">Address</th>
-                    <th scope="col">Price</th>
+                    <th scope="col">Total price</th>
                     <th scope="col">Comment</th>
                     <th scope="col">Status</th>
                     <th scope="col">Details</th>
@@ -29,7 +29,7 @@
                   {% for c in orders %}
                   <tr>
                     <th scope="row">{{c.id}}</th>
-                    <td>{{c.created}}</td>
+                    <td ><i class="bi bi-calendar-date"></i> {{ c.created|date:"d-m-Y" }} <i class="bi bi-clock"></i> {{ c.created|date:"H:i" }}</td>
                     <td>
                       {% if c.user.location.exists %}
                       {{ c.user.location.first.address }}
@@ -37,11 +37,11 @@
                       <span class="text-muted">No location available</span>
                       {% endif %}
                     </td>
-                    <td>50000 W</td>
+                    <td>{{c.total_amount}} ₩</td>
                     <td>{{c.comment}}</td>
-                    <td><span class="badge bg-success">Approved</span></td>
+                    <td><span class="badge bg-success">{{c.status}}</span></td>
                     <td>
-                      <a href="#">  
+                      <a href="{% url 'user-order-detail' c.id %}">  
                         <i class="fa-solid fa-eye fa-2xl"></i>
                       </a>
                     </td>

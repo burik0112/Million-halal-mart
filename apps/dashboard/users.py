@@ -1,5 +1,5 @@
 from apps.customer.models import Profile
-from apps.merchant.models import Order
+from apps.merchant.models import Order, OrderItem, Service
 from django.views.generic import ListView, DetailView
 from django.shortcuts import render, redirect, HttpResponse
 
@@ -23,8 +23,82 @@ class UserOrdersView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(UserOrdersView, self).get_context_data(**kwargs)
         orders = Order.objects.filter(user__id=self.kwargs['pk'])
+        user = Profile.objects.get(id=self.kwargs['pk'])
         if orders:
             context["orders"] = orders
+            context["user"] = user
         else:
             context["no_orders_message"] = "This user has no orders."
         return context
+
+class UserOrderDetailView(DetailView):
+    model = Order
+    template_name = "customer/users/user_order_detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(UserOrderDetailView, self).get_context_data(**kwargs)
+        order = Order.objects.get(id=self.kwargs['pk'])
+        order_items = OrderItem.objects.filter(order__id=self.kwargs['pk'])
+        user = Profile.objects.get(id=self.kwargs['pk'])
+        cargo = Service.objects.all().first().delivery_fee
+
+        order_items_data = []  # List to store data for each OrderItem
+
+        for order_item in order_items:
+            product_type, details = self.get_product_type(order_item.product)
+            first_image_url = self.get_first_image_url(order_item.product)
+            # Calculate total price for each OrderItem
+            if order_item.product.new_price:
+                total_price = order_item.quantity * order_item.product.new_price
+            elif order_item.product.old_price:
+                total_price = order_item.quantity * order_item.product.old_price
+            else:
+                total_price = 0
+
+            # Add data for each OrderItem to the list
+            order_items_data.append({
+                "order_item": order_item,
+                "product_type": product_type,
+                "details": details,
+                "total_price": total_price,
+                "first_image_url": first_image_url,
+            })
+
+        if order_items:
+            context["order_items_data"] = order_items_data
+            context["user"] = user
+            context["order"] = order
+            context["cargo"] = cargo
+        else:
+            context["no_orders_message"] = "This user has no orders."
+
+        return context
+    def get_first_image_url(self, product_item):
+        # Get the first image URL for the product
+        first_image = product_item.images.first()
+        return first_image.image.url if first_image else None
+    def get_product_type(self, product_item):
+        if hasattr(product_item, "phones"):
+            return "Phone", {
+                "model_name": product_item.phones.model_name,
+                "ram": product_item.phones.get_ram_display(),
+                "storage": product_item.phones.get_storage_display(),
+                "color": product_item.phones.get_color_display(),
+                "condition": product_item.phones.get_condition_display(),
+            }
+        elif hasattr(product_item, "tickets"):
+            x= "Ticket", {
+                "event_name": product_item.tickets.event_name,
+                "event_date": product_item.tickets.event_date,
+                "category": product_item.tickets.category.name if product_item.tickets.category else "Bilet",
+                "price": product_item.new_price if product_item.new_price else product_item.old_price,
+            }
+            return x
+        elif hasattr(product_item, "goods"):
+            return "Good", {
+                "name": product_item.goods.name,
+                "ingredients": product_item.goods.ingredients,
+                "expire_date": product_item.goods.expire_date,
+                "sub_cat": product_item.goods.sub_cat.name if product_item.goods.sub_cat else None,
+            }
+        return None, None
