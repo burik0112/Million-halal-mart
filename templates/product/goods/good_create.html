@@ -16,42 +16,55 @@
       <!-- First Column -->
       <div class="col-md-6">
         <div class="mb-3">
-          {{ form.name.label_tag }} {{ form.name }}
+          {{ form.name_uz.label_tag }} {{ form.name_uz }}
         </div>
-        <div class="mb-3">{{ form.ingredients.label_tag }} {{ form.ingredients }}</div>
-        <div class="mb-3">{{ form.old_price.label_tag }} {{ form.old_price }}</div>
+        <div class="mb-3">
+          {{ form.name_ru.label_tag }} {{ form.name_ru }}
+        </div>
         <div class="mb-3">{{ form.measure.label_tag }} {{ form.measure }}</div>
+        <div class="mb-3">{{ form.old_price.label_tag }} {{ form.old_price }}</div>
         <div class="mb-3">
           <label for="id_images">Images:</label>{{ form.images }}
         </div>
+        <div class="mb-3">
+          {{ form.expire_date.label_tag }} {{ form.expire_date }}
+        </div>
+          <div class="mb-3">{{ form.desc_uz.label_tag }} {{ form.desc_uz }}</div>
+          <div class="mb-3">{{ form.desc_ru.label_tag }} {{ form.desc_ru }}</div>
       </div>
 
       <!-- Second Column -->
       <div class="col-md-6">
         <div class="row">
+          <div class="mb-3">
+            {{ form.name_en.label_tag }} {{ form.name_en }}
+          </div>
+          <div class="mb-3">
+            {{ form.name_kr.label_tag }} {{ form.name_kr }}
+          </div>
           <div class="col-md-9 mb-3">
             {{ form.category.label_tag }} {{ form.category }}
           </div>
           <div class="col-md-3 d-flex align-items-center">
-            <a href="{% url 'good_category' %}" class="btn btn-success btn-sm">Add category</a>
+            <a href="{% url 'good_subcategory' %}" class="btn btn-success btn-sm">Add category</a>
           </div>
         </div>
         <div class="mb-3">{{ form.new_price.label_tag }} {{ form.new_price }}</div>
         <div class="mb-3">
           {{ form.available_quantity.label_tag }} {{ form.available_quantity }}
         </div>
-        <div class="col-sm-10">
-          {{ form.expire_date.label_tag }} {{ form.expire_date }}
-        </div>
+        <br>
+        <br>
+        <br>
+          <div class="mb-3">{{ form.desc_en.label_tag }} {{ form.desc_en }}</div>
+          <div class="mb-3">{{ form.desc_kr.label_tag }} {{ form.desc_kr }}</div>
       </div>
 
 
-      <div class="col-md-12">
-        <div class="mb-3">{{ form.desc.label_tag }} {{ form.desc }}</div>
-      </div>
+      
 
       <div class="col-md-12">
-        <div class="mb-3">{{ form.active }}Active </div>
+        <div class="mb-3">{{ form.active }} Active </div>
       </div>
     </div>
     <!-- {{ form.as_p }} -->

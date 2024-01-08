@@ -16,7 +16,6 @@
               <th scope="col">Name</th>
               <th scope="col">Image</th>
               <th scope="col">Category</th>
-              <th scope="col">Ingredients</th>
               <th scope="col">Description</th>
               <th scope="col">Old price</th>
               <th scope="col">New price</th>
@@ -36,11 +35,10 @@
               <td class="text-center">
                 <img src="{{ good.product.images.first.image.url }}" alt="{{ good.name }}" width="50" height="50" />
               </td>
-              <td class="text-center">{{ good.category }}</td>
-              <td class="text-center">{{ good.ingredients }}</td>
-              <td class="text-center">{{ good.product.desc }}</td>
+              <td class="text-center">{{ good.sub_cat }}</td>
+              <td class="text-center">{{ good.product.desc_uz }}</td>
               <td class="text-center">{{ good.product.old_price }} ₩</td>
-              <td class="text-center">{{ good.product.price_price }} ₩</td>
+              <td class="text-center">{{ good.product.new_price }} ₩</td>
               <td class="text-center">{{ good.product.get_measure_display }}</td>
               <td class="text-center">{{ good.product.available_quantity }}</td>
               <td class="text-center">{{ good.expire_date }}</td>

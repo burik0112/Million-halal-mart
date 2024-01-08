@@ -3,6 +3,7 @@
 
 <!-- Existing form and content -->
 <form method="post">
+  <h1>Product edit page</h1>
   {% csrf_token %} {{ form.as_p }}
   <button type="submit" class="btn btn-primary" name="edit">Save Changes</button>
   <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteConfirmModal" id="yourDeleteButtonId">
