@@ -14,7 +14,7 @@
               <th scope="col">#</th>
               <th scope="col">Full name</th>
               <th scope="col">Phone number</th>
-              <th scope="col">Cashback</th>
+              <th scope="col">Orders count</th>
               <th scope="col">Address</th>
               <th scope="col">Joined</th>
               <th scope="col">Orders</th>
@@ -27,7 +27,7 @@
               <th scope="row">{{ user.id }}</th>
               <td>{{ user.full_name }}</td>
               <td>{{ user.phone_number }}</td>
-              <td class="text-center">{{ user.cashback }}</td>
+              <td class="text-center">{{ user.order.count }}</td>
               {% with location_instance=user.location.last %}
               {% if location_instance %}
               <td>{{ location_instance.address }}</td>

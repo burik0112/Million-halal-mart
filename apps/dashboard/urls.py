@@ -20,7 +20,7 @@ from .product import (
     GoodMainCategoryCreateView,
     NewsEditView,
 )
-from .users import (UserListView, UserOrdersView)
+from .users import (UserListView, UserOrdersView, UserOrderDetailView)
 from .main import (dashboard, InformationView,
                    InformationEditView, ServiceView, ServiceEditView)
 from .bot import index
@@ -63,6 +63,7 @@ urlpatterns = [
 
     path("users/", UserListView.as_view(), name="users-list"),
     path("users/<int:pk>/order", UserOrdersView.as_view(), name="user-orders-list"),
+    path("users/order-detail/<int:pk>/", UserOrderDetailView.as_view(), name="user-order-detail"),
 
     path('info/list/', InformationView.as_view(), name='info-list'),
     path('info/edit/<int:pk>/',
