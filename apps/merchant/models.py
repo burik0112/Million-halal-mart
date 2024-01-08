@@ -27,10 +27,7 @@ class Order(TimeStampedModel, models.Model):
     total_amount = models.DecimalField(decimal_places=0, max_digits=20, default=0.00)
 
     def get_product_details(self, product_item, order_item):
-        total_amount = (
-            product_item.new_price * order_item.quantity
-            - product_item.new_price * product_item.stock / 100
-        )
+        total_amount = product_item.new_price * order_item.quantity
         # print(total_amount)
 
         if hasattr(product_item, "goods"):
