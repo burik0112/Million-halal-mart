@@ -26,7 +26,7 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td ><i class="bi bi-calendar-date"></i> {{ order.created|date:"d-m-Y" }} <i class="bi bi-clock"></i> {{ order.created|date:"H:i" }}</td>
+                    <td ><i class="bi bi-calendar-date"></i> {{ order.created|date:"d-m-Y" }} <br><i class="bi bi-clock"></i> {{ order.created|date:"H:i" }}</td>
                     <td>
                       {% if order.user.location.exists %}
                       {{ order.user.location.first.address }}
@@ -37,7 +37,21 @@
                     <td>{{cargo}} ₩</td>
                     <td>{{order.total_amount}} ₩</td>
                     <td>{{order.comment}}</td>
-                    <td><span class="badge bg-success">{{order.status}}</span></td>
+                    <td>
+                      {% if order.status == "in_cart" %}
+                          <span class="badge bg-warning">Savatchada</span>
+                      {% elif order.status == "pending" %}
+                          <span class="badge bg-warning">Kutilmoqda</span>
+                      {% elif order.status == "approved" %}
+                          <span class="badge bg-primary">To'lov tasdiqlandi</span>
+                      {% elif order.status == "sent" %}
+                          <span class="badge bg-success">Yuborildi</span>
+                      {% elif order.status == "cancelled" %}
+                          <span class="badge bg-danger">Bekor qilindi</span>
+                      {% else %}
+                          <span class="badge bg-secondary">{{ order.status }}</span>
+                      {% endif %}
+                  </td>
                   </tr>
                 </tbody>
               </table>

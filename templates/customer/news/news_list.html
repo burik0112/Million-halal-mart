@@ -6,20 +6,20 @@
     <div class="card">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
-          <h5 class="card-title">News List</h5>
-          <a href="{% url 'news-create' %}" class="btn btn-success">Create News</a>
+          <h5 class="card-title">E'lonlar ro'yhati</h5>
+          <a href="{% url 'news-create' %}" class="btn btn-success">E'lon yaratish</a>
         </div>
         <table class="table datatable">
           <thead>
             <tr>
               <th scope="col">#</th>
-              <th scope="col">Title</th>
-              <th scope="col">Start date</th>
-              <th scope="col">End date</th>
-              <th scope="col">Description</th>
-              <th scope="col">Image</th>
-              <th scope="col">Active</th>
-              <th scope="col">Actions</th>
+              <th scope="col">Sarlavha</th>
+              <th scope="col">Boshlanishi</th>
+              <th scope="col">Tugashi</th>
+              <th scope="col">Ta'rif</th>
+              <th scope="col">Foto</th>
+              <th scope="col">Faol</th>
+              <th scope="col">Qo'shimcha</th>
             </tr>
           </thead>
           <tbody>
@@ -27,8 +27,8 @@
             <tr>
               <th scope="row" class="text-center">{{ good.id }}</th>
               <td class="text-center">{{ good.title }}</td>
-              <td class="text-center">{{ good.start_date }}</td>
-              <td class="text-center">{{ good.end_date }}</td>
+              <td ><i class="bi bi-calendar-date"></i> {{ good.start_date|date:"d-m-Y" }} <br><i class="bi bi-clock"></i> {{ good.start_date|date:"H:i" }}</td>
+              <td ><i class="bi bi-calendar-date"></i> {{ good.end_date|date:"d-m-Y" }} <br> <i class="bi bi-clock"></i> {{ good.end_date|date:"H:i" }}</td>
               <td class="text-center">{{ good.description_uz }}</td>
               <td class="text-center">
                 <img src="{{ good.image.url }}" alt="{{ good.title }}" width="50" height="50" />
@@ -39,7 +39,7 @@
                 <td ><img src="{% static 'assets/img/cancel.png' %}" height="20" width="20" alt="Mavjud emas"></td>
               {% endif %}
                 <td class="text-center">
-                  <a href="{% url 'edit_delete_news' good.id %}" class="btn btn-primary btn-sm">Edit</a>
+                  <a href="{% url 'edit_delete_news' good.id %}" class="btn btn-primary btn-sm">Tahrirlash</a>
                 </td>
             </tr>
             {% endfor %}

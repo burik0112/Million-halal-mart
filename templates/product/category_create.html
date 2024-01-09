@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% block content %}
 <div class="container">
-  <h2>Create Product Category</h2>
+  <h2>Mahsulot kategoriyasi yaratish oynasi</h2>
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="row">
@@ -10,7 +10,7 @@
         <div class="mb-3">{{ form.name_uz.label_tag }} {{ form.name_uz }}</div>
         <div class="mb-3">{{ form.name_ru.label_tag }} {{ form.name_ru }}</div>
         <div class="mb-3">
-          <label for="id_images">Category image:</label>{{ form.image }}
+          <label for="id_images">Kategoriya rasmi:</label>{{ form.image }}
         </div>
       </div>
       
@@ -27,7 +27,7 @@
     <div class="row">
       <div class="col-12 text-end">
         <!-- text-end klassi qo'shildi -->
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">Saqlash</button>
       </div>
     </div>
   </form>
