@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils.translation import gettext_lazy as _
 from rest_framework.pagination import PageNumberPagination
 from apps.product.models import ProductItem, Good, Phone, Ticket, Image
 from .models import Favorite, Location, News, Profile, ViewedNews, Banner
@@ -26,9 +27,47 @@ class LoginSerializer(serializers.Serializer):
                     data["user"] = user
                     data["profile"] = profile
                     return data
+                else:
+                    # Multi-language error message for incorrect password
+                    raise serializers.ValidationError(
+                        {
+                            "password": {
+                                "en": _("Invalid password"),
+                                "uz": _("Parol xato"),
+                                "ru": _("Неверный пароль"),
+                                "kr": _("비밀번호가 들렸습니다"),
+                            }
+                        }
+                    )
             except Profile.DoesNotExist:
-                pass
-        raise serializers.ValidationError("Invalid phone number or password")
+                # Multi-language error message for invalid phone number
+                raise serializers.ValidationError(
+                    {
+                        "phone_number": {
+                            "en": _("Please enter a valid phone number"),
+                            "uz": _("Iltimos, yaroqli telefon raqamini kiriting"),
+                            "ru": _("Пожалуйста, введите действующий номер телефона"),
+                            "kr": _("유효한 전화 번호를 입력하세요"),
+                        }
+                    }
+                )
+
+        raise serializers.ValidationError(
+            {
+                "phone_number": {
+                    "en": _("Please enter a valid phone number"),
+                    "uz": _("Iltimos, yaroqli telefon raqamini kiriting"),
+                    "ru": _("Пожалуйста, введите действующий номер телефона"),
+                    "kr": _("유효한 전화 번호를 입력하세요"),
+                },
+                "password": {
+                    "en": _("Invalid password"),
+                    "uz": _("Parol xato"),
+                    "ru": _("Неверный пароль"),
+                    "kr": _("비밀번호가 들렸습니다"),
+                },
+            }
+        )
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -61,9 +100,19 @@ class VerifyOTPSerializer(serializers.Serializer):
         try:
             profile = Profile.objects.get(phone_number=phone_number)
             if phone_number == "+821021424342":
-                pass
-            elif profile.otp != otp:
-                raise serializers.ValidationError("Invalid OTP")
+                return data
+            if profile.otp != otp:
+                # Multi-language error message for invalid OTP
+                raise serializers.ValidationError(
+                    {
+                        "otp": {
+                            "en": _("Invalid confirmation code"),
+                            "uz": _("Tasdiq kodi noto'g'ri"),
+                            "ru": _("Неверный код подверждение"),
+                            "kr": _("인증번호가 잘못되었습니다"),
+                        }
+                    }
+                )
         except Profile.DoesNotExist:
             raise serializers.ValidationError("Profile not found")
 

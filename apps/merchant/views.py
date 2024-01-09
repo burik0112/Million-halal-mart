@@ -5,6 +5,7 @@ from rest_framework.generics import (
     ListAPIView,
     RetrieveUpdateDestroyAPIView,
 )
+from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, permissions
@@ -88,6 +89,26 @@ class OrderItemCreateAPIView(CreateAPIView):
         context["request"] = self.request
         return context
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        # Multi-language success message for product addition
+        success_message = {
+            "en": _("The product has been successfully added to the cart"),
+            "uz": _("Maxsulot savatga muvafaqqiyatli qo'shildi"),
+            "ru": _("Товар успешно добавлен в корзину"),
+            "kr": _("제품이 장바구니에 성공적으로 추가되었습니다"),
+        }
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            {"message": success_message, "order_item": serializer.data},
+            status=status.HTTP_201_CREATED,
+            headers=headers,
+        )
+
 
 class OrderItemListAPIView(ListAPIView):
     queryset = OrderItem.objects.all()
@@ -99,6 +120,22 @@ class OrderItemRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
 
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        order = instance.order
+        self.perform_destroy(instance)
+        order.update_total_amount()  # Update the order's total amount after deleting the item
+
+        # Multi-language success message for product removal
+        success_message = {
+            "en": _("The product has been removed from the cart"),
+            "uz": _("Maxsulot savatdan o'chirib tashlandi"),
+            "ru": _("Товар удален из корзины"),
+            "kr": _("제품이 장바구니에서 제거되었습니다"),
+        }
+
+        return Response({"message": success_message}, status=status.HTTP_204_NO_CONTENT)
+
 
 class InformationListAPIView(ListAPIView):
     queryset = Information.objects.all().order_by("-pk")
@@ -109,12 +146,12 @@ class CheckoutView(APIView):
     def post(self, request, order_id, *args, **kwargs):
         with transaction.atomic():
             try:
-                # Avvalgi Order tekshiriladi
+                # Check the original Order
                 original_order = Order.objects.get(
                     id=order_id, user=request.user.profile
                 )
 
-                # Agar Order to'langan yoki qabul qilingan bo'lsa, yangi Order yaratiladi
+                # If Order is paid or approved, create a new Order
                 if original_order.status in ["approved", "sent", "cancelled"]:
                     new_order = Order.objects.create(
                         user=request.user.profile, status="pending"
@@ -129,16 +166,31 @@ class CheckoutView(APIView):
                 else:
                     order = original_order
 
-                # Mijoz tomonidan yuborilgan ma'lumotlarni qabul qilish
+                # Accepting data sent by the client
                 update_data = request.data.copy()
                 update_data["status"] = "pending"
 
                 serializer = OrderStatusUpdateSerializer(order, data=update_data)
                 if serializer.is_valid():
                     serializer.save()
-                    # Botga xabar yuborish logikasi
+                    # Logic for sending message to a bot
                     bot(order)
-                    return Response({"status": "success", "order_id": order.id})
+
+                    # Multi-language success message for order creation
+                    success_message = {
+                        "en": _("Order created successfully"),
+                        "uz": _("Buyurtma muvafaqqiyatli yaratildi"),
+                        "ru": _("Заказ успешно создан"),
+                        "kr": _("주문이 성공적으로 생성되었습니다"),
+                    }
+
+                    return Response(
+                        {
+                            "status": "success",
+                            "order_id": order.id,
+                            "message": success_message,
+                        }
+                    )
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             except Order.DoesNotExist:
                 return Response(

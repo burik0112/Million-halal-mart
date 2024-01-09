@@ -43,11 +43,12 @@ class LoginView(APIView):
 
             profile_serializer = ProfileSerializer(profile)
 
-            return Response({
-                "token": token.key,
-                "profile": profile_serializer.data
-            }, status=status.HTTP_200_OK)
+            return Response(
+                {"token": token.key, "profile": profile_serializer.data},
+                status=status.HTTP_200_OK,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # Create your views here.
 
@@ -219,9 +220,16 @@ class VerifyRegisterOTPView(APIView):
         profile.otp = None
         profile.save()
 
-        # Bu yerda token berilmaydi, faqat OTPni tasdiqlash amalga oshiriladi
+        # Multi-language success message for account activation
+        success_message = {
+            "en": _("Account activated successfully"),
+            "uz": _("Akkount muvafaqqiyatli faollashtirildi"),
+            "ru": _("Аккаунт успешно активирован"),
+            "kr": _("계정이 성공적으로 활성화되었습니다"),
+        }
+
         return Response(
-            {"message": "OTP verified successfully. Please set your password."},
+            {"message": success_message},
             status=status.HTTP_200_OK,
         )
 
