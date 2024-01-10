@@ -105,12 +105,10 @@ class VerifyOTPSerializer(serializers.Serializer):
                 # Multi-language error message for invalid OTP
                 raise serializers.ValidationError(
                     {
-                        "otp": {
-                            "en": _("Invalid confirmation code"),
-                            "uz": _("Tasdiq kodi noto'g'ri"),
-                            "ru": _("Неверный код подверждение"),
-                            "kr": _("인증번호가 잘못되었습니다"),
-                        }
+                        "en": _("Invalid confirmation code"),
+                        "uz": _("Tasdiq kodi noto'g'ri"),
+                        "ru": _("Неверный код подверждение"),
+                        "kr": _("인증번호가 잘못되었습니다"),
                     }
                 )
         except Profile.DoesNotExist:
