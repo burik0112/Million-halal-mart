@@ -14,7 +14,7 @@ from apps.product.models import (
 from apps.customer.models import News
 from apps.merchant.models import Information, Service
 from django.utils import timezone
-
+from ckeditor.widgets import CKEditorWidget
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
 
@@ -1076,51 +1076,215 @@ class ServiceEditForm(forms.ModelForm):
 
 
 class InformationEditForm(forms.ModelForm):
-    reminder = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    reminder_uz = forms.CharField(
+        required=False,
+        label='Eslatma UZ',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+
     )
-    agreement = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    reminder_ru = forms.CharField(
+        required=False,
+        label='Eslatma RU',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+
     )
-    shipment_terms = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    reminder_en = forms.CharField(
+        required=False,
+        label='Eslatma EN',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+
     )
-    privacy_policy = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    reminder_kr = forms.CharField(
+        required=False,
+        label='Eslatma KR',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+
     )
-    about_us = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    agreement_uz = forms.CharField(
+        required=False, 
+        label='Kelishuv UZ',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
-    support_center = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    agreement_ru = forms.CharField(
+        required=False, 
+        label='Kelishuv RU',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
-    payment_data = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    agreement_en = forms.CharField(
+        required=False, 
+        label='Kelishuv EN',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    agreement_kr = forms.CharField(
+        required=False, 
+        label='Kelishuv KR',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    shipment_terms_uz = forms.CharField(
+        required=False, 
+        label='Yetkazish shartlari UZ',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    shipment_terms_ru = forms.CharField(
+        required=False, 
+        label='Yetkazish shartlari RU',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    shipment_terms_en = forms.CharField(
+        required=False, 
+        label='Yetkazish shartlari EN',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    shipment_terms_kr = forms.CharField(
+        required=False, 
+        label='Yetkazish shartlari KR',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    privacy_policy_uz = forms.CharField(
+        required=False, 
+        label='Offerta shartlari UZ',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    privacy_policy_ru = forms.CharField(
+        required=False, 
+        label='Offerta shartlari RU',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    privacy_policy_en = forms.CharField(
+        required=False, 
+        label='Offerta shartlari EN',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    privacy_policy_kr = forms.CharField(
+        required=False, 
+        label='Offerta shartlari KR',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    about_us_uz = forms.CharField(
+        required=False, 
+        label='Biz haqimizda UZ',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    about_us_ru = forms.CharField(
+        required=False, 
+        label='Biz haqimizda RU',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    about_us_en = forms.CharField(
+        required=False, 
+        label='Biz haqimizda EN',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    about_us_kr = forms.CharField(
+        required=False, 
+        label='Biz haqimizda KR',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    support_center_uz = forms.CharField(
+        required=False, 
+        label='Qollab quvvatlash markazi UZ',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    support_center_ru = forms.CharField(
+        required=False, 
+        label='Qollab quvvatlash markazi RU',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    support_center_en = forms.CharField(
+        required=False, 
+        label='Qollab quvvatlash markazi EN',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    support_center_kr = forms.CharField(
+        required=False, 
+        label='Qollab quvvatlash markazi KR',
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    payment_data_uz = forms.CharField(
+        required=False, 
+        label="Hisob raqam/Pul o'tkazish shartlari UZ",
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    payment_data_ru = forms.CharField(
+        required=False, 
+        label="Hisob raqam/Pul o'tkazish shartlari RU",
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    payment_data_en = forms.CharField(
+        required=False, 
+        label="Hisob raqam/Pul o'tkazish shartlari EN",
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+    )
+    payment_data_kr = forms.CharField(
+        required=False, 
+        label="Hisob raqam/Pul o'tkazish shartlari KR",
+        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
 
     class Meta:
         model = Information
         fields = [
-            "reminder",
-            "agreement",
-            "shipment_terms",
-            "privacy_policy",
-            "about_us",
-            "support_center",
-            "payment_data",
+            "reminder_uz",
+            "reminder_ru",
+            "reminder_en",
+            "reminder_kr",
+            "agreement_uz",
+            "agreement_ru",
+            "agreement_en",
+            "agreement_kr",
+            "shipment_terms_uz",
+            "shipment_terms_ru",
+            "shipment_terms_en",
+            "shipment_terms_kr",
+            "privacy_policy_uz",
+            "privacy_policy_ru",
+            "privacy_policy_en",
+            "privacy_policy_kr",
+            "about_us_uz",
+            "about_us_ru",
+            "about_us_en",
+            "about_us_kr",
+            "support_center_uz",
+            "support_center_ru",
+            "support_center_en",
+            "support_center_kr",
+            "payment_data_uz",
+            "payment_data_ru",
+            "payment_data_en",
+            "payment_data_kr",
         ]
 
     def __init__(self, *args, **kwargs):
         super(InformationEditForm, self).__init__(*args, **kwargs)
         if self.instance:
-            self.fields["reminder"].initial = self.instance.reminder
-            self.fields["agreement"].initial = self.instance.agreement
-            self.fields["shipment_terms"].initial = self.instance.shipment_terms
-            self.fields["privacy_policy"].initial = self.instance.privacy_policy
-            self.fields["about_us"].initial = self.instance.about_us
-            self.fields["support_center"].initial = self.instance.support_center
-            self.fields["payment_data"].initial = self.instance.payment_data
-
+            self.fields["reminder_uz"].initial = self.instance.reminder_uz
+            self.fields["reminder_ru"].initial = self.instance.reminder_ru
+            self.fields["reminder_en"].initial = self.instance.reminder_en
+            self.fields["reminder_kr"].initial = self.instance.reminder_kr
+            self.fields["agreement_uz"].initial = self.instance.agreement_uz
+            self.fields["agreement_ru"].initial = self.instance.agreement_ru
+            self.fields["agreement_en"].initial = self.instance.agreement_en
+            self.fields["agreement_kr"].initial = self.instance.agreement_kr
+            self.fields["shipment_terms_uz"].initial = self.instance.shipment_terms_uz
+            self.fields["shipment_terms_ru"].initial = self.instance.shipment_terms_ru
+            self.fields["shipment_terms_en"].initial = self.instance.shipment_terms_en
+            self.fields["shipment_terms_kr"].initial = self.instance.shipment_terms_kr
+            self.fields["privacy_policy_uz"].initial = self.instance.privacy_policy_uz
+            self.fields["privacy_policy_ru"].initial = self.instance.privacy_policy_ru
+            self.fields["privacy_policy_en"].initial = self.instance.privacy_policy_en
+            self.fields["privacy_policy_kr"].initial = self.instance.privacy_policy_kr
+            self.fields["about_us_uz"].initial = self.instance.about_us_uz
+            self.fields["about_us_ru"].initial = self.instance.about_us_ru
+            self.fields["about_us_en"].initial = self.instance.about_us_en
+            self.fields["about_us_kr"].initial = self.instance.about_us_kr
+            self.fields["support_center_uz"].initial = self.instance.support_center_uz
+            self.fields["support_center_ru"].initial = self.instance.support_center_ru
+            self.fields["support_center_en"].initial = self.instance.support_center_en
+            self.fields["support_center_kr"].initial = self.instance.support_center_kr
+            self.fields["payment_data_uz"].initial = self.instance.payment_data_uz
+            self.fields["payment_data_ru"].initial = self.instance.payment_data_ru
+            self.fields["payment_data_en"].initial = self.instance.payment_data_en
+            self.fields["payment_data_kr"].initial = self.instance.payment_data_kr
     def save(self, commit=True):
         information = super(InformationEditForm, self).save(commit=False)
         if commit:

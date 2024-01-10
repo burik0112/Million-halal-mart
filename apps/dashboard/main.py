@@ -50,8 +50,9 @@ class InformationEditView(View):
 
     def get(self, request, pk):
         info = get_object_or_404(Information, pk=pk)
+        key = request.GET.get('key', None)
         form = InformationEditForm(instance=info)
-        return render(request, self.template_name, {"form": form, "info": info})
+        return render(request, self.template_name, {"form": form, "info": info, 'key':key})
 
     def post(self, request, pk):
         info = get_object_or_404(Information, pk=pk)

@@ -8,25 +8,11 @@
             <!-- Recent Sales -->
             <div class="col-12">
               <div class="card recent-sales overflow-auto">
-
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-
                 <div class="card-body">
-                  <h5 class="card-title">Information</h5>
+                  <h5 class="card-title">Xizmatlar</h5>
                   <td class="text-center">
                     {% for service in services%}
-                    <a href="{% url 'edit_service' service.id %}" class="btn btn-primary btn-sm">Edit price</a>
+                    
                     
                   </td>
                 </tr>
@@ -34,15 +20,17 @@
                       <thead>
                           <tr>
                               <th scope="col" rowspan="1" style="width: 50px; min-width: 50px;">#</th>
-                              <th scope="col" colspan="3" style="width: 100px; min-width: 100px;">Name</th>
-                              <th scope="col" colspan="8" style="width: 200px; min-width: 200px;">Price</th>
+                              <th scope="col" colspan="3" style="width: 100px; min-width: 100px;">Nomi</th>
+                              <th scope="col" colspan="6" style="width: 200px; min-width: 200px;">Narxi</th>
+                              <th scope="col" colspan="2" style="width: 200px; min-width: 200px;">Narxi</th>
                           </tr>
                       </thead>
                       <tbody>
                           <tr>
                               <th scope="row">1</th>
-                              <td colspan="3">Delivery fee</td>
-                              <td colspan="8">{{service.delivery_fee}} ₩</td>
+                              <td colspan="3">Yetkazib berish ximati</td>
+                              <td colspan="6">{{service.delivery_fee}} ₩</td>
+                              <td colspan="2"><a href="{% url 'edit_service' service.id %}" class="btn btn-primary btn-sm">Tahrirlash</a></td>
                           </tr>
                     {% endfor %}
                       </tbody>

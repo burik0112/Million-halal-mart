@@ -4,7 +4,7 @@
 <!-- Form for Adding Phone and ProductItem -->
 {% block content %}
 <div class="container">
-  <h2>Create new Ticket</h2>
+  <h2>Yangi chipta yaratish</h2>
   <form method="post" enctype="multipart/form-data">
     <!-- Add enctype attribute -->
     {% csrf_token %}
@@ -43,7 +43,7 @@
             {{ form.category.label_tag }} {{ form.category }}
           </div>
           <div class="col-md-3 d-flex align-items-center">
-            <a href="{% url 'ticket_category' %}" class="btn btn-success btn-sm">Add category</a>
+            <a href="{% url 'ticket_category' %}" class="btn btn-success btn-sm">Kategoriya yaratish</a>
           </div>
         </div>
         <div class="mb-3">{{ form.new_price.label_tag }} {{ form.new_price }}</div>
@@ -62,8 +62,15 @@
       </div>
     </div>
     <!-- {{ form.as_p }} -->
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="submit" class="btn btn-primary">Saqlash</button>
+    <button type="button" class="btn btn-danger" onclick="goBack()">Ortga</button>
+    
   </form>
 
 </div>
+<script>
+  function goBack() {
+    window.history.back();
+  }
+</script>
 {% endblock %}

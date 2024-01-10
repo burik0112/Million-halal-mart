@@ -9,17 +9,17 @@
           <h5 class="card-title">E'lonlar ro'yhati</h5>
           <a href="{% url 'news-create' %}" class="btn btn-success">E'lon yaratish</a>
         </div>
-        <table class="table datatable">
+        <table class="table">
           <thead>
             <tr>
-              <th scope="col">#</th>
-              <th scope="col">Sarlavha</th>
-              <th scope="col">Boshlanishi</th>
-              <th scope="col">Tugashi</th>
-              <th scope="col">Ta'rif</th>
-              <th scope="col">Foto</th>
-              <th scope="col">Faol</th>
-              <th scope="col">Qo'shimcha</th>
+              <th scope="col" class="text-center">#</th>
+              <th scope="col" class="text-center">Sarlavha</th>
+              <th scope="col" class="text-center">Boshlanishi</th>
+              <th scope="col" class="text-center">Tugashi</th>
+              <th scope="col" class="text-center">Ta'rif</th>
+              <th scope="col" class="text-center">Foto</th>
+              <th scope="col" class="text-center">Faol</th>
+              <th scope="col" class="text-center">Qo'shimcha</th>
             </tr>
           </thead>
           <tbody>
@@ -27,20 +27,24 @@
             <tr>
               <th scope="row" class="text-center">{{ good.id }}</th>
               <td class="text-center">{{ good.title }}</td>
-              <td ><i class="bi bi-calendar-date"></i> {{ good.start_date|date:"d-m-Y" }} <br><i class="bi bi-clock"></i> {{ good.start_date|date:"H:i" }}</td>
-              <td ><i class="bi bi-calendar-date"></i> {{ good.end_date|date:"d-m-Y" }} <br> <i class="bi bi-clock"></i> {{ good.end_date|date:"H:i" }}</td>
-              <td class="text-center">{{ good.description_uz }}</td>
+              <td class="text-center"><i class="bi bi-calendar-date"></i> {{ good.start_date|date:"d-m-Y" }} <br><i
+                  class="bi bi-clock"></i> {{ good.start_date|date:"H:i" }}</td>
+              <td class="text-center"><i class="bi bi-calendar-date"></i> {{ good.end_date|date:"d-m-Y" }} <br> <i
+                  class="bi bi-clock"></i> {{ good.end_date|date:"H:i" }}</td>
+              <td class="text-center">{{ good.description_uz|truncatechars:100 }}</td>
               <td class="text-center">
                 <img src="{{ good.image.url }}" alt="{{ good.title }}" width="50" height="50" />
-              </td>
+              </td class="text-center">
               {% if good.active %}
-                <td ><img src="{% static 'assets/img/check.png' %}" height="20" width="20" alt="Mavjud"></td>
+              <td class="text-center"><img src="{% static 'assets/img/check.png' %}" height="20" width="20"
+                  alt="Mavjud"></td>
               {% else %}
-                <td ><img src="{% static 'assets/img/cancel.png' %}" height="20" width="20" alt="Mavjud emas"></td>
+              <td class="text-center"><img src="{% static 'assets/img/cancel.png' %}" height="20" width="20"
+                  alt="Mavjud emas"></td>
               {% endif %}
-                <td class="text-center">
-                  <a href="{% url 'edit_delete_news' good.id %}" class="btn btn-primary btn-sm">Tahrirlash</a>
-                </td>
+              <td class="text-center">
+                <a href="{% url 'edit_delete_news' good.id %}" class="btn btn-primary btn-sm">Tahrirlash</a>
+              </td>
             </tr>
             {% endfor %}
             <!-- End loop -->
