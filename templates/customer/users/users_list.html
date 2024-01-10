@@ -8,45 +8,49 @@
         <div class="d-flex justify-content-between align-items-center">
           <h5 class="card-title">Foydalanuvchilar ro'yhati</h5>
         </div>
-        <table class="table datatable">
+        <table class="table">
           <thead>
             <tr>
-              <th scope="col">#</th>
-              <th scope="col">To'liq ismi</th>
-              <th scope="col">Telefon raqami</th>
-              <th scope="col">Buyurtmarlar soni</th>
-              <th scope="col">Manzili</th>
-              <th scope="col">Qo'shilgan sana</th>
-              <th scope="col">Buyurtmalari</th>
-              <th scope="col">Qo'shimcha</th>
+              <th scope="col" class="text-center">#</th>
+              <th scope="col" class="text-center">To'liq ismi</th>
+              <th scope="col" class="text-center">Telefon raqami</th>
+              <th scope="col" class="text-center">Buyurtmarlar soni</th>
+              <th scope="col" class="text-center">Manzili</th>
+              <th scope="col" class="text-center">Qo'shilgan sana</th>
+              <th scope="col" class="text-center">Buyurtmalari</th>
+              <th scope="col" class="text-center">Qo'shimcha</th>
             </tr>
           </thead>
           <tbody>
             {% for user in users %}
             <tr>
               <th scope="row">{{ user.id }}</th>
-              <td>{{ user.full_name }}</td>
-              <td>{{ user.phone_number }}</td>
+              <td class="text-center">{{ user.full_name }}</td>
+              <td class="text-center">{{ user.phone_number }}</td>
               <td class="text-center">{{ user.order.count }}</td>
-              {% with location_instance=user.location.last %}
-              {% if location_instance %}
-              <td>{{ location_instance.address }}</td>
-              {% else %}
-              <td>Location not found</td>
-              {% endif %}
-              <td ><i class="bi bi-calendar-date"></i> {{ user.created|date:"d-m-Y" }} <br> <i class="bi bi-clock"></i> {{ user.created|date:"H:i" }}</td>
-              {% endwith %}
-              <td>
-                <a href="{% url 'user-orders-list' user.origin.id %}">  
-                  <i class="fa-solid fa-eye fa-2xl"></i>
-                </a>
+              <td class="text-center">
+                  {% if location_instance %}
+                      {{ location_instance.address }}
+                  {% else %}
+                      Location not found
+                  {% endif %}
               </td>
-              <td>
-                {% if user.origin.is_active == True %}
-                <a href="" class="btn btn-danger btn-sm">Block</a>
-                {% else %}
-                <a href="" class="btn btn-primary btn-sm">Acivate</a>
-                {% endif %}
+              <td class="text-center">
+                  <i class="bi bi-calendar-date"></i> {{ user.created|date:"d-m-Y" }} <br>
+                  <i class="bi bi-clock"></i> {{ user.created|date:"H:i" }}
+              </td>
+              <td class="text-center">
+                  <a href="{% url 'user-orders-list' user.origin.id %}">
+                      <i class="bi bi-journal-text" style="font-size: 2em;"></i>
+                  </a>
+              </td>
+              <td class="text-center">
+                  {% if user.origin.is_active == True %}
+                      <a href="" class="btn btn-danger btn-sm">Block</a>
+                  {% else %}
+                      <a href="" class="btn btn-primary btn-sm">Activate</a>
+                  {% endif %}
+              </td>
 
               </td>
             </tr>

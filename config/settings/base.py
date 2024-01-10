@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     'ckeditor',
+    'ckeditor_uploader',
 ] + LOCAL_APPS
 
 MIDDLEWARE = [
@@ -83,7 +84,18 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
 ]
-
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': [
+            {'name': 'styles', 'items': ['Styles', 'Format']},
+        ],
+        'height': 300,
+        'width': 800,
+        'allowedContent': True,
+        'extraPlugins': ','.join(['image2', 'codesnippet', 'styles']),
+    },
+}
+CKEDITOR_UPLOAD_PATH = "uploads/"
 REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"]
 }

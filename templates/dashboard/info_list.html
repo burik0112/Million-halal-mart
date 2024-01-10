@@ -9,62 +9,67 @@
             <div class="col-12">
               <div class="card recent-sales overflow-auto">
 
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-
                 <div class="card-body">
-                  <h5 class="card-title">Information</h5>
+                  <h5 class="card-title">Ma'lumotlar</h5>
                   {% for info in infos%}
-                  <a href="{% url 'edit_info' info.id %}" class="btn btn-primary btn-sm">Edit texts</a>
+                 
                   <table class="table">
                       <thead>
                           <tr>
                               <th scope="col" rowspan="1" style="width: 50px; min-width: 50px;">#</th>
-                              <th scope="col" colspan="3" style="width: 100px; min-width: 100px;">Name</th>
-                              <th scope="col" colspan="8" style="width: 200px; min-width: 200px;">Description</th>
+                              <th scope="col" colspan="3" style="width: 100px; min-width: 100px;">Nomi</th>
+                              <th scope="col" colspan="6" style="width: 200px; min-width: 200px;">Tasnifi</th>
+                              <th scope="col" colspan="2" style="width: 200px; min-width: 200px;">Tahrirlash</th>
                           </tr>
                       </thead>
                       <tbody>
                           <tr>
                               <th scope="row">1</th>
-                              <td colspan="3">Reminder</td>
-                              <td colspan="8">{{info.reminder}}</td>
+                              <td colspan="3">Eslatma</td>
+                              <td colspan="6">{{info.reminder|truncatechars:100|safe}}</td>
+                              <td> <a href="{% url 'edit_info' info.id %}?key=reminder" class="btn btn-primary btn-sm">Tahrirlash</a></td>
+
                           </tr>
                           <tr>
                               <th scope="row">2</th>
-                              <td colspan="3">Agreement</td>
-                              <td colspan="8">{{info.agreement}}</td>
+                              <td colspan="3">Kelishuv</td>
+                              <td colspan="6">{{info.agreement|safe|truncatechars:100}}</td>
+                              <td> <a href="{% url 'edit_info' info.id %}?key=agreement" class="btn btn-primary btn-sm">Tahrirlash</a></td>
                           </tr>
                           <tr>
                               <th scope="row">3</th>
-                              <td colspan="3">Shipment terms</td>
-                              <td colspan="8">{{info.shipment_terms}}</td>
+                              <td colspan="3">Yetkazish shartlari</td>
+                              <td colspan="6">{{info.shipment_terms|safe|truncatechars:100}}</td>
+                              <td> <a href="{% url 'edit_info' info.id %}?key=shipment" class="btn btn-primary btn-sm">Tahrirlash</a></td>
+
                           </tr>
                           <tr>
                             <th scope="row">4</th>
-                            <td colspan="3">Privacy & Policy</td>
-                            <td colspan="8">{{info.privacy_policy}}</td>
+                            <td colspan="3">Offerta shartlari</td>
+                            <td colspan="6">{{info.privacy_policy|safe|truncatechars:100}}</td>
+                            <td> <a href="{% url 'edit_info' info.id %}?key=privacy" class="btn btn-primary btn-sm">Tahrirlash</a></td>
+
                         </tr>
                         <tr>
                           <th scope="row">5</th>
-                          <td colspan="3">About Us</td>
-                          <td colspan="8">{{info.about_us}}</td>
+                          <td colspan="3">Biz haqimizda</td>
+                          <td colspan="6">{{info.about_us|safe|truncatechars:100}}</td>
+                          <td> <a href="{% url 'edit_info' info.id %}?key=about" class="btn btn-primary btn-sm">Tahrirlash</a></td>
+
                       </tr>
                       <tr>
                         <th scope="row">6</th>
-                        <td colspan="3">Support Center</td>
-                        <td colspan="8">{{info.support_center}}</td>
-                    </tr>
+                        <td colspan="3">Qollab quvvatlash markazi</td>
+                        <td colspan="6">{{info.support_center|safe|truncatechars:100}}</td>
+                        <td> <a href="{% url 'edit_info' info.id %}?key=support" class="btn btn-primary btn-sm">Tahrirlash</a></td>
+
+                    </tr><tr>
+                      <th scope="row">7</th>
+                      <td colspan="3">Hisob raqam/Pul o'tkazish shartlari</td>
+                      <td colspan="6">{{info.payment_data|safe|truncatechars:100}}</td>
+                      <td> <a href="{% url 'edit_info' info.id %}?key=payment" class="btn btn-primary btn-sm">Tahrirlash</a></td>
+
+                  </tr>
                     {% endfor %}
                       </tbody>
                   </table>

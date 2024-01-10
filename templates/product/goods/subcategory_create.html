@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% block content %}
 <div class="container">
-  <h2>Create Product SubCategory</h2>
+  <h2>Quyi kategoriya yaratish oynasi</h2>
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="row">
@@ -23,7 +23,7 @@
                 {{ form.category.label_tag }} {{ form.category }}
             </div>
             <div class="col-md-3 d-flex align-items-center">
-                <a href="{% url 'good_category' %}" class="btn btn-success btn-sm">Add category</a>
+                <a href="{% url 'good_category' %}" class="btn btn-success btn-sm">Bosh kategoriya yaratish</a>
             </div>
         </div>
     </div>
@@ -36,9 +36,16 @@
     <div class="row">
       <div class="col-12 text-end">
         <!-- text-end klassi qo'shildi -->
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">Saqlash</button>
+        <button type="button" class="btn btn-danger" onclick="goBack()">Ortga</button>
+
       </div>
     </div>
   </form>
 </div>
+<script>
+  function goBack() {
+    window.history.back();
+  }
+</script>
 {% endblock %}

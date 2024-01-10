@@ -39,7 +39,7 @@ class UserOrderDetailView(DetailView):
         context = super(UserOrderDetailView, self).get_context_data(**kwargs)
         order = Order.objects.get(id=self.kwargs['pk'])
         order_items = OrderItem.objects.filter(order__id=self.kwargs['pk'])
-        user = Profile.objects.get(id=self.kwargs['pk'])
+        user = order.user
         cargo = Service.objects.all().first().delivery_fee
 
         order_items_data = []  # List to store data for each OrderItem

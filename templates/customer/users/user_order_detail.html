@@ -8,6 +8,8 @@
         <div class="d-flex justify-content-between align-items-center">
           <h5 class="card-title">{{user.full_name}} buyurtmalari</h5>
         </div>
+        <button type="button" style="position: absolute; top: 8px; right: 2px; margin-right: 100px;"
+          class="btn btn-danger" onclick="goBack()">Ortga</button>
         <!-- Recent Sales -->
         <div class="col-12">
           <div class="card recent-sales overflow-auto">
@@ -16,104 +18,117 @@
               <table class="table">
                 <thead>
                   <tr>
-                    <th scope="col">Sana</th>
-                    <th scope="col">Manzil</th>
-                    <th scope="col">Pochta narxi</th>
-                    <th scope="col">Umumiy narxi</th>
-                    <th scope="col">Izoh</th>
-                    <th scope="col">Holati</th>
+                    <th scope="col" class="text-center">Sana</th>
+                    <th scope="col" class="text-center">Manzil</th>
+                    <th scope="col" class="text-center">Pochta narxi</th>
+                    <th scope="col" class="text-center">Umumiy narxi</th>
+                    <th scope="col" class="text-center">Izoh</th>
+                    <th scope="col" class="text-center">Holati</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody class="text-center">
                   <tr>
-                    <td ><i class="bi bi-calendar-date"></i> {{ order.created|date:"d-m-Y" }} <br><i class="bi bi-clock"></i> {{ order.created|date:"H:i" }}</td>
-                    <td>
+                    <td class="text-center"><i class="bi bi-calendar-date"></i> {{ order.created|date:"d-m-Y" }} <br><i
+                        class="bi bi-clock"></i> {{ order.created|date:"H:i" }}</td>
+                    <td class="text-center">
                       {% if order.user.location.exists %}
                       {{ order.user.location.first.address }}
                       {% else %}
                       <span class="text-muted">No location available</span>
                       {% endif %}
                     </td>
-                    <td>{{cargo}} ₩</td>
-                    <td>{{order.total_amount}} ₩</td>
-                    <td>{{order.comment}}</td>
-                    <td>
+                    <td class="text-center">{{cargo}} ₩</td>
+                    <td class="text-center">{{order.total_amount}} ₩</td>
+                    <td class="text-center">{{order.comment}}</td>
+                    <td class="text-center">
                       {% if order.status == "in_cart" %}
-                          <span class="badge bg-warning">Savatchada</span>
+                      <span class="badge bg-warning">Savatchada</span>
                       {% elif order.status == "pending" %}
-                          <span class="badge bg-warning">Kutilmoqda</span>
+                      <span class="badge bg-warning">Kutilmoqda</span>
                       {% elif order.status == "approved" %}
-                          <span class="badge bg-primary">To'lov tasdiqlandi</span>
+                      <span class="badge bg-primary">To'lov tasdiqlandi</span>
                       {% elif order.status == "sent" %}
-                          <span class="badge bg-success">Yuborildi</span>
+                      <span class="badge bg-success">Yuborildi</span>
                       {% elif order.status == "cancelled" %}
-                          <span class="badge bg-danger">Bekor qilindi</span>
+                      <span class="badge bg-danger">Bekor qilindi</span>
                       {% else %}
-                          <span class="badge bg-secondary">{{ order.status }}</span>
+                      <span class="badge bg-secondary">{{ order.status }}</span>
                       {% endif %}
-                  </td>
+                    </td>
                   </tr>
                 </tbody>
               </table>
               <br>
               <h5 class="card-title">Maxsulotlar</h5>
-              
+
               {% if order_items_data %}
-              
-                <table class="table table-borderless">
-                  <thead>
-                      <tr>
-                          <th scope="col">#</th>
-                          <th scope="col">Turi</th>
-                          <th scope="col">Maxsulot</th>
-                          <th scope="col">Foto</th>
-                          <th scope="col">Narxi</th>
-                          <th scope="col">Miqdori</th>
-                          <th scope="col">Umumiy narxi</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                    {% for item_data in order_items_data %}
-                      <tr>
-                        <td>{{ item_data.order_item.id }}</td>
-                          {% if item_data.order_item.product.phones %}
-                          <td>{{item_data.order_item.product.phones.category}}</td>
-                          <td>{{ item_data.order_item.product.phones.model_name }}/{{ item_data.order_item.product.phones.get_ram_display }}/{{ item_data.order_item.product.phones.get_storage_display }}/{{ item_data.order_item.product.phones.get_color_display }}</td>
-                          {% if item_data.first_image_url %}
-                            <td><img src="{{ item_data.first_image_url }}" height="75" width="75" alt="Product Image"></td>
-                          {% endif %}
-                          <td>{{ item_data.order_item.product.new_price|default:item_data.order_item.product.old_price }} ₩</td>
-                          <td>{{ item_data.order_item.quantity }} {{ item_data.order_item.product.get_measure_display }}</td>
-                          <td>{{item_data.total_price}} ₩</td>
-                          
-                          {% elif item_data.order_item.product.tickets %}
-                            <td>{{item_data.order_item.product.tickets.category}}</td>
-                            <td>{{ item_data.order_item.product.tickets.event_name }}</td>
-                            {% if item_data.first_image_url %}
-                            <td><img src="{{ item_data.first_image_url }}" height="75" width="75"alt="Product Image"></td>
-                          {% endif %}
-                            <td>{{ item_data.order_item.product.new_price|default:item_data.order_item.product.old_price }} ₩</td>
-                            <td>{{ item_data.order_item.quantity }} {{ item_data.order_item.product.get_measure_display }}</td>
-                            <td>{{item_data.total_price}} ₩</td>
-                          {% elif item_data.order_item.product.goods %}
-                          <td>{{item_data.order_item.product.goods.sub_cat}}</td>
-                          <td>{{ item_data.order_item.product.goods.name }}</td>
-                          {% if item_data.first_image_url %}
-                            <td><img src="{{ item_data.first_image_url }}" height="75" width="75" alt="Product Image"></td>
-                          {% endif %}
-                          <td>{{ item_data.order_item.product.new_price|default:item_data.order_item.product.old_price }} ₩</td>
-                          <td>{{ item_data.order_item.quantity }} {{ item_data.order_item.product.get_measure_display }}</td>
-                          <td>{{item_data.total_price}} ₩</td>
-                          {% endif %}
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
+
+              <table class="table table-borderless">
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-center">#</th>
+                    <th scope="col">Turi</th>
+                    <th scope="col">Maxsulot</th>
+                    <th scope="col" class="text-center">Foto</th>
+                    <th scope="col" class="text-center">Narxi</th>
+                    <th scope="col" class="text-center">Miqdori</th>
+                    <th scope="col" class="text-center">Umumiy narxi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item_data in order_items_data %}
+                  <tr>
+                    <td class="text-center">{{ item_data.order_item.id }}</td>
+                    {% if item_data.order_item.product.phones %}
+                    <td>{{item_data.order_item.product.phones.category}}</td>
+                    <td>{{ item_data.order_item.product.phones.model_name }}/{{
+                      item_data.order_item.product.phones.get_ram_display }}/{{
+                      item_data.order_item.product.phones.get_storage_display }}/{{
+                      item_data.order_item.product.phones.get_color_display }}</td>
+                    {% if item_data.first_image_url %}
+                    <td class="text-center"><img src="{{ item_data.first_image_url }}" height="75" width="75"
+                        alt="Product Image"></td>
+                    {% endif %}
+                    <td class="text-center">{{
+                      item_data.order_item.product.new_price|default:item_data.order_item.product.old_price }} ₩</td>
+                    <td class="text-center">{{ item_data.order_item.quantity }} {{
+                      item_data.order_item.product.get_measure_display }}</td>
+                    <td class="text-center">{{item_data.total_price}} ₩</td>
+
+                    {% elif item_data.order_item.product.tickets %}
+                    <td>{{item_data.order_item.product.tickets.category}}</td>
+                    <td>{{ item_data.order_item.product.tickets.event_name }}</td>
+                    {% if item_data.first_image_url %}
+                    <td class="text-center"><img src="{{ item_data.first_image_url }}" height="75" width="75"
+                        alt="Product Image"></td>
+                    {% endif %}
+                    <td class="text-center">{{
+                      item_data.order_item.product.new_price|default:item_data.order_item.product.old_price }} ₩</td>
+                    <td class="text-center">{{ item_data.order_item.quantity }} {{
+                      item_data.order_item.product.get_measure_display }}</td>
+                    <td class="text-center">{{item_data.total_price}} ₩</td>
+                    {% elif item_data.order_item.product.goods %}
+                    <td>{{item_data.order_item.product.goods.sub_cat}}</td>
+                    <td>{{ item_data.order_item.product.goods.name }}</td>
+                    {% if item_data.first_image_url %}
+                    <td class="text-center"><img src="{{ item_data.first_image_url }}" height="75" width="75"
+                        alt="Product Image"></td>
+                    {% endif %}
+                    <td class="text-center">{{
+                      item_data.order_item.product.new_price|default:item_data.order_item.product.old_price }} ₩</td>
+                    <td class="text-center">{{ item_data.order_item.quantity }} {{
+                      item_data.order_item.product.get_measure_display }}</td>
+                    <td class="text-center">{{item_data.total_price}} ₩</td>
+                    {% endif %}
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
               {% else %}
-                <p>No ordered items for this user.</p>
+              <p>No ordered items for this user.</p>
               {% endif %}
-            </table>
-            
+              </table>
+
             </div>
           </div>
         </div>
@@ -121,4 +136,9 @@
     </div>
   </div>
 </div>
+<script>
+  function goBack() {
+    window.history.back();
+  }
+</script>
 {% endblock %}

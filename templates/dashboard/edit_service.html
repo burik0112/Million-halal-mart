@@ -1,5 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 <form method="post">
+  <h1>Yetkazib berish xizmati narxini tahrirlash oynasi</h1>
   {% csrf_token %}
   {{ form.delivery_fee.label_tag }}
   {{ form.delivery_fee }}
@@ -9,7 +10,8 @@
     }
   </style>
   <br>
-  <button type="submit" class="btn btn-primary" name="edit">Save Changes</button>
+  <button type="submit" class="btn btn-primary" name="edit">Saqlash</button>
+  <button type="button" class="btn btn-danger" onclick="goBack()">Ortga</button>
 </form>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
@@ -18,6 +20,11 @@
   document.getElementById('yourDeleteButtonId').addEventListener('click', function () {
     $('#deleteConfirmModal').modal('show');
   });
+</script>
+<script>
+  function goBack() {
+    window.history.back();
+  }
 </script>
 
 {% endblock %}

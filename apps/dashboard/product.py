@@ -195,6 +195,7 @@ class GoodEditDeleteView(View):
             form = GoodEditForm(request.POST, request.FILES, instance=good)
             if form.is_valid():
                 form.save()
+                print(form.data)
                 return redirect("good-list")
         else:
             form = GoodEditForm(instance=good)
