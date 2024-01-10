@@ -2,7 +2,7 @@
 <!-- Delete Confirmation Modal -->
 
 <!-- Existing form and content -->
-<form method="post">
+<form method="post" enctype="multipart/form-data">
   <h1>Product edit page</h1>
   {% csrf_token %} {{ form.as_p }}
   <button type="submit" class="btn btn-primary" name="edit">Save Changes</button>

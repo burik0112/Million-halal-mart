@@ -79,7 +79,7 @@ class Ticket(models.Model):
     product = models.OneToOneField(
         ProductItem, on_delete=models.CASCADE, related_name="tickets"
     )
-    event_date = models.DateField(auto_now=True)
+    event_date = models.DateTimeField(auto_now=True)
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True, related_name="tickets"
     )

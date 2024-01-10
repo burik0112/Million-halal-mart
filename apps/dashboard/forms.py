@@ -180,6 +180,143 @@ class PhoneCategoryCreateForm(forms.ModelForm):
         self.fields["name_en"].required = True
         self.fields["name_kr"].required = True
 
+class PhoneEditForm(forms.ModelForm):
+    product_desc_uz = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    product_desc_ru = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    product_desc_en = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    product_desc_kr = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    product_old_price = forms.DecimalField(
+        decimal_places=0,
+        max_digits=10,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
+    product_new_price = forms.DecimalField(
+        decimal_places=0,
+        max_digits=10,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
+    product_measure = forms.ChoiceField(
+        choices=ProductItem.CHOICES, widget=forms.Select(
+            attrs={"class": "form-select"})
+    )
+    product_available_quantity = forms.IntegerField(
+        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
+    )
+    images = MultipleFileField(required=False)
+    # product_bonus = forms.IntegerField(
+    #     min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
+    # )
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.filter(main_type='p'),
+        widget=forms.Select(attrs={"class": "form-select"})
+    )
+    product_active = forms.BooleanField(
+        required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+
+    class Meta:
+        model = Phone
+        fields = [
+            "model_name",
+            "color",
+            "condition",
+            "ram",
+            "storage",
+            "category",
+            'images',
+            "product_old_price",
+            "product_new_price",
+            "product_measure",
+            "product_available_quantity",
+            "product_desc_uz",
+            "product_desc_ru",
+            "product_desc_en",
+            "product_desc_kr",
+            "product_active",
+        ]
+        widgets = {
+            "model_name": forms.TextInput(attrs={"class": "form-control"}),
+            "color": forms.Select(attrs={"class": "form-select"}),
+            "condition": forms.Select(attrs={"class": "form-select"}),
+            "ram": forms.Select(attrs={"class": "form-select"}),
+            "storage": forms.Select(attrs={"class": "form-select"}),
+            "category": forms.Select(attrs={"class": "form-select"}),
+            "images": forms.ClearableFileInput(attrs={"class": "form-control"}),
+
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(PhoneEditForm, self).__init__(*args, **kwargs)
+        if self.instance and self.instance.product:
+            product = self.instance.product
+            self.fields["product_old_price"].initial = product.old_price
+            self.fields["product_new_price"].initial = product.new_price
+            self.fields["product_measure"].initial = product.measure
+            self.fields[
+                "product_available_quantity"
+            ].initial = product.available_quantity
+            self.fields["product_desc_uz"].initial = product.desc_uz
+            self.fields["product_desc_ru"].initial = product.desc_ru
+            self.fields["product_desc_en"].initial = product.desc_en
+            self.fields["product_desc_kr"].initial = product.desc_kr
+            self.fields["product_active"].initial = product.active
+
+    def save(self, commit=True):
+        phone = super(PhoneEditForm, self).save(commit=False)
+        if not phone.product_id:
+            phone.product = ProductItem()
+        product_item = phone.product
+        product_item.old_price = self.cleaned_data["product_old_price"]
+        product_item.new_price = self.cleaned_data["product_new_price"]
+        product_item.measure = self.cleaned_data["product_measure"]
+        product_item.available_quantity = self.cleaned_data[
+            "product_available_quantity"
+        ]
+        # product_item.stock = self.cleaned_data["product_stock"]
+        # product_item.bonus = self.cleaned_data["product_bonus"]
+        product_item.desc_uz = self.cleaned_data["product_desc_uz"]
+        product_item.desc_ru = self.cleaned_data["product_desc_ru"]
+        product_item.desc_en= self.cleaned_data["product_desc_en"]
+        product_item.desc_kr = self.cleaned_data["product_desc_kr"]
+        product_item.active = self.cleaned_data["product_active"]
+        if commit:
+            product_item.save()
+            phone.product = product_item
+
+            # Update ticket category
+            phone.category = self.cleaned_data["category"]
+
+            # Save the phone
+            phone.save()
+
+            # Save or update multiple images
+            existing_images = phone.product.images.all()
+
+            # Delete existing images if not present in the form data
+            form_images = self.files.getlist("images")
+            if form_images:
+                for existing_image in existing_images:
+                    if existing_image.image.name not in form_images:
+                        existing_image.delete()
+
+                # Save new images
+                for img in form_images:
+                    image = Image(
+                        image=img,
+                        name=f"{self.cleaned_data['model_name']}_{img.name}",
+                        product=product_item,
+                    )
+                    image.save()
+        return phone
+
 
 class TicketCategoryCreateForm(forms.ModelForm):
     class Meta:
@@ -296,8 +433,6 @@ class TicketProductItemForm(forms.ModelForm):
             new_price=self.cleaned_data["new_price"],
             old_price=self.cleaned_data.get("old_price"),
             available_quantity=self.cleaned_data["available_quantity"],
-            # stock=self.cleaned_data["stock"],
-            # bonus=self.cleaned_data["bonus"],
             active=self.cleaned_data["active"],
         )
         if commit:
@@ -316,6 +451,134 @@ class TicketProductItemForm(forms.ModelForm):
                 )
                 image.save()
         return ticket
+
+class TicketEditForm(forms.ModelForm):
+    product_desc_uz = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    product_desc_ru = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    product_desc_en = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    product_desc_kr = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+    product_new_price = forms.DecimalField(
+        decimal_places=0,
+        max_digits=10,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
+    images = MultipleFileField(required=False)
+    product_available_quantity = forms.IntegerField(
+        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
+    )
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.filter(main_type='t'),
+        widget=forms.Select(attrs={"class": "form-select"})
+    )
+    product_active = forms.BooleanField(
+        required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+
+    class Meta:
+        model = Ticket
+        exclude = ["event_date"]
+        fields = [
+            "event_name_uz",
+            "event_name_ru",
+            "event_name_en",
+            "event_name_kr",
+            "event_date",
+            "category",
+            'images',
+            "product_new_price",
+            "product_available_quantity",
+            "product_desc_uz",
+            "product_desc_ru",
+            "product_desc_en",
+            "product_desc_kr",
+            "product_active",
+        ]
+        widgets = {
+            "event_name_uz": forms.TextInput(attrs={"class": "form-control"}),
+            "event_name_en": forms.TextInput(attrs={"class": "form-control"}),
+            "event_name_ru": forms.TextInput(attrs={"class": "form-control"}),
+            "event_name_kr": forms.TextInput(attrs={"class": "form-control"}),
+            "event_date": forms.Select(attrs={"class": "form-select"}),
+            "category": forms.Select(attrs={"class": "form-select"}),
+            "product_desc_uz": forms.TextInput(attrs={"class": "form-control"}),
+            "product_desc_ru": forms.TextInput(attrs={"class": "form-control"}),
+            "product_desc_en": forms.TextInput(attrs={"class": "form-control"}),
+            "product_desc_kr": forms.TextInput(attrs={"class": "form-control"}),
+            "images": forms.ClearableFileInput(attrs={"class": "form-control"}),
+
+
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(TicketEditForm, self).__init__(*args, **kwargs)
+        if self.instance and self.instance.product:
+            product = self.instance.product
+            self.fields["product_desc_uz"].initial = product.desc_uz
+            self.fields["product_desc_ru"].initial = product.desc_ru
+            self.fields["product_desc_en"].initial = product.desc_en
+            self.fields["product_desc_kr"].initial = product.desc_kr
+            self.fields["product_new_price"].initial = product.new_price
+            self.fields[
+                "product_available_quantity"
+            ].initial = product.available_quantity
+            self.fields["product_active"].initial = product.active
+
+    def save(self, commit=True):
+        ticket = super(TicketEditForm, self).save(commit=False)
+
+        if not ticket.product_id:
+            # If there is no product associated with the ticket, create a new one
+            ticket.product = ProductItem()
+
+        # Populate the product fields with form data
+        product_item = ticket.product
+        product_item.desc_uz = self.cleaned_data["product_desc_uz"]
+        product_item.desc_ru = self.cleaned_data["product_desc_ru"]
+        product_item.desc_en = self.cleaned_data["product_desc_en"]
+        product_item.desc_kr = self.cleaned_data["product_desc_kr"]
+        product_item.new_price = self.cleaned_data["product_new_price"]
+        product_item.available_quantity = self.cleaned_data["product_available_quantity"]
+        product_item.active = self.cleaned_data["product_active"]
+
+        if commit:
+            product_item.save()
+            ticket.product = product_item
+
+            # Update ticket category
+            ticket.category = self.cleaned_data["category"]
+
+            # Save the ticket
+            ticket.save()
+
+            # Save or update multiple images
+            existing_images = ticket.product.images.all()
+
+            # Delete existing images if not present in the form data
+            form_images = self.files.getlist("images")
+            if form_images:
+                for existing_image in existing_images:
+                    if existing_image.image.name not in form_images:
+                        existing_image.delete()
+
+                # Save new images
+                for img in form_images:
+                    image = Image(
+                        image=img,
+                        name=f"{self.cleaned_data['event_name_uz']}_{img.name}",
+                        product=product_item,
+                    )
+                    image.save()
+
+        return ticket
+
 
 
 class GoodMainCategoryCreateForm(forms.ModelForm):
@@ -555,221 +818,6 @@ class GoodProductItemForm(forms.ModelForm):
         return good
 
 
-class PhoneEditForm(forms.ModelForm):
-    product_desc_uz = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
-    )
-    product_desc_ru = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
-    )
-    product_desc_en = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
-    )
-    product_desc_kr = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
-    )
-    product_old_price = forms.DecimalField(
-        decimal_places=0,
-        max_digits=10,
-        widget=forms.NumberInput(attrs={"class": "form-control"}),
-    )
-    product_new_price = forms.DecimalField(
-        decimal_places=0,
-        max_digits=10,
-        widget=forms.NumberInput(attrs={"class": "form-control"}),
-    )
-    product_measure = forms.ChoiceField(
-        choices=ProductItem.CHOICES, widget=forms.Select(
-            attrs={"class": "form-select"})
-    )
-    product_available_quantity = forms.IntegerField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
-    )
-    # product_bonus = forms.IntegerField(
-    #     min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
-    # )
-    category = forms.ModelChoiceField(
-        queryset=Category.objects.filter(main_type='p'),
-        widget=forms.Select(attrs={"class": "form-select"})
-    )
-    product_active = forms.BooleanField(
-        required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
-    )
-
-    class Meta:
-        model = Phone
-        fields = [
-            "model_name",
-            "color",
-            "condition",
-            "ram",
-            "storage",
-            "category",
-            "product_old_price",
-            "product_new_price",
-            "product_measure",
-            "product_available_quantity",
-            "product_desc_uz",
-            "product_desc_ru",
-            "product_desc_en",
-            "product_desc_kr",
-            # "product_stock",
-            # "product_bonus",
-            "product_active",
-        ]
-        widgets = {
-            "model_name": forms.TextInput(attrs={"class": "form-control"}),
-            "color": forms.Select(attrs={"class": "form-select"}),
-            "condition": forms.Select(attrs={"class": "form-select"}),
-            "ram": forms.Select(attrs={"class": "form-select"}),
-            "storage": forms.Select(attrs={"class": "form-select"}),
-            "category": forms.Select(attrs={"class": "form-select"}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super(PhoneEditForm, self).__init__(*args, **kwargs)
-        if self.instance and self.instance.product:
-            product = self.instance.product
-            self.fields["product_old_price"].initial = product.old_price
-            self.fields["product_new_price"].initial = product.new_price
-            self.fields["product_measure"].initial = product.measure
-            self.fields[
-                "product_available_quantity"
-            ].initial = product.available_quantity
-            self.fields["product_desc_uz"].initial = product.desc_uz
-            self.fields["product_desc_ru"].initial = product.desc_ru
-            self.fields["product_desc_en"].initial = product.desc_en
-            self.fields["product_desc_kr"].initial = product.desc_kr
-            # self.fields["product_stock"].initial = product.stock
-            # self.fields["product_bonus"].initial = product.bonus
-            self.fields["product_active"].initial = product.active
-
-    def save(self, commit=True):
-        phone = super(PhoneEditForm, self).save(commit=False)
-        if not phone.product_id:
-            phone.product = ProductItem()
-        product_item = phone.product
-        product_item.old_price = self.cleaned_data["product_old_price"]
-        product_item.new_price = self.cleaned_data["product_new_price"]
-        product_item.measure = self.cleaned_data["product_measure"]
-        product_item.available_quantity = self.cleaned_data[
-            "product_available_quantity"
-        ]
-        # product_item.stock = self.cleaned_data["product_stock"]
-        # product_item.bonus = self.cleaned_data["product_bonus"]
-        product_item.desc = self.cleaned_data["product_desc_uz"]
-        product_item.desc = self.cleaned_data["product_desc_ru"]
-        product_item.desc = self.cleaned_data["product_desc_en"]
-        product_item.desc = self.cleaned_data["product_desc_kr"]
-        product_item.active = self.cleaned_data["product_active"]
-        if commit:
-            product_item.save()
-            phone.save()
-        return phone
-
-
-class TicketEditForm(forms.ModelForm):
-    product_desc_uz = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
-    )
-    product_desc_ru = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
-    )
-    product_desc_en = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
-    )
-    product_desc_kr = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"})
-    )
-    product_new_price = forms.DecimalField(
-        decimal_places=0,
-        max_digits=10,
-        widget=forms.NumberInput(attrs={"class": "form-control"}),
-    )
-
-    product_available_quantity = forms.IntegerField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
-    )
-    category = forms.ModelChoiceField(
-        queryset=Category.objects.filter(main_type='t'),
-        widget=forms.Select(attrs={"class": "form-select"})
-    )
-    # product_stock = forms.IntegerField(
-    #     min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
-    # )
-    # product_bonus = forms.IntegerField(
-    #     min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
-    # )
-    product_active = forms.BooleanField(
-        required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
-    )
-
-    class Meta:
-        model = Ticket
-        exclude = ["event_date"]
-        fields = [
-            "event_name_uz",
-            "event_name_ru",
-            "event_name_en",
-            "event_name_kr",
-            "event_date",
-            "category",
-            "product_new_price",
-            "product_available_quantity",
-            "product_desc_uz",
-            "product_desc_ru",
-            "product_desc_en",
-            "product_desc_kr",
-            # "product_stock",
-            # "product_bonus",
-            "product_active",
-        ]
-        widgets = {
-            "event_name_uz": forms.TextInput(attrs={"class": "form-control"}),
-            "event_name_en": forms.TextInput(attrs={"class": "form-control"}),
-            "event_name_ru": forms.TextInput(attrs={"class": "form-control"}),
-            "event_name_kr": forms.TextInput(attrs={"class": "form-control"}),
-            "event_date": forms.Select(attrs={"class": "form-select"}),
-            "category": forms.Select(attrs={"class": "form-select"}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super(TicketEditForm, self).__init__(*args, **kwargs)
-        if self.instance and self.instance.product:
-            product = self.instance.product
-            self.fields["product_desc_uz"].initial = product.desc_uz
-            self.fields["product_desc_ru"].initial = product.desc_ru
-            self.fields["product_desc_en"].initial = product.desc_en
-            self.fields["product_desc_kr"].initial = product.desc_kr
-            self.fields["product_new_price"].initial = product.new_price
-            self.fields[
-                "product_available_quantity"
-            ].initial = product.available_quantity
-            # self.fields["product_stock"].initial = product.stock
-            # self.fields["product_bonus"].initial = product.bonus
-            self.fields["product_active"].initial = product.active
-
-    def save(self, commit=True):
-        ticket = super(TicketEditForm, self).save(commit=False)
-        if not ticket.product_id:
-            ticket.product = ProductItem()
-        product_item = ticket.product
-        product_item.desc = self.cleaned_data["product_desc_uz"]
-        product_item.desc = self.cleaned_data["product_desc_ru"]
-        product_item.desc = self.cleaned_data["product_desc_en"]
-        product_item.desc = self.cleaned_data["product_desc_kr"]
-        product_item.new_price = self.cleaned_data["product_new_price"]
-        product_item.available_quantity = self.cleaned_data[
-            "product_available_quantity"
-        ]
-        # product_item.stock = self.cleaned_data["product_stock"]
-        # product_item.bonus = self.cleaned_data["product_bonus"]
-        product_item.active = self.cleaned_data["product_active"]
-        if commit:
-            product_item.save()
-            ticket.save()
-        return ticket
-
 
 class GoodEditForm(forms.ModelForm):
     # Fields for the Good model
@@ -801,6 +849,8 @@ class GoodEditForm(forms.ModelForm):
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
+    images = MultipleFileField(required=False)
+
     old_price = forms.DecimalField(
         decimal_places=0,
         max_digits=10,
@@ -824,6 +874,7 @@ class GoodEditForm(forms.ModelForm):
             "sub_cat",
             "old_price",
             "new_price",
+            'images',
             "available_quantity",
             "desc_uz",
             "desc_ru",
@@ -833,6 +884,8 @@ class GoodEditForm(forms.ModelForm):
         ]
         widgets = {
             "sub_cat": forms.Select(attrs={"class": "form-select"}),
+            "images": forms.ClearableFileInput(attrs={"class": "form-control"}),
+
         }
 
     def __init__(self, *args, **kwargs):
@@ -867,6 +920,23 @@ class GoodEditForm(forms.ModelForm):
         if commit:
             product_item.save()
             good.save()
+            existing_images = good.product.images.all()
+
+            # Delete existing images if not present in the form data
+            form_images = self.files.getlist("images")
+            if form_images:
+                for existing_image in existing_images:
+                    if existing_image.image.name not in form_images:
+                        existing_image.delete()
+
+                # Save new images
+                for img in form_images:
+                    image = Image(
+                        image=img,
+                        name=f"{self.cleaned_data['name_uz']}_{img.name}",
+                        product=product_item,
+                    )
+                    image.save()
         return good
 
 
@@ -908,9 +978,13 @@ class NewsForm(forms.ModelForm):
         widget=forms.DateTimeInput(
             attrs={"type": "date", "class": "form-control"}),
     )
+    def save(self, commit=True):
+        news = super(NewsForm, self).save(commit=False)
 
-    def save(self, commit: bool = ...) -> Any:
-        news = super().save(commit)
+        if 'image' in self.files:
+            news.image.delete()  # Delete the old image
+            news.image = self.files['image']  # Assign the new image
+
         if commit:
             news.save()
         return news
