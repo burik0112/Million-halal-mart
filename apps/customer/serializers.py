@@ -31,7 +31,7 @@ class LoginSerializer(serializers.Serializer):
                     # Multi-language error message for incorrect password
                     raise serializers.ValidationError(
                         {
-                            "password": {
+                            "error": {
                                 "en": _("Invalid password"),
                                 "uz": _("Parol xato"),
                                 "ru": _("Неверный пароль"),
@@ -43,7 +43,7 @@ class LoginSerializer(serializers.Serializer):
                 # Multi-language error message for invalid phone number
                 raise serializers.ValidationError(
                     {
-                        "phone_number": {
+                        "error": {
                             "en": _("Please enter a valid phone number"),
                             "uz": _("Iltimos, yaroqli telefon raqamini kiriting"),
                             "ru": _("Пожалуйста, введите действующий номер телефона"),
@@ -54,13 +54,13 @@ class LoginSerializer(serializers.Serializer):
 
         raise serializers.ValidationError(
             {
-                "phone_number": {
+                "error": {
                     "en": _("Please enter a valid phone number"),
                     "uz": _("Iltimos, yaroqli telefon raqamini kiriting"),
                     "ru": _("Пожалуйста, введите действующий номер телефона"),
                     "kr": _("유효한 전화 번호를 입력하세요"),
                 },
-                "password": {
+                "error": {
                     "en": _("Invalid password"),
                     "uz": _("Parol xato"),
                     "ru": _("Неверный пароль"),
