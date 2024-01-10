@@ -15,6 +15,8 @@ from apps.customer.models import News
 from apps.merchant.models import Information, Service
 from django.utils import timezone
 from ckeditor.widgets import CKEditorWidget
+
+
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
 
@@ -180,6 +182,7 @@ class PhoneCategoryCreateForm(forms.ModelForm):
         self.fields["name_en"].required = True
         self.fields["name_kr"].required = True
 
+
 class PhoneEditForm(forms.ModelForm):
     product_desc_uz = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
@@ -284,7 +287,7 @@ class PhoneEditForm(forms.ModelForm):
         # product_item.bonus = self.cleaned_data["product_bonus"]
         product_item.desc_uz = self.cleaned_data["product_desc_uz"]
         product_item.desc_ru = self.cleaned_data["product_desc_ru"]
-        product_item.desc_en= self.cleaned_data["product_desc_en"]
+        product_item.desc_en = self.cleaned_data["product_desc_en"]
         product_item.desc_kr = self.cleaned_data["product_desc_kr"]
         product_item.active = self.cleaned_data["product_active"]
         if commit:
@@ -452,6 +455,7 @@ class TicketProductItemForm(forms.ModelForm):
                 image.save()
         return ticket
 
+
 class TicketEditForm(forms.ModelForm):
     product_desc_uz = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
@@ -466,6 +470,11 @@ class TicketEditForm(forms.ModelForm):
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
     )
     product_new_price = forms.DecimalField(
+        decimal_places=0,
+        max_digits=10,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
+    product_old_price = forms.DecimalField(
         decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
@@ -493,6 +502,7 @@ class TicketEditForm(forms.ModelForm):
             "event_date",
             "category",
             'images',
+            "product_old_price",
             "product_new_price",
             "product_available_quantity",
             "product_desc_uz",
@@ -525,6 +535,7 @@ class TicketEditForm(forms.ModelForm):
             self.fields["product_desc_ru"].initial = product.desc_ru
             self.fields["product_desc_en"].initial = product.desc_en
             self.fields["product_desc_kr"].initial = product.desc_kr
+            self.fields["product_old_price"].initial = product.old_price
             self.fields["product_new_price"].initial = product.new_price
             self.fields[
                 "product_available_quantity"
@@ -544,6 +555,7 @@ class TicketEditForm(forms.ModelForm):
         product_item.desc_ru = self.cleaned_data["product_desc_ru"]
         product_item.desc_en = self.cleaned_data["product_desc_en"]
         product_item.desc_kr = self.cleaned_data["product_desc_kr"]
+        product_item.new_price = self.cleaned_data["product_old_price"]
         product_item.new_price = self.cleaned_data["product_new_price"]
         product_item.available_quantity = self.cleaned_data["product_available_quantity"]
         product_item.active = self.cleaned_data["product_active"]
@@ -578,7 +590,6 @@ class TicketEditForm(forms.ModelForm):
                     image.save()
 
         return ticket
-
 
 
 class GoodMainCategoryCreateForm(forms.ModelForm):
@@ -818,7 +829,6 @@ class GoodProductItemForm(forms.ModelForm):
         return good
 
 
-
 class GoodEditForm(forms.ModelForm):
     # Fields for the Good model
     name_uz = forms.CharField(widget=forms.TextInput(
@@ -913,6 +923,7 @@ class GoodEditForm(forms.ModelForm):
         product_item.desc_kr = self.cleaned_data["desc_kr"]
         product_item.desc_en = self.cleaned_data["desc_en"]
         product_item.new_price = self.cleaned_data["new_price"]
+        product_item.old_price = self.cleaned_data["old_price"]
         product_item.available_quantity = self.cleaned_data[
             "available_quantity"
         ]
@@ -978,6 +989,7 @@ class NewsForm(forms.ModelForm):
         widget=forms.DateTimeInput(
             attrs={"type": "date", "class": "form-control"}),
     )
+
     def save(self, commit=True):
         news = super(NewsForm, self).save(commit=False)
 
@@ -1038,6 +1050,7 @@ class NewsEditForm(forms.ModelForm):
             "description_en": True,
             "description_kr": True,
         }
+
     def save(self, commit=True):
         news = super().save(commit=False)
         if not news.start_date:
@@ -1079,146 +1092,174 @@ class InformationEditForm(forms.ModelForm):
     reminder_uz = forms.CharField(
         required=False,
         label='Eslatma UZ',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
 
     )
     reminder_ru = forms.CharField(
         required=False,
         label='Eslatma RU',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
 
     )
     reminder_en = forms.CharField(
         required=False,
         label='Eslatma EN',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
 
     )
     reminder_kr = forms.CharField(
         required=False,
         label='Eslatma KR',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
 
     )
     agreement_uz = forms.CharField(
-        required=False, 
+        required=False,
         label='Kelishuv UZ',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     agreement_ru = forms.CharField(
-        required=False, 
+        required=False,
         label='Kelishuv RU',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     agreement_en = forms.CharField(
-        required=False, 
+        required=False,
         label='Kelishuv EN',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     agreement_kr = forms.CharField(
-        required=False, 
+        required=False,
         label='Kelishuv KR',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     shipment_terms_uz = forms.CharField(
-        required=False, 
+        required=False,
         label='Yetkazish shartlari UZ',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     shipment_terms_ru = forms.CharField(
-        required=False, 
+        required=False,
         label='Yetkazish shartlari RU',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     shipment_terms_en = forms.CharField(
-        required=False, 
+        required=False,
         label='Yetkazish shartlari EN',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     shipment_terms_kr = forms.CharField(
-        required=False, 
+        required=False,
         label='Yetkazish shartlari KR',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     privacy_policy_uz = forms.CharField(
-        required=False, 
+        required=False,
         label='Offerta shartlari UZ',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     privacy_policy_ru = forms.CharField(
-        required=False, 
+        required=False,
         label='Offerta shartlari RU',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     privacy_policy_en = forms.CharField(
-        required=False, 
+        required=False,
         label='Offerta shartlari EN',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     privacy_policy_kr = forms.CharField(
-        required=False, 
+        required=False,
         label='Offerta shartlari KR',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     about_us_uz = forms.CharField(
-        required=False, 
+        required=False,
         label='Biz haqimizda UZ',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     about_us_ru = forms.CharField(
-        required=False, 
+        required=False,
         label='Biz haqimizda RU',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     about_us_en = forms.CharField(
-        required=False, 
+        required=False,
         label='Biz haqimizda EN',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     about_us_kr = forms.CharField(
-        required=False, 
+        required=False,
         label='Biz haqimizda KR',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     support_center_uz = forms.CharField(
-        required=False, 
+        required=False,
         label='Qollab quvvatlash markazi UZ',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     support_center_ru = forms.CharField(
-        required=False, 
+        required=False,
         label='Qollab quvvatlash markazi RU',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     support_center_en = forms.CharField(
-        required=False, 
+        required=False,
         label='Qollab quvvatlash markazi EN',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     support_center_kr = forms.CharField(
-        required=False, 
+        required=False,
         label='Qollab quvvatlash markazi KR',
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     payment_data_uz = forms.CharField(
-        required=False, 
+        required=False,
         label="Hisob raqam/Pul o'tkazish shartlari UZ",
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     payment_data_ru = forms.CharField(
-        required=False, 
+        required=False,
         label="Hisob raqam/Pul o'tkazish shartlari RU",
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     payment_data_en = forms.CharField(
-        required=False, 
+        required=False,
         label="Hisob raqam/Pul o'tkazish shartlari EN",
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
     payment_data_kr = forms.CharField(
-        required=False, 
+        required=False,
         label="Hisob raqam/Pul o'tkazish shartlari KR",
-        widget=CKEditorWidget(attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100})
     )
 
     class Meta:
@@ -1285,6 +1326,7 @@ class InformationEditForm(forms.ModelForm):
             self.fields["payment_data_ru"].initial = self.instance.payment_data_ru
             self.fields["payment_data_en"].initial = self.instance.payment_data_en
             self.fields["payment_data_kr"].initial = self.instance.payment_data_kr
+
     def save(self, commit=True):
         information = super(InformationEditForm, self).save(commit=False)
         if commit:
