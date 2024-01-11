@@ -100,7 +100,7 @@ class Order(TimeStampedModel, models.Model):
         """
         Order bilan bog'liq barcha OrderItem'larni qaytaradi.
         """
-        return self.orderitem.all()
+        return self.orderitem.all().order_by("-pk") 
 
 
 class OrderItem(TimeStampedModel, models.Model):
