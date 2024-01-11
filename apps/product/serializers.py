@@ -30,16 +30,16 @@ class ImageSerializer(serializers.ModelSerializer):
 
 
 class ProductItemSerializer(serializers.ModelSerializer):
-    price_reduction_percentage = serializers.SerializerMethodField()
+    sale = serializers.SerializerMethodField()
     images = ImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = ProductItem
         fields = "__all__"
 
-    def get_price_reduction_percentage(self, obj):
+    def get_sale(self, obj):
         """ProductItem obyektining price_reduction_percentage xususiyatini qaytaradi."""
-        return obj.price_reduction_percentage
+        return obj.sale
 
 
 class TicketSerializer(ProductItemCreatorMixin):

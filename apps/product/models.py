@@ -60,7 +60,7 @@ class ProductItem(TimeStampedModel, models.Model):
     active = models.BooleanField(default=True)
 
     @property
-    def price_reduction_percentage(self):
+    def sale(self):
         """Agar yangi narx eski narxdan past bo'lsa, foizni qaytaradi."""
         if self.old_price and self.new_price < self.old_price:
             return round((1 - self.new_price / self.old_price) * 100, 2)
