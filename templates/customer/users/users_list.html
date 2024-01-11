@@ -24,7 +24,7 @@
           <tbody>
             {% for user in users %}
             <tr>
-              <th scope="row">{{ user.id }}</th>
+              <th scope="row" class="text-center">{{ user.id }}</th>
               <td class="text-center">{{ user.full_name }}</td>
               <td class="text-center">{{ user.phone_number }}</td>
               <td class="text-center">{{ user.order.count }}</td>
@@ -45,12 +45,12 @@
                   </a>
               </td>
               <td class="text-center">
-                  {% if user.origin.is_active == True %}
-                      <a href="" class="btn btn-danger btn-sm">Block</a>
-                  {% else %}
-                      <a href="" class="btn btn-primary btn-sm">Activate</a>
-                  {% endif %}
-              </td>
+            {% if user.origin.is_active %}
+                <a href="{% url 'block_activate_user' pk=user.id %}" class="btn btn-danger btn-sm">Block</a>
+            {% else %}
+                <a href="{% url 'block_activate_user' pk=user.id %}" class="btn btn-success btn-sm">Activate</a>
+            {% endif %}
+        </td>
 
               </td>
             </tr>
