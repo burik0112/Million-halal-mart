@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>Dashboard - NiceAdmin Bootstrap Template</title>
+    <title>Dashboard - Million halal market</title>
     <meta content="" name="description" />
     <meta content="" name="keywords" />
 
@@ -65,7 +65,7 @@
     <header id="header" class="header fixed-top d-flex align-items-center">
       <div class="d-flex align-items-center justify-content-between">
         <a href="index.html" class="logo d-flex align-items-center">
-          <img src="{% static 'assets/img/logo.png' %}" alt="" />
+          <img src="{% static 'assets/img/logo.png' %}" alt="#" />
           <span class="d-none d-lg-block">Million Mart</span>
         </a>
         <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -185,7 +185,7 @@
               </li>
 
               <li class="dropdown-footer">
-                <a href="#">Show all messages</a>
+                <a href="#">Barchasini ko'rish</a>
               </li>
             </ul>
             <!-- End Messages Dropdown Items -->
@@ -260,7 +260,7 @@
             data-bs-toggle="collapse"
             href="#"
           >
-            <i class="bi bi-journal-text"></i><span>Products</span
+            <i class="bi bi-journal-text"></i><span>Mahsulotlar</span
             ><i class="bi bi-chevron-down ms-auto"></i>
           </a>
           <ul
@@ -271,25 +271,25 @@
             <li>
               {% url 'phone_list' as phone_list %}
               <a class="{% if request.path == phone_list %}active{% endif %}" href="{% url 'phone_list'  %}">
-                <i class="bi bi-circle"></i><span>Phones and Electrones</span>
+                <i class="bi bi-circle"></i><span>Mobil qurilmalar</span>
               </a>
             </li>
             <li>
               {% url 'ticket-list' as ticket_list %}
               <a class="{% if request.path == ticket_list %}active{% endif %}" href="{% url 'ticket-list'  %}">
-                <i class="bi bi-circle"></i><span>Tickets</span>
+                <i class="bi bi-circle"></i><span>Chiptalar</span>
               </a>
             </li>
             <li>
               {% url 'good-list' as good_list %}
               <a  class="{% if request.path == good_list %}active{% endif %}" href="{% url 'good-list' %}">
-                <i class="bi bi-circle"></i><span>Food Products</span>
+                <i class="bi bi-circle"></i><span>Oziq-ovqat mahsulotlari</span>
               </a>
             </li>
             <li>  
               {% url 'news-list' as news_list %}
               <a class="{% if request.path == news_list %}active{% endif %}" href="{% url 'news-list' %}">
-                <i class="bi bi-circle"></i><span>News page</span>
+                <i class="bi bi-circle"></i><span>E'lonlar</span>
               </a>
             </li>
           </ul>
@@ -302,7 +302,7 @@
           {% url 'users-list' as users_list %}
           <a class="nav-link {% if request.path == users_list %}active{% endif %}" href="{% url 'users-list' %}">
               <i class="bi bi-person"></i>
-              <span>Users</span>
+              <span>Foydalanuvchilar</span>
           </a>
       </li>
         <!-- End Profile Page Nav -->
@@ -311,14 +311,14 @@
           {% url 'info-list' as info_list %}
           <a class="nav-link {% if request.path == info_list %}active{% endif %}" href="{% url 'info-list' %}">
             <i class="bi bi-question-circle"></i>
-            <span>Information</span>
+            <span>Ma'lumotlar</span>
           </a>
         </li>
         <li class="nav-item">
           {% url 'service-list' as service_list %}
           <a class="nav-link {% if request.path == service_list %}active{% endif %}" href="{% url 'service-list' %}">
             <i class="bi bi-menu-button-wide"></i>
-            <span>Services</span>
+            <span>Xizmatlar</span>
           </a>
         </li>
         <!-- End F.A.Q Page Nav -->
@@ -372,7 +372,7 @@
         <h1>Dashboard</h1>
         <nav>
           <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Market</a></li>
             <li class="breadcrumb-item active">Dashboard</li>
           </ol>
         </nav>
@@ -400,15 +400,15 @@
                       <h6>Filter</h6>
                     </li>
 
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Week</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
+                    <li><a class="dropdown-item" href="#">Bugun</a></li>
+                    <li><a class="dropdown-item" href="#">Bu hafta</a></li>
+                    <li><a class="dropdown-item" href="#">Bu oy</a></li>
+                    <li><a class="dropdown-item" href="#">Bu yil</a></li>
                   </ul>
                 </div>
 
                 <div class="card-body">
-                  <h5 class="card-title">Sales <span>| Today</span></h5>
+                  <h5 class="card-title">Sotuv hajmi <span>| Bugun</span></h5>
 
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
@@ -885,7 +885,7 @@
     <!-- ======= Footer ======= -->
     <footer id="footer" class="footer">
       <div class="copyright">
-        &copy; Copyright <strong><span>Million Halal Mart</span></strong
+        &copy; Copyright <strong><span>Million Halal Mart 2024</span></strong
         >. All Rights Reserved
       </div>
       <div class="credits">
