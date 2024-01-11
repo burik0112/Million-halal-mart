@@ -35,7 +35,7 @@
                 <img src="{{ good.product.images.first.image.url }}" alt="{{ good.name }}" width="50" height="50" />
               </td>
               <td class="text-center">{{ good.sub_cat }}</td>
-              <td class="text-center">{{ good.product.desc_uz|truncatechars:100 }}</td>
+              <td class="text-center">{{ good.product.desc_uz|truncatechars:50 }}</td>
               <td class="text-center">{{ good.product.old_price }} ₩</td>
               <td class="text-center">{{ good.product.new_price }} ₩</td>
               <td class="text-center">{{ good.product.available_quantity }} {{ good.product.get_measure_display }}</td>
