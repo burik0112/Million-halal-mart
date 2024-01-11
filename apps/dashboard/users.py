@@ -2,9 +2,11 @@ from apps.customer.models import Profile, Location
 from apps.merchant.models import Order, OrderItem, Service
 from django.views.generic import ListView, DetailView
 from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import get_object_or_404, redirect
+from django.views import View
+from django.views.generic import ListView
+from django.db.models import Subquery, OuterRef
 
-
-from django.db.models import OuterRef, Subquery
 
 class UserListView(ListView):
     model = Profile
@@ -30,6 +32,13 @@ class UserListView(ListView):
         context["users"] = users_with_active_location
         return context
 
+class BlockActivateUserView(View):
+    def get(self, request, pk):
+        user = get_object_or_404(Profile, id=pk)
+        user.origin.is_active = not user.origin.is_active
+        user.origin.save()
+        return redirect('users-list')
+
 
 class UserOrdersView(DetailView):
     model = Profile
@@ -42,7 +51,7 @@ class UserOrdersView(DetailView):
             context["orders"] = orders
             context["user"] = user
         else:
-            context["no_orders_message"] = "This user has no orders."
+            context["no_orders_message"] = "Foydalanuvhi hali buyurtma qilmagan"
         return context
 
 class UserOrderDetailView(DetailView):
@@ -116,3 +125,11 @@ class UserOrderDetailView(DetailView):
                 "sub_cat": product_item.goods.sub_cat.name if product_item.goods.sub_cat else None,
             }
         return None, None
+
+
+class OrdersListView(ListView):
+    template_name = "customer/orders/orders_list.html"
+    context_object_name = "orders"
+
+    def get_queryset(self):
+        return Order.objects.all().order_by('-created')

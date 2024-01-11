@@ -305,6 +305,13 @@
               <span>Foydalanuvchilar</span>
           </a>
       </li>
+      <li class="nav-item">
+        {% url 'orders-list' as orders_list %}
+        <a class="nav-link {% if request.path == orders_list %}active{% endif %}" href="{% url 'orders-list' %}">
+          <i class="bi bi-gem"></i><span>Buyurtmalar</span><i></i>
+            
+        </a>
+    </li>
         <!-- End Profile Page Nav -->
 
         <li class="nav-item">

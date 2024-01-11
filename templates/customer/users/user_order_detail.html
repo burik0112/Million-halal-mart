@@ -108,7 +108,7 @@
                         alt="Product Image"></td>
                     {% endif %}
                     <td class="text-center">{{item_data.order_item.product.new_price|default:item_data.order_item.product.old_price }} ₩</td>
-                    <td class="text-center">{{ item_data.order_item.quantity }} {{sasdasdasdasdasdasdasditem_data.order_item.product.get_measure_display }}</td>
+                    <td class="text-center">{{ item_data.order_item.quantity }} {{item_data.order_item.product.get_measure_display }}</td>
                     <td class="text-center">{{item_data.total_price}} ₩</td>
                     {% endif %}
                   </tr>
