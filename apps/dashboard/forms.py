@@ -1327,8 +1327,34 @@ class InformationEditForm(forms.ModelForm):
             self.fields["payment_data_en"].initial = self.instance.payment_data_en
             self.fields["payment_data_kr"].initial = self.instance.payment_data_kr
 
+    def clean(self):
+        cleaned_data = super().clean()
+        initial_values = {}
+
+        for field_name in self.fields:
+            initial_values[field_name] = getattr(self.instance, field_name)
+
+        for field_name, initial_value in initial_values.items():
+            new_value = cleaned_data.get(field_name)
+            if new_value == initial_value:
+                cleaned_data[field_name] = initial_value
+
+        return cleaned_data
+
     def save(self, commit=True):
-        information = super(InformationEditForm, self).save(commit=False)
+        information = super().save(commit=False)
+        changed_fields = []
+
+        # Compare cleaned data with initial values
+        for field_name, field_value in self.cleaned_data.items():
+            if field_value != getattr(information, field_name):
+                changed_fields.append(field_name)
+
+        # Set unchanged fields to their initial values
+        for field_name in set(self.fields) - set(changed_fields):
+            setattr(information, field_name, getattr(self.instance, field_name))
+
         if commit:
             information.save()
+
         return information

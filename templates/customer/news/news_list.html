@@ -26,7 +26,7 @@
             {% for good in news %}
             <tr>
               <th scope="row" class="text-center">{{ good.id }}</th>
-              <td class="text-center">{{ good.title }}</td>
+              <td class="text-center">{{ good.title_uz }}</td>
               <td class="text-center"><i class="bi bi-calendar-date"></i> {{ good.start_date|date:"d-m-Y" }} <br><i
                   class="bi bi-clock"></i> {{ good.start_date|date:"H:i" }}</td>
               <td class="text-center"><i class="bi bi-calendar-date"></i> {{ good.end_date|date:"d-m-Y" }} <br> <i

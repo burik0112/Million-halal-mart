@@ -81,18 +81,13 @@
                     <td class="text-center">{{ item_data.order_item.id }}</td>
                     {% if item_data.order_item.product.phones %}
                     <td>{{item_data.order_item.product.phones.category}}</td>
-                    <td>{{ item_data.order_item.product.phones.model_name }}/{{
-                      item_data.order_item.product.phones.get_ram_display }}/{{
-                      item_data.order_item.product.phones.get_storage_display }}/{{
-                      item_data.order_item.product.phones.get_color_display }}</td>
+                    <td>{{ item_data.order_item.product.phones.model_name }}/{{item_data.order_item.product.phones.get_ram_display }}/{{item_data.order_item.product.phones.get_storage_display }}/{{item_data.order_item.product.phones.get_color_display }}</td>
                     {% if item_data.first_image_url %}
                     <td class="text-center"><img src="{{ item_data.first_image_url }}" height="75" width="75"
                         alt="Product Image"></td>
                     {% endif %}
-                    <td class="text-center">{{
-                      item_data.order_item.product.new_price|default:item_data.order_item.product.old_price }} ₩</td>
-                    <td class="text-center">{{ item_data.order_item.quantity }} {{
-                      item_data.order_item.product.get_measure_display }}</td>
+                    <td class="text-center">{{item_data.order_item.product.new_price|default:item_data.order_item.product.old_price }} ₩</td>
+                    <td class="text-center">{{ item_data.order_item.quantity }} {{item_data.order_item.product.get_measure_display }}</td>
                     <td class="text-center">{{item_data.total_price}} ₩</td>
 
                     {% elif item_data.order_item.product.tickets %}
@@ -102,10 +97,8 @@
                     <td class="text-center"><img src="{{ item_data.first_image_url }}" height="75" width="75"
                         alt="Product Image"></td>
                     {% endif %}
-                    <td class="text-center">{{
-                      item_data.order_item.product.new_price|default:item_data.order_item.product.old_price }} ₩</td>
-                    <td class="text-center">{{ item_data.order_item.quantity }} {{
-                      item_data.order_item.product.get_measure_display }}</td>
+                    <td class="text-center">{{item_data.order_item.product.new_price|default:item_data.order_item.product.old_price }} ₩</td>
+                    <td class="text-center">{{ item_data.order_item.quantity }} {{item_data.order_item.product.get_measure_display }}</td>
                     <td class="text-center">{{item_data.total_price}} ₩</td>
                     {% elif item_data.order_item.product.goods %}
                     <td>{{item_data.order_item.product.goods.sub_cat}}</td>
@@ -114,10 +107,8 @@
                     <td class="text-center"><img src="{{ item_data.first_image_url }}" height="75" width="75"
                         alt="Product Image"></td>
                     {% endif %}
-                    <td class="text-center">{{
-                      item_data.order_item.product.new_price|default:item_data.order_item.product.old_price }} ₩</td>
-                    <td class="text-center">{{ item_data.order_item.quantity }} {{
-                      item_data.order_item.product.get_measure_display }}</td>
+                    <td class="text-center">{{item_data.order_item.product.new_price|default:item_data.order_item.product.old_price }} ₩</td>
+                    <td class="text-center">{{ item_data.order_item.quantity }} {{sasdasdasdasdasdasdasditem_data.order_item.product.get_measure_display }}</td>
                     <td class="text-center">{{item_data.total_price}} ₩</td>
                     {% endif %}
                   </tr>

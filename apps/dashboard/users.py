@@ -1,8 +1,10 @@
-from apps.customer.models import Profile
+from apps.customer.models import Profile, Location
 from apps.merchant.models import Order, OrderItem, Service
 from django.views.generic import ListView, DetailView
 from django.shortcuts import render, redirect, HttpResponse
 
+
+from django.db.models import OuterRef, Subquery
 
 class UserListView(ListView):
     model = Profile
@@ -14,6 +16,18 @@ class UserListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        # Retrieve the active location for each user using Subquery
+        active_locations = Location.objects.filter(
+            user=OuterRef("pk"), active=True
+        ).values("address")[:1]
+
+        # Annotate the queryset with the active location
+        users_with_active_location = Profile.objects.annotate(
+            active_location=Subquery(active_locations)
+        )
+
+        context["users"] = users_with_active_location
         return context
 
 

@@ -29,11 +29,11 @@
               <td class="text-center">{{ user.phone_number }}</td>
               <td class="text-center">{{ user.order.count }}</td>
               <td class="text-center">
-                  {% if location_instance %}
-                      {{ location_instance.address }}
-                  {% else %}
-                      Location not found
-                  {% endif %}
+                {% if user.active_location %}
+                    {{ user.active_location }}
+                {% else %}
+                    Manzil topilmadi
+                {% endif %}
               </td>
               <td class="text-center">
                   <i class="bi bi-calendar-date"></i> {{ user.created|date:"d-m-Y" }} <br>
