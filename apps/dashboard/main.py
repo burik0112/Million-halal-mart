@@ -52,15 +52,17 @@ class InformationEditView(View):
         info = get_object_or_404(Information, pk=pk)
         key = request.GET.get('key', None)
         form = InformationEditForm(instance=info)
-        return render(request, self.template_name, {"form": form, "info": info, 'key':key})
+        return render(request, self.template_name, {"form": form, "info": info, 'key': key})
 
     def post(self, request, pk):
         info = get_object_or_404(Information, pk=pk)
-        if "edit" in request.POST:
-            form = InformationEditForm(request.POST, instance=info)
-            if form.is_valid():
-                form.save()
-                return redirect("info-list")
+        form = InformationEditForm(request.POST, instance=info)
+
+        if "edit" in request.POST and form.is_valid():
+            form.save()
+            print(request)
+            return redirect("info-list")
+
         return render(request, self.template_name, {"form": form, "info": info})
 
 
