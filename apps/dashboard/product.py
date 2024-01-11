@@ -28,7 +28,7 @@ class PhoneListView(ListView):
     context_object_name = "phones"
 
     def get_queryset(self):
-        return Phone.objects.all().order_by('-pk')
+        return Phone.objects.all().order_by('pk')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -78,7 +78,7 @@ class TicketListView(ListView):
     context_object_name = "tickets"
 
     def get_queryset(self):
-        return Ticket.objects.all().order_by('-pk')
+        return Ticket.objects.all().order_by('pk')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -125,7 +125,7 @@ class GoodListView(ListView):
     context_object_name = "goods"
 
     def get_queryset(self):
-        return Good.objects.all().order_by('-pk')
+        return Good.objects.all().order_by('pk')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
