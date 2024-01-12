@@ -1,13 +1,15 @@
 from apps.merchant.models import Information, Service
+from apps.customer.models import Banner
 from decouple import config
 from django.core.exceptions import ImproperlyConfigured
 import requests
 import urllib.parse
 import json
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import ListView
+from django.views.generic import ListView,DeleteView, DetailView
 from django.views import View
 from .forms import ServiceEditForm, InformationEditForm
+from apps.dashboard.forms import BannerForm
 
 
 def get_env_value(env_variable):
@@ -78,7 +80,47 @@ class ServiceView(ListView):
         context = super().get_context_data(**kwargs)
         return context
 
+from django.urls import reverse_lazy
 
+class BannerView(ListView):
+    model = Banner
+    template_name = "dashboard/banner.html"
+    context_object_name = "banners"
+    form_class = BannerForm
+
+    def get_queryset(self):
+        return Banner.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        return render(request, self.template_name, {'banners': self.get_queryset(), 'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('banner-list')
+        else:
+            return render(request, self.template_name, {'banners': self.get_queryset(), 'form': form})
+
+class BannerActionView(View):
+    def post(self, request, *args, **kwargs):
+        if 'action' not in request.POST:
+            return render(request, 'error.html', {'error_message': 'Action not specified'})
+
+        action = request.POST.get('action')
+        
+        if action == 'toggle':
+            # Toggle the active status
+            banner = get_object_or_404(Banner, pk=kwargs['pk'])
+            banner.active = not banner.active
+            banner.save()
+        elif action == 'delete':
+            # Delete the banner
+            banner = get_object_or_404(Banner, pk=kwargs['pk'])
+            banner.delete()
+
+        return redirect('banner-list')
 class ServiceEditView(View):
     template_name = "dashboard/edit_service.html"
 

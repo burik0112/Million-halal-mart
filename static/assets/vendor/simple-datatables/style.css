@@ -122,23 +122,24 @@
 .datatable-table > thead > tr > th {
 	vertical-align: top;
 	padding: 8px 10px;
+	text-align: center;
 }
 
 .datatable-table > thead > tr > th {
 	vertical-align: bottom;
-	text-align: left;
+	text-align: center;
 	border-bottom: 1px solid #d9d9d9;
 }
 
 .datatable-table > tfoot > tr > th {
 	vertical-align: bottom;
-	text-align: left;
+	text-align: center;
 	border-top: 1px solid #d9d9d9;
 }
 
 .datatable-table th {
 	vertical-align: bottom;
-	text-align: left;
+	text-align: center;
 }
 
 .datatable-table th a {
@@ -149,10 +150,10 @@
 .datatable-table th button,
 .datatable-pagination-list button {
     color: inherit;
-    border: 0;
+    border: 0;	
     background-color: inherit;
     cursor: pointer;
-    text-align: inherit;
+    text-align: center;
     font-weight: inherit;
     font-size: inherit;
 }

@@ -11,7 +11,7 @@ from apps.product.models import (
     Category,
 )
 
-from apps.customer.models import News
+from apps.customer.models import News, Banner
 from apps.merchant.models import Information, Service
 from django.utils import timezone
 from ckeditor.widgets import CKEditorWidget
@@ -1358,3 +1358,14 @@ class InformationEditForm(forms.ModelForm):
             information.save()
 
         return information
+    
+class BannerForm(forms.ModelForm):
+    class Meta:
+        model = Banner
+        fields = ['title', 'image', 'active']
+
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }

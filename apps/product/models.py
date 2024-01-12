@@ -5,7 +5,6 @@ from django.utils.text import slugify
 from django.utils import timezone
 
 
-# Create your models here.
 class Category(TimeStampedModel, models.Model):
     PRODUCT_TYPE = (("f", "Food"), ("p", "Phone"), ("t", "Ticket"))
     main_type = models.CharField(
@@ -13,8 +12,6 @@ class Category(TimeStampedModel, models.Model):
     name = models.CharField(blank=True, max_length=255)
     image = models.ImageField(upload_to="category")
     desc = models.TextField(blank=True)
-    # stock = models.IntegerField(default=0)
-    # bonus = models.IntegerField(default=0)
     active = models.BooleanField(default=True)
 
     def __str__(self) -> str:
@@ -28,8 +25,6 @@ class SubCategory(TimeStampedModel, models.Model):
     name = models.CharField(blank=True, max_length=255)
     image = models.ImageField(upload_to="subcategory")
     desc = models.TextField(blank=True, null=True)
-    # stock = models.IntegerField(default=0)
-    # bonus = models.IntegerField(default=0)
     active = models.BooleanField(default=True)
 
     def __str__(self) -> str:
@@ -45,7 +40,6 @@ class ProductItem(TimeStampedModel, models.Model):
     )
 
     desc = models.TextField()
-    # price = models.DecimalField(decimal_places=0, max_digits=10, default=0)
     old_price = models.DecimalField(
         decimal_places=0, max_digits=10, null=True, blank=True, default=0
     )
@@ -54,7 +48,6 @@ class ProductItem(TimeStampedModel, models.Model):
     )
     measure = models.IntegerField(choices=CHOICES, default=0)
     available_quantity = models.PositiveIntegerField(default=0)
-    # stock = models.IntegerField(default=0)
     bonus = models.IntegerField(default=0)
     is_favorite = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
@@ -86,6 +79,11 @@ class Ticket(models.Model):
 
     def __str__(self) -> str:
         return self.event_name
+    
+    def save(self, *args, **kwargs):
+        self.product.measure = 1  # Assuming 1 corresponds to "DONA" in the CHOICES tuple
+        self.product.save()
+        super().save(*args, **kwargs)
 
 
 class Phone(models.Model):
@@ -155,7 +153,11 @@ class Phone(models.Model):
 
     def __str__(self) -> str:
         return self.model_name
-
+    
+    def save(self, *args, **kwargs):
+        self.product.measure = 1 
+        self.product.save()
+        super().save(*args, **kwargs)
 
 class Good(models.Model):
     name = models.CharField(max_length=255)

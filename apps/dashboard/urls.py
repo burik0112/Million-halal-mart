@@ -20,9 +20,10 @@ from .product import (
     GoodMainCategoryCreateView,
     NewsEditView,
 )
-from .users import (UserListView, UserOrdersView, UserOrderDetailView, OrdersListView, BlockActivateUserView)
+from .users import (UserListView, UserOrdersView,
+                    UserOrderDetailView, OrdersListView, BlockActivateUserView)
 from .main import (dashboard, InformationView,
-                   InformationEditView, ServiceView, ServiceEditView)
+                   InformationEditView, ServiceView, ServiceEditView, BannerView, BannerActionView)
 from .bot import index
 urlpatterns = [
     path("", dashboard, name="dashboard"),
@@ -56,24 +57,28 @@ urlpatterns = [
          GoodDeleteView.as_view(), name='delete_good'),
 
 
-    path("product/news/", NewsListView.as_view(), name="news-list"),
-    path("product/news-create/", NewsCreateView.as_view(), name="news-create"),
-    path('product/news/edit/<int:pk>/',
+    path("other/news/", NewsListView.as_view(), name="news-list"),
+    path("other/news-create/", NewsCreateView.as_view(), name="news-create"),
+    path('other/news/edit/<int:pk>/',
          NewsEditView.as_view(), name='edit_delete_news'),
 
     path("users/", UserListView.as_view(), name="users-list"),
     path("users/<int:pk>/order", UserOrdersView.as_view(), name="user-orders-list"),
-    path("users/order-detail/<int:pk>/", UserOrderDetailView.as_view(), name="user-order-detail"),
-    path('block_activate_user/<int:pk>/', BlockActivateUserView.as_view(), name='block_activate_user'),
-    
+    path("users/order-detail/<int:pk>/",
+         UserOrderDetailView.as_view(), name="user-order-detail"),
+    path('block_activate_user/<int:pk>/',
+         BlockActivateUserView.as_view(), name='block_activate_user'),
+
     path("orders/", OrdersListView.as_view(), name="orders-list"),
 
-    path('info/list/', InformationView.as_view(), name='info-list'),
-    path('info/edit/<int:pk>/',
+    path('other/info/list/', InformationView.as_view(), name='info-list'),
+    path('other/info/edit/<int:pk>/',
          InformationEditView.as_view(), name='edit_info'),
-    path('service/list', ServiceView.as_view(), name='service-list'),
-    path('service/edit/<int:pk>/',
+    path('other/service/list', ServiceView.as_view(), name='service-list'),
+    path('other/service/edit/<int:pk>/',
          ServiceEditView.as_view(), name='edit_service'),
+    path('other/banners/list/', BannerView.as_view(), name='banner-list'),
+    path('other/banner/action/<int:pk>/', BannerActionView.as_view(), name='banner-action'),
 
     path('bot/', index, name='bot'),
 
