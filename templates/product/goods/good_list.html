@@ -30,7 +30,7 @@
             {% for good in goods %}
             <tr>
               <th scope="row" class="text-center">{{ good.id }}</th>
-              <td class="text-center">{{ good.name }}</td>
+              <td class="text-center">{{ good.name_uz }}</td>
               <td class="text-center">
                 <img src="{{ good.product.images.first.image.url }}" alt="{{ good.name }}" width="50" height="50" />
               </td>
