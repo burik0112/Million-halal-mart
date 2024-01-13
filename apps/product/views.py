@@ -1,6 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
-from django.conf import settings
 from rest_framework.generics import ListAPIView
 from rest_framework import views, status
 from django.db.models import Sum, Count
@@ -175,31 +174,21 @@ class GoodsOnSaleListView(ListAPIView):
 class MultiProductSearchView(views.APIView):
     def get(self, request):
         search_query = request.query_params.get("search", None)
+
         if not search_query:
             return Response(
                 {"message": "No search query provided"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        def build_query_for_model(model, field_name):
-            query = Q()
-            modeltranslation_languages = settings.MODELTRANSLATION_LANGUAGES
-            for lang in modeltranslation_languages:
-                query |= Q(**{f"{field_name}_{lang}__icontains": search_query})
-            return query
+        tickets = Ticket.objects.filter(event_name__icontains=search_query)
+        phones = Phone.objects.filter(model_name__icontains=search_query)
+        goods = Good.objects.filter(name__icontains=search_query)
 
         results = {
-            "tickets": TicketSerializer(
-                Ticket.objects.filter(build_query_for_model(Ticket, "event_name")),
-                many=True,
-            ).data,
-            "phones": PhoneSerializer(
-                Phone.objects.filter(build_query_for_model(Phone, "model_name")),
-                many=True,
-            ).data,
-            "goods": GoodSerializer(
-                Good.objects.filter(build_query_for_model(Good, "name")), many=True
-            ).data,
+            "tickets": TicketSerializer(tickets, many=True).data,
+            "phones": PhoneSerializer(phones, many=True).data,
+            "goods": GoodSerializer(goods, many=True).data,
         }
 
         return Response(results)

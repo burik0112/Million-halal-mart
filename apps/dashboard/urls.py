@@ -18,6 +18,8 @@ from .product import (
     GoodMainCategoryCreateView,
 )
 
+from .users import (UserListView, UserOrdersView,
+                    UserOrderDetailView, OrdersListView, BlockActivateUserView)
 from .main import (dashboard, InformationView,
                    InformationEditView, ServiceView, ServiceEditView, BannerView, BannerActionView, NewsCreateView, NewsListView, NewsEditView, OrdersView, update_order_status)
 from .users import (
@@ -28,62 +30,31 @@ from .users import (
     BlockActivateUserView,
 )
 from .bot import index
-
-from .information import (
-    edit_reminder,
-    edit_agreement,
-    edit_shipment,
-    edit_privacy,
-    edit_aboutus,
-    edit_support,
-    edit_payment
-)
-
 urlpatterns = [
     path("", dashboard, name="dashboard"),
     path("product/create-phone/", PhoneCreateView.as_view(), name="create_phone"),
-    path(
-        "product/phone-category/",
-        PhoneCategoryCreateView.as_view(),
-        name="phone_category",
-    ),
+    path("product/phone-category/",
+         PhoneCategoryCreateView.as_view(), name="phone_category"),
     path("product/phones/", PhoneListView.as_view(), name="phone_list"),
-    path(
-        "product/phones/edit-delete/<int:pk>/",
-        PhoneEditDeleteView.as_view(),
-        name="edit_delete_phone",
-    ),
-    path(
-        "product/phone/<int:pk>/delete/", PhoneDeleteView.as_view(), name="delete_phone"
-    ),
+    path('product/phones/edit-delete/<int:pk>/',
+         PhoneEditDeleteView.as_view(), name='edit_delete_phone'),
+    path('product/phone/<int:pk>/delete/',
+         PhoneDeleteView.as_view(), name='delete_phone'),
+
     path("product/ticket-create/", TicketCreateView.as_view(), name="ticket_create"),
-    path(
-        "product/ticket-category/",
-        TicketCategoryCreateView.as_view(),
-        name="ticket_category",
-    ),
+    path("product/ticket-category/", TicketCategoryCreateView.as_view(),
+         name="ticket_category"),
     path("product/tickets/", TicketListView.as_view(), name="ticket-list"),
-    path(
-        "product/ticket/edit-delete/<int:pk>/",
-        TicketEditDeleteView.as_view(),
-        name="edit_delete_ticket",
-    ),
-    path(
-        "product/ticket/<int:pk>/delete/",
-        TicketDeleteView.as_view(),
-        name="delete_ticket",
-    ),
+    path('product/ticket/edit-delete/<int:pk>/',
+         TicketEditDeleteView.as_view(), name='edit_delete_ticket'),
+    path('product/ticket/<int:pk>/delete/',
+         TicketDeleteView.as_view(), name='delete_ticket'),
+
     path("product/good-create/", GoodCreateView.as_view(), name="good_create"),
-    path(
-        "product/good-category/",
-        GoodMainCategoryCreateView.as_view(),
-        name="good_category",
-    ),
-    path(
-        "product/good-subcategory/",
-        GoodCategoryCreateView.as_view(),
-        name="good_subcategory",
-    ),
+    path("product/good-category/",
+         GoodMainCategoryCreateView.as_view(), name="good_category"),
+    path("product/good-subcategory/",
+         GoodCategoryCreateView.as_view(), name="good_subcategory"),
     path("product/goods/", GoodListView.as_view(), name="good-list"),
 
     path("product/good/edit-delete/<int:pk>/",
