@@ -17,15 +17,9 @@ from .product import (
     GoodDeleteView,
     GoodMainCategoryCreateView,
 )
-<<<<<<< HEAD
-<<<<<<< HEAD
-from .users import (UserListView, UserOrdersView,
-                    UserOrderDetailView, OrdersListView, BlockActivateUserView)
+
 from .main import (dashboard, InformationView,
                    InformationEditView, ServiceView, ServiceEditView, BannerView, BannerActionView, NewsCreateView, NewsListView, NewsEditView, OrdersView, update_order_status)
-=======
-=======
->>>>>>> 9cd1d2acd380b8f633d3423553844cc6a899b8e3
 from .users import (
     UserListView,
     UserOrdersView,
@@ -33,17 +27,6 @@ from .users import (
     OrdersListView,
     BlockActivateUserView,
 )
-from .main import (
-    dashboard,
-    InformationView,
-    InformationEditView,
-    ServiceView,
-    ServiceEditView,
-)
-<<<<<<< HEAD
->>>>>>> 9cd1d2acd380b8f633d3423553844cc6a899b8e3
-=======
->>>>>>> 9cd1d2acd380b8f633d3423553844cc6a899b8e3
 from .bot import index
 
 from .information import (
@@ -102,14 +85,11 @@ urlpatterns = [
         name="good_subcategory",
     ),
     path("product/goods/", GoodListView.as_view(), name="good-list"),
-<<<<<<< HEAD
-<<<<<<< HEAD
+
     path("product/good/edit-delete/<int:pk>/",
          GoodEditDeleteView.as_view(), name='edit-delete-good'),
     path('product/good/<int:pk>/delete/',
          GoodDeleteView.as_view(), name='delete_good'),
-
-
 
     path("users/", UserListView.as_view(), name="users-list"),
     path("users/<int:pk>/order", UserOrdersView.as_view(), name="user-orders-list"),
@@ -131,67 +111,14 @@ urlpatterns = [
     path('other/service/edit/<int:pk>/',
          ServiceEditView.as_view(), name='edit_service'),
     path('other/banners/list/', BannerView.as_view(), name='banner-list'),
-    path('other/banner/action/<int:pk>/', BannerActionView.as_view(), name='banner-action'),
+    path('other/banner/action/<int:pk>/',
+         BannerActionView.as_view(), name='banner-action'),
     path("orders/<int:pk>/", OrdersView.as_view(), name="orders-list"),
-    path('update-order-status/<int:pk>/', update_order_status, name='update-order-status'),
+    path('update-order-status/<int:pk>/',
+         update_order_status, name='update-order-status'),
 
     path('bot/', index, name='bot'),
 
-
-
-=======
-    path(
-        "product/good/edit-delete/<int:pk>/",
-        GoodEditDeleteView.as_view(),
-        name="edit-delete-good",
-    ),
-    path("product/good/<int:pk>/delete/", GoodDeleteView.as_view(), name="delete_good"),
-    path("product/news/", NewsListView.as_view(), name="news-list"),
-    path("product/news-create/", NewsCreateView.as_view(), name="news-create"),
-    path(
-        "product/news/edit/<int:pk>/", NewsEditView.as_view(), name="edit_delete_news"
-    ),
-    path("users/", UserListView.as_view(), name="users-list"),
-    path("users/<int:pk>/order", UserOrdersView.as_view(), name="user-orders-list"),
-    path(
-        "users/order-detail/<int:pk>/",
-        UserOrderDetailView.as_view(),
-        name="user-order-detail",
-    ),
-    path(
-        "block_activate_user/<int:pk>/",
-        BlockActivateUserView.as_view(),
-        name="block_activate_user",
-    ),
-    path("orders/", OrdersListView.as_view(), name="orders-list"),
-=======
-    path(
-        "product/good/edit-delete/<int:pk>/",
-        GoodEditDeleteView.as_view(),
-        name="edit-delete-good",
-    ),
-    path("product/good/<int:pk>/delete/", GoodDeleteView.as_view(), name="delete_good"),
-    path("product/news/", NewsListView.as_view(), name="news-list"),
-    path("product/news-create/", NewsCreateView.as_view(), name="news-create"),
-    path(
-        "product/news/edit/<int:pk>/", NewsEditView.as_view(), name="edit_delete_news"
-    ),
-    path("users/", UserListView.as_view(), name="users-list"),
-    path("users/<int:pk>/order", UserOrdersView.as_view(), name="user-orders-list"),
-    path(
-        "users/order-detail/<int:pk>/",
-        UserOrderDetailView.as_view(),
-        name="user-order-detail",
-    ),
-    path(
-        "block_activate_user/<int:pk>/",
-        BlockActivateUserView.as_view(),
-        name="block_activate_user",
-    ),
-    path("orders/", OrdersListView.as_view(), name="orders-list"),
->>>>>>> 9cd1d2acd380b8f633d3423553844cc6a899b8e3
-    path("info/list/", InformationView.as_view(), name="info-list"),
-    path("info/edit/<int:pk>/", InformationEditView.as_view(), name="edit_info"),
     # info
     path("edit-reminder/<int:pk>/", edit_reminder, name="edit_reminder"),
     path("edit-agreement/<int:pk>/", edit_agreement, name="edit_agreement"),
@@ -200,11 +127,5 @@ urlpatterns = [
     path("edit-about_us/<int:pk>/", edit_aboutus, name="edit_aboutus"),
     path("edit-support/<int:pk>/", edit_support, name="edit_support"),
     path("edit-payment/<int:pk>/", edit_payment, name="edit_payment"),
-    path("service/list", ServiceView.as_view(), name="service-list"),
-    path("service/edit/<int:pk>/", ServiceEditView.as_view(), name="edit_service"),
     path("bot/", index, name="bot"),
-<<<<<<< HEAD
->>>>>>> 9cd1d2acd380b8f633d3423553844cc6a899b8e3
-=======
->>>>>>> 9cd1d2acd380b8f633d3423553844cc6a899b8e3
 ]

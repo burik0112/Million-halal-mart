@@ -979,25 +979,14 @@ class NewsForm(forms.ModelForm):
     def save(self, commit=True):
         news = super(NewsForm, self).save(commit=False)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         new_image = self.cleaned_data.get('image', None)
         if new_image:
             news.image = new_image
-=======
         if "image" in self.files:
             news.image.delete()  # Delete the old image
             news.image = self.files["image"]  # Assign the new image
->>>>>>> 9cd1d2acd380b8f633d3423553844cc6a899b8e3
-=======
-        if "image" in self.files:
-            news.image.delete()  # Delete the old image
-            news.image = self.files["image"]  # Assign the new image
->>>>>>> 9cd1d2acd380b8f633d3423553844cc6a899b8e3
-
         if commit:
             news.save()
-
         return news
 
 
@@ -1642,9 +1631,6 @@ class InformationEditForm(forms.ModelForm):
             "payment_data_en",
             "payment_data_kr",
         ]
-<<<<<<< HEAD
-<<<<<<< HEAD
-
     def __init__(self, *args, **kwargs):
         super(InformationEditForm, self).__init__(*args, **kwargs)
         if self.instance:
@@ -1721,7 +1707,3 @@ class BannerForm(forms.ModelForm):
             'image': forms.FileInput(attrs={'class': 'form-control'}),
             'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
-=======
->>>>>>> 9cd1d2acd380b8f633d3423553844cc6a899b8e3
-=======
->>>>>>> 9cd1d2acd380b8f633d3423553844cc6a899b8e3
