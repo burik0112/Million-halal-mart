@@ -71,10 +71,11 @@ class InformationEditView(View):
 
         if "edit" in request.POST and form.is_valid():
             form.save()
-            print(request)
             return redirect("info-list")
 
         return render(request, self.template_name, {"form": form, "info": info})
+
+
 
 
 class ServiceView(ListView):
