@@ -28,7 +28,7 @@ class PhoneListView(ListView):
     context_object_name = "phones"
 
     def get_queryset(self):
-        return Phone.objects.all().order_by('pk')
+        return Phone.objects.all().order_by("pk")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -78,7 +78,7 @@ class TicketListView(ListView):
     context_object_name = "tickets"
 
     def get_queryset(self):
-        return Ticket.objects.all().order_by('pk')
+        return Ticket.objects.all().order_by("pk")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -125,7 +125,7 @@ class GoodListView(ListView):
     context_object_name = "goods"
 
     def get_queryset(self):
-        return Good.objects.all().order_by('pk')
+        return Good.objects.all().order_by("pk")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -191,7 +191,7 @@ class GoodEditDeleteView(View):
 
     def post(self, request, pk):
         good = get_object_or_404(Good, pk=pk)
-        if request.method == 'POST':
+        if request.method == "POST":
             form = GoodEditForm(request.POST, request.FILES, instance=good)
             if form.is_valid():
                 form.save()
@@ -212,7 +212,7 @@ class PhoneEditDeleteView(View):
 
     def post(self, request, pk):
         phone = get_object_or_404(Phone, pk=pk)
-        if request.method == 'POST':
+        if request.method == "POST":
             form = PhoneEditForm(request.POST, request.FILES, instance=phone)
             if form.is_valid():
                 form.save()
@@ -237,12 +237,16 @@ class TicketEditDeleteView(View):
     def get(self, request, pk):
         ticket = get_object_or_404(Ticket, pk=pk)
         form = TicketEditForm(instance=ticket)
-        categories = Category.objects.filter(main_type='t')
-        return render(request, self.template_name, {"form": form, "ticket": ticket, "categories": categories})
+        categories = Category.objects.filter(main_type="t")
+        return render(
+            request,
+            self.template_name,
+            {"form": form, "ticket": ticket, "categories": categories},
+        )
 
     def post(self, request, pk):
         ticket = get_object_or_404(Ticket, pk=pk)
-        if request.method == 'POST':
+        if request.method == "POST":
             form = TicketEditForm(request.POST, request.FILES, instance=ticket)
             if form.is_valid():
                 form.save()
@@ -276,7 +280,7 @@ class NewsListView(ListView):
     context_object_name = "news"
 
     def get_queryset(self):
-        return News.objects.all().order_by('-pk')
+        return News.objects.all().order_by("-pk")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -306,17 +310,19 @@ class NewsEditView(View):
         news = get_object_or_404(News, pk=pk)
         form = NewsEditForm(instance=news)
         return render(request, self.template_name, {"form": form, "news": news})
-    
+
     def post(self, request, pk):
         news = get_object_or_404(News, pk=pk)
+        form = NewsEditForm(request.POST, request.FILES, instance=news)
+
         if "edit" in request.POST:
-            form = NewsEditForm(request.POST, request.FILES, instance=news)
+            print("editga kirdi")
             if form.is_valid():
                 form.save()
                 return redirect("news-list")
-            else:
-                form = NewsEditForm(instance=news)
         elif "delete" in request.POST:
-            news.delete()  # Delete the Ticket instance
-            return redirect("news-list")  # Redirect to ticket list
+            print(news, "delete bolyaptimi")
+            news.delete()  # Delete the News instance
+            return redirect("news-list")  # Redirect to news list
+
         return render(request, self.template_name, {"form": form, "news": news})

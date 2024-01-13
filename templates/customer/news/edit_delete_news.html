@@ -3,7 +3,7 @@
   <h1>E`lon tahrirlash oynasi</h1>
   {% csrf_token %} {{ form.as_p }}
   <button type="submit" class="btn btn-primary" name="edit">Saqlash</button>
-  <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteConfirmModal" id="yourDeleteButtonId">
+  <button type="button" class="btn btn-danger" name="delete" data-toggle="modal" data-target="#deleteConfirmModal" id="yourDeleteButtonId">
     E'lonni o'chirish
 </button>
 </form>
