@@ -262,6 +262,12 @@
               data-bs-parent="#sidebar-nav">
               <!-- Mahsulotlar section content -->
               <li>
+                {% url 'good-list' as good_list %}
+                <a  class="{% if request.path == good_list %}active{% endif %}" href="{% url 'good-list' %}">
+                  <i class="bi bi-circle"></i><span>Oziq-ovqat mahsulotlari</span>
+                </a>
+              </li>
+              <li>
                   {% url 'phone_list' as phone_list %}
                   <a class="{% if request.path == phone_list %}active{% endif %}" href="{% url 'phone_list'  %}">
                       <i class="bi bi-circle"></i><span>Mobil qurilmalar</span>
@@ -273,18 +279,6 @@
               {% url 'ticket-list' as ticket_list %}
               <a class="{% if request.path == ticket_list %}active{% endif %}" href="{% url 'ticket-list'  %}">
                 <i class="bi bi-circle"></i><span>Chiptalar</span>
-              </a>
-            </li>
-            <li>
-              {% url 'good-list' as good_list %}
-              <a  class="{% if request.path == good_list %}active{% endif %}" href="{% url 'good-list' %}">
-                <i class="bi bi-circle"></i><span>Oziq-ovqat mahsulotlari</span>
-              </a>
-            </li>
-            <li>  
-              {% url 'news-list' as news_list %}
-              <a class="{% if request.path == news_list %}active{% endif %}" href="{% url 'news-list' %}">
-                <i class="bi bi-circle"></i><span>E'lonlar</span>
               </a>
             </li>
           </ul>

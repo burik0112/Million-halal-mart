@@ -31,32 +31,39 @@
                   <tr>
                     <th scope="row" class="text-center">{{c.id}}</th>
                     <th class="text-center">{{c.user.full_name}}</th>
-                    <td class="text-center"><i class="bi bi-calendar-date"></i> {{ c.created|date:"d-m-Y" }} <br> <i
-                        class="bi bi-clock"></i> {{ c.created|date:"H:i" }}</td>
+                    <td class="text-center">
+                      <i class="bi bi-calendar-date"></i> {{ c.created|date:"d-m-Y" }} <br>
+                      <i class="bi bi-clock"></i> {{ c.created|date:"H:i" }}
+                    </td>
                     <td class="text-center">
                       {% if c.user.location.exists %}
                       {{ c.user.location.first.address }}
                       {% else %}
                       <span class="text-muted">No location available</span>
                       {% endif %}
-                    </td class="text-center">
+                    </td>
                     <td class="text-center">{{c.total_amount}} ₩</td>
                     <td class="text-center">{{c.comment}}</td>
                     <td class="text-center">
-                      {% if c.status == "in_cart" %}
-                      <span class="badge bg-warning">Savatchada</span>
-                      {% elif c.status == "pending" %}
-                      <span class="badge bg-warning">Kutilmoqda</span>
-                      {% elif c.status == "approved" %}
-                      <span class="badge bg-primary">To'lov tasdiqlandi</span>
-                      {% elif c.status == "sent" %}
-                      <span class="badge bg-success">Yuborildi</span>
-                      {% elif c.status == "cancelled" %}
-                      <span class="badge bg-danger">Bekor qilindi</span>
-                      {% else %}
-                      <span class="badge bg-secondary">{{ c.status }}</span>
-                      {% endif %}
-                    </td>
+                      <form method="post" action="{% url 'update-order-status' c.id %}">
+                          {% csrf_token %}
+                          <div class="input-group">
+                              <select name="status" class="form-select" style="color:white; background-color: 
+                                  {% if c.status == 'in_cart' %}gray;
+                                  {% elif c.status == 'cancelled' %}red;
+                                  {% elif c.status == 'pending' %}orange;
+                                  {% elif c.status == 'approved' %}blue;
+                                  {% elif c.status == 'sent' %}green;
+                                  {% endif %}" onchange="this.form.submit()">
+                                  {% for choice_value, choice_label in c.STATUS_CHOICES %}
+                                      <option style="color: white;" value="{{ choice_value }}" {% if c.status == choice_value %}selected{% endif %}>
+                                          {{ choice_label }}
+                                      </option>
+                                  {% endfor %}
+                              </select>
+                          </div>
+                      </form>
+                  </td>
                     <td class="text-center">
                       <a href="{% url 'user-order-detail' c.id %}">
                         <i class="bi bi-receipt" style="font-size: 2em;"></i>

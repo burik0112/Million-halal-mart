@@ -20,7 +20,7 @@ from .product import (
 from .users import (UserListView, UserOrdersView,
                     UserOrderDetailView, OrdersListView, BlockActivateUserView)
 from .main import (dashboard, InformationView,
-                   InformationEditView, ServiceView, ServiceEditView, BannerView, BannerActionView, NewsCreateView, NewsListView, NewsEditView)
+                   InformationEditView, ServiceView, ServiceEditView, BannerView, BannerActionView, NewsCreateView, NewsListView, NewsEditView, OrdersView, update_order_status)
 from .bot import index
 urlpatterns = [
     path("", dashboard, name="dashboard"),
@@ -76,6 +76,8 @@ urlpatterns = [
          ServiceEditView.as_view(), name='edit_service'),
     path('other/banners/list/', BannerView.as_view(), name='banner-list'),
     path('other/banner/action/<int:pk>/', BannerActionView.as_view(), name='banner-action'),
+    path("orders/<int:pk>/", OrdersView.as_view(), name="orders-list"),
+    path('update-order-status/<int:pk>/', update_order_status, name='update-order-status'),
 
     path('bot/', index, name='bot'),
 

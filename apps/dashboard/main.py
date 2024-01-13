@@ -1,5 +1,5 @@
-from apps.merchant.models import Information, Service
-from apps.customer.models import Banner
+from apps.merchant.models import Information, Service, Order
+from apps.customer.models import Banner, Profile
 from decouple import config
 from django.core.exceptions import ImproperlyConfigured
 import requests
@@ -234,4 +234,45 @@ class NewsEditView(View):
         # If it's not a valid form or a delete action, render the form with the existing data
         return render(request, self.template_name, {"form": form, "news": news})
 
-        
+
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
+class OrdersView(DetailView):
+    model = Profile
+    template_name = "customer/orders/orders_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(OrdersView, self).get_context_data(**kwargs)
+        user = get_object_or_404(Profile, id=self.kwargs['pk'])
+        orders = Order.objects.filter(user=user)
+
+        if orders:
+            context["orders"] = orders
+            context["user"] = user
+        else:
+            context["no_orders_message"] = "Foydalanuvhi hali buyurtma qilmagan"
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        order_id = self.kwargs['pk']
+        order = get_object_or_404(Order, id=order_id)
+        new_status = request.POST.get('status')
+
+        if new_status in dict(order.STATUS_CHOICES):
+            order.status = new_status
+            order.save()
+
+        return HttpResponseRedirect(reverse('orders-list', kwargs={'pk': order.user.id}))
+
+def update_order_status(request, pk):
+    order = get_object_or_404(Order, id=pk)
+
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        if new_status in dict(order.STATUS_CHOICES):
+            order.status = new_status
+            order.save()
+
+    return HttpResponseRedirect(reverse('orders-list', kwargs={'pk': order.user.id}))
