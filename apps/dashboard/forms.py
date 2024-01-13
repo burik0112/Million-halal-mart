@@ -993,16 +993,59 @@ class NewsForm(forms.ModelForm):
     def save(self, commit=True):
         news = super(NewsForm, self).save(commit=False)
 
-        if 'image' in self.files:
-            news.image.delete()  # Delete the old image
-            news.image = self.files['image']  # Assign the new image
+        new_image = self.cleaned_data.get('image', None)
+        if new_image:
+            news.image = new_image
 
         if commit:
             news.save()
+
         return news
 
 
 class NewsEditForm(forms.ModelForm):
+    start_date = forms.DateTimeField(
+        input_formats=["%Y-%m-%d"],  # Adjust the format as needed
+        widget=forms.DateTimeInput(
+            attrs={"type": "datetime-local", "class": "form-control"}),
+        initial=timezone.now(),
+    )
+
+    end_date = forms.DateTimeField(
+        input_formats=["%Y-%m-%d"],  # Adjust the format as needed
+        widget=forms.DateTimeInput(
+            attrs={"type": "datetime-local", "class": "form-control"}),
+        initial=timezone.now(),
+    )
+    description_uz = forms.CharField(
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100}),
+        label="Description (Uzbek)",
+        required=True,
+    )
+
+    description_ru = forms.CharField(
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100}),
+        label="Description (Russian)",
+        required=True,
+    )
+
+    description_en = forms.CharField(
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100}),
+        label="Description (English)",
+        required=True,
+    )
+
+    description_kr = forms.CharField(
+        widget=CKEditorWidget(
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100}),
+        label="Description (Korean)",
+        required=True,
+
+    )
+
     class Meta:
         model = News
         fields = [
@@ -1011,6 +1054,8 @@ class NewsEditForm(forms.ModelForm):
             "title_en",
             "title_kr",
             "image",
+            "start_date",
+            "end_date",
             "description_uz",
             "description_ru",
             "description_en",
@@ -1030,6 +1075,7 @@ class NewsEditForm(forms.ModelForm):
             "description_kr": forms.Textarea(attrs={"class": "form-control"}),
             "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
+
         labels = {
             "title_uz": "Title (Uzbek)",
             "title_ru": "Title (Russian)",
@@ -1040,6 +1086,7 @@ class NewsEditForm(forms.ModelForm):
             "description_en": "Description (English)",
             "description_kr": "Description (Korean)",
         }
+
         required = {
             "title_uz": True,
             "title_ru": True,
@@ -1051,12 +1098,12 @@ class NewsEditForm(forms.ModelForm):
             "description_kr": True,
         }
 
-    def save(self, commit=True):
+    def save(self, commit=False):
         news = super().save(commit=False)
         if not news.start_date:
-            news.start_date = timezone.now()
+            news.start_date = self.cleaned_data['start_date']
         if not news.end_date:
-            news.end_date = timezone.now()
+            news.end_date = self.cleaned_data['end_date']
         if commit:
             news.save()
 
@@ -1352,13 +1399,15 @@ class InformationEditForm(forms.ModelForm):
 
         # Set unchanged fields to their initial values
         for field_name in set(self.fields) - set(changed_fields):
-            setattr(information, field_name, getattr(self.instance, field_name))
+            setattr(information, field_name, getattr(
+                self.instance, field_name))
 
         if commit:
             information.save()
 
         return information
-    
+
+
 class BannerForm(forms.ModelForm):
     class Meta:
         model = Banner

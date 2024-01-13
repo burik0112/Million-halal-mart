@@ -6,10 +6,11 @@ import requests
 import urllib.parse
 import json
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import ListView,DeleteView, DetailView
+from django.views.generic import ListView, DeleteView, DetailView
 from django.views import View
 from .forms import ServiceEditForm, InformationEditForm
-from apps.dashboard.forms import BannerForm
+from apps.dashboard.forms import BannerForm, NewsForm, NewsEditForm
+from apps.customer.models import News
 
 
 def get_env_value(env_variable):
@@ -36,7 +37,7 @@ def dashboard(request):
 
 class InformationView(ListView):
     model = Information
-    template_name = "dashboard/info_list.html"
+    template_name = "dashboard/information/info_list.html"
     context_object_name = "infos"
 
     def get_queryset(self):
@@ -48,7 +49,7 @@ class InformationView(ListView):
 
 
 class InformationEditView(View):
-    template_name = "dashboard/edit_info.html"
+    template_name = "dashboard/information/edit_info.html"
 
     def get(self, request, pk):
         info = get_object_or_404(Information, pk=pk)
@@ -70,7 +71,7 @@ class InformationEditView(View):
 
 class ServiceView(ListView):
     model = Service
-    template_name = "dashboard/service_list.html"
+    template_name = "dashboard/service/service_list.html"
     context_object_name = "services"
 
     def get_queryset(self):
@@ -80,7 +81,6 @@ class ServiceView(ListView):
         context = super().get_context_data(**kwargs)
         return context
 
-from django.urls import reverse_lazy
 
 class BannerView(ListView):
     model = Banner
@@ -89,7 +89,7 @@ class BannerView(ListView):
     form_class = BannerForm
 
     def get_queryset(self):
-        return Banner.objects.all()
+        return Banner.objects.all().order_by('-created')
 
     def get(self, request, *args, **kwargs):
         form = self.form_class()
@@ -103,13 +103,14 @@ class BannerView(ListView):
         else:
             return render(request, self.template_name, {'banners': self.get_queryset(), 'form': form})
 
+
 class BannerActionView(View):
     def post(self, request, *args, **kwargs):
         if 'action' not in request.POST:
             return render(request, 'error.html', {'error_message': 'Action not specified'})
 
         action = request.POST.get('action')
-        
+
         if action == 'toggle':
             # Toggle the active status
             banner = get_object_or_404(Banner, pk=kwargs['pk'])
@@ -121,8 +122,10 @@ class BannerActionView(View):
             banner.delete()
 
         return redirect('banner-list')
+
+
 class ServiceEditView(View):
-    template_name = "dashboard/edit_service.html"
+    template_name = "dashboard/service/edit_service.html"
 
     def get(self, request, pk):
         service = get_object_or_404(Service, pk=pk)
@@ -171,3 +174,64 @@ def bot(order):
         return response.text
     except Exception as e:
         return f"Error: {e}"
+
+
+class NewsListView(ListView):
+    model = News
+    template_name = "dashboard/news/news_list.html"
+    context_object_name = "news"
+
+    def get_queryset(self):
+        return News.objects.all().order_by('-pk')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class NewsCreateView(View):
+    template_name = "dashboard/news/news_create.html"
+
+    def get(self, request):
+        form = NewsForm()
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request):
+        form = NewsForm(request.POST, request.FILES)
+        print(request.FILES)  # Debugging statement
+        if form.is_valid():
+            print(form.cleaned_data)  # Debugging statement
+            form.save()
+            return redirect("news-list")
+        else:
+            print(form.errors)  # Debugging statement
+            return render(request, self.template_name, {"form": form})
+
+
+class NewsEditView(View):
+    template_name = "dashboard/news/edit_delete_news.html"
+
+    def get(self, request, pk):
+        news = get_object_or_404(News, pk=pk)
+        form = NewsEditForm(instance=news)
+        return render(request, self.template_name, {"form": form, "news": news})
+
+    def post(self, request, pk):
+        news = get_object_or_404(News, pk=pk)
+        form = NewsEditForm(request.POST, request.FILES, instance=news)
+
+        if "edit" in request.POST:
+            if form.is_valid():
+                form.save()
+                return redirect("news-list")
+            else:
+                print(form.errors)  # Print errors to console for debugging
+        elif "delete" in request.POST:
+            news = get_object_or_404(News, pk=pk)
+            news.delete()  # Delete the Phone instance
+            return redirect("news-list")  # Redirect to phone list
+
+        # If it's not a valid form or a delete action, render the form with the existing data
+        return render(request, self.template_name, {"form": form, "news": news})
+
+        
