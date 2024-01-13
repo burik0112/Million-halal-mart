@@ -248,48 +248,37 @@
             <span>Dashboard</span>
           </a>
         </li>
-        <!-- End Dashboard Nav -->
 
-        
-        <!-- End Components Nav -->
 
         <li class="nav-item">
-          <a
-            class="nav-link {% if not 'dashboard/product' in request.path  %}collapsed {% else %}active{% endif %} "
-            data-bs-target="#forms-nav"
-            data-bs-toggle="collapse"
-            href="#"
-          >
-            <i class="bi bi-journal-text"></i><span>Mahsulotlar</span
-            ><i class="bi bi-chevron-down ms-auto"></i>
+          <a class="nav-link {% if not 'dashboard/product' in request.path  %}collapsed {% else %}active{% endif %}"
+             data-bs-target="#mahsulotlar-nav"
+             data-bs-toggle="collapse"
+             href="#">
+              <i class="bi bi-journal-text"></i><span style="color: #4154f1;">Mahsulotlar</span>
+              <i class="bi bi-chevron-down ms-auto"></i>
           </a>
-          <ul
-            id="forms-nav"
-            class="nav-content  {% if not 'dashboard/product' in request.path  %}collapse{% endif %}"
-            data-bs-parent="#sidebar-nav"
-          >
-            <li>
-              {% url 'phone_list' as phone_list %}
-              <a class="{% if request.path == phone_list %}active{% endif %}" href="{% url 'phone_list'  %}">
-                <i class="bi bi-circle"></i><span>Mobil qurilmalar</span>
-              </a>
-            </li>
+          <ul id="mahsulotlar-nav" class="nav-content {% if not 'dashboard/product' in request.path  %}collapse{% endif %}"
+              data-bs-parent="#sidebar-nav">
+              <!-- Mahsulotlar section content -->
+              <li>
+                {% url 'good-list' as good_list %}
+                <a  class="{% if request.path == good_list %}active{% endif %}" href="{% url 'good-list' %}">
+                  <i class="bi bi-circle"></i><span>Oziq-ovqat mahsulotlari</span>
+                </a>
+              </li>
+              <li>
+                  {% url 'phone_list' as phone_list %}
+                  <a class="{% if request.path == phone_list %}active{% endif %}" href="{% url 'phone_list'  %}">
+                      <i class="bi bi-circle"></i><span>Mobil qurilmalar</span>
+                  </a>
+              </li>
+
+
             <li>
               {% url 'ticket-list' as ticket_list %}
               <a class="{% if request.path == ticket_list %}active{% endif %}" href="{% url 'ticket-list'  %}">
                 <i class="bi bi-circle"></i><span>Chiptalar</span>
-              </a>
-            </li>
-            <li>
-              {% url 'good-list' as good_list %}
-              <a  class="{% if request.path == good_list %}active{% endif %}" href="{% url 'good-list' %}">
-                <i class="bi bi-circle"></i><span>Oziq-ovqat mahsulotlari</span>
-              </a>
-            </li>
-            <li>  
-              {% url 'news-list' as news_list %}
-              <a class="{% if request.path == news_list %}active{% endif %}" href="{% url 'news-list' %}">
-                <i class="bi bi-circle"></i><span>E'lonlar</span>
               </a>
             </li>
           </ul>
@@ -313,20 +302,46 @@
         </a>
     </li>
         <!-- End Profile Page Nav -->
-
+        
         <li class="nav-item">
-          {% url 'info-list' as info_list %}
-          <a class="nav-link {% if request.path == info_list %}active{% endif %}" href="{% url 'info-list' %}">
-            <i class="bi bi-question-circle"></i>
-            <span>Ma'lumotlar</span>
-          </a>
+    <a class="nav-link {% if not 'dashboard/news' in request.path  %}collapsed {% else %}active{% endif %}"
+       data-bs-target="#qoshimchalar-nav"
+       data-bs-toggle="collapse"
+       href="#">
+        <i class="bi bi-question-circle"></i><span style="color: #4154f1;">Qo'shimchalar</span>
+        <i class="bi bi-chevron-down ms-auto"></i>
+    </a>
+    <ul id="qoshimchalar-nav" class="nav-content collapse {% if 'dashboard/other' in request.path  %}show{% endif %}"
+        data-bs-parent="#sidebar-nav">
+        <!-- Qo'shimchalar section content -->
+        <li>
+            {% url 'info-list' as info_list %}
+            <a class="nav-link {% if request.path == info_list %}active{% endif %}" href="{% url 'info-list' %}">
+                <i class="bi bi-circle"></i><span>Ma'lumotnomalar</span>
+            </a>
         </li>
-        <li class="nav-item">
-          {% url 'service-list' as service_list %}
-          <a class="nav-link {% if request.path == service_list %}active{% endif %}" href="{% url 'service-list' %}">
-            <i class="bi bi-menu-button-wide"></i>
-            <span>Xizmatlar</span>
-          </a>
+
+
+
+            <li>
+              {% url 'service-list' as service_list %}
+              <a class="{% if request.path == service_list %}active{% endif %}" href="{% url 'service-list' %}">
+                <i class="bi bi-circle"></i><span>Xizmatlar</span>
+              </a>
+            </li>
+            <li>
+              {% url 'banner-list' as banner_list %}
+              <a  class="{% if request.path == banner_list %}active{% endif %}" href="{% url 'banner-list' %}">
+                <i class="bi bi-circle"></i><span>Bannerlar</span>
+              </a>
+            </li>
+            <li>  
+              {% url 'news-list' as news_list %}
+              <a class="{% if request.path == news_list %}active{% endif %}" href="{% url 'news-list' %}">
+                <i class="bi bi-circle"></i><span>E'lonlar</span>
+              </a>
+            </li>
+          </ul>
         </li>
         <!-- End F.A.Q Page Nav -->
 
@@ -608,57 +623,63 @@
                 </div>
 
                 <div class="card-body">
-                  <h5 class="card-title">Recent Sales <span>| Today</span></h5>
+                  <h5 class="card-title">Recent Sales </h5>
 
                   <table class="table table-borderless datatable">
                     <thead>
                       <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Customer</th>
-                        <th scope="col">Product</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Status</th>
+                        <th scope="col" class="text-center">#</th>
+                        <th scope="col" class="text-center">Foydalanuvchi</th>
+                        <th scope="col" class="text-center">Sana</th>
+                        <th scope="col" class="text-center">Manzil</th>
+                        <th scope="col" class="text-center">Umumiy narx</th>
+                        <th scope="col" class="text-center">Izoh</th>
+                        <th scope="col" class="text-center">Holati</th>
+                        <th scope="col" class="text-center">Batafsil</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <th scope="row"><a href="#">#2457</a></th>
-                        <td>Brandon Jacob</td>
-                        <td><a href="#" class="text-primary">At praesentium minu</a></td>
-                        <td>$64</td>
-                        <td><span class="badge bg-success">Approved</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2147</a></th>
-                        <td>Bridie Kessler</td>
-                        <td><a href="#" class="text-primary">Blanditiis dolor omnis similique</a></td>
-                        <td>$47</td>
-                        <td><span class="badge bg-warning">Pending</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2049</a></th>
-                        <td>Ashleigh Langosh</td>
-                        <td><a href="#" class="text-primary">At recusandae consectetur</a></td>
-                        <td>$147</td>
-                        <td><span class="badge bg-success">Approved</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2644</a></th>
-                        <td>Angus Grady</td>
-                        <td><a href="#" class="text-primar">Ut voluptatem id earum et</a></td>
-                        <td>$67</td>
-                        <td><span class="badge bg-danger">Rejected</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2644</a></th>
-                        <td>Raheem Lehner</td>
-                        <td><a href="#" class="text-primary">Sunt similique distinctio</a></td>
-                        <td>$165</td>
-                        <td><span class="badge bg-success">Approved</span></td>
-                      </tr>
+                      {% for c in orders %}
+                        <tr>
+                          <th scope="row" class="text-center">{{c.id}}</th>
+                          <th class="text-center">{{c.user.full_name}}</th>
+                          <td class="text-center">
+                            <i class="bi bi-calendar-date"></i> {{ c.created|date:"d-m-Y" }} <br>
+                            <i class="bi bi-clock"></i> {{ c.created|date:"H:i" }}
+                          </td>
+                          <td class="text-center">
+                            {% if c.user.location.exists %}
+                            {{ c.user.location.first.address }}
+                            {% else %}
+                            <span class="text-muted">No location available</span>
+                            {% endif %}
+                            </td>
+                            <td class="text-center">{{c.total_amount}} ₩</td>
+                            <td class="text-center">{{c.comment}}</td>
+                            <td class="text-center">
+                              {% if c.status == "in_cart" %}
+                              <span class="badge bg-warning">Savatchada</span>
+                              {% elif c.status == "pending" %}
+                              <span class="badge bg-warning">Kutilmoqda</span>
+                              {% elif c.status == "approved" %}
+                              <span class="badge bg-primary">To'lov tasdiqlandi</span>
+                              {% elif c.status == "sent" %}
+                              <span class="badge bg-success">Yuborildi</span>
+                              {% elif c.status == "cancelled" %}
+                              <span class="badge bg-danger">Bekor qilindi</span>
+                              {% else %}
+                              <span class="badge bg-secondary">{{ c.status }}</span>
+                              {% endif %}
+                            </td>
+                          <td class="text-center">
+                            <a href="{% url 'user-order-detail' c.id %}">
+                              <i class="bi bi-receipt" style="font-size: 2em;"></i>
+                            </a>
+                          </td>
+                        </tr>
+                  {% endfor %}
                     </tbody>
                   </table>
-
                 </div>
 
               </div>

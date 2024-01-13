@@ -1,13 +1,16 @@
-from apps.merchant.models import Information, Service
+from apps.merchant.models import Information, Service, Order
+from apps.customer.models import Banner, Profile
 from decouple import config
 from django.core.exceptions import ImproperlyConfigured
 import requests
 import urllib.parse
 import json
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import ListView
+from django.views.generic import ListView, DeleteView, DetailView
 from django.views import View
 from .forms import ServiceEditForm, InformationEditForm
+from apps.dashboard.forms import BannerForm, NewsForm, NewsEditForm
+from apps.customer.models import News
 
 
 def get_env_value(env_variable):
@@ -28,13 +31,19 @@ def index(request):
     return render(request, "index.html")
 
 
+from django.db.models import Sum
 def dashboard(request):
-    return render(request, "base.html")
+    orders = Order.objects.all()
+    customers = Profile.objects.all()
+    revenue = round(Order.objects.aggregate(total_amount_sum=Sum('total_amount'))['total_amount_sum']/1000, 2)
+    recent=orders.order_by('-created')[:25]
+    # top_sales=
+    return render(request, "base.html", {'orders': orders, 'customers':customers, 'revenue':revenue, 'recent':recent})
 
 
 class InformationView(ListView):
     model = Information
-    template_name = "dashboard/info_list.html"
+    template_name = "dashboard/information/info_list.html"
     context_object_name = "infos"
 
     def get_queryset(self):
@@ -46,7 +55,7 @@ class InformationView(ListView):
 
 
 class InformationEditView(View):
-    template_name = "dashboard/edit_info.html"
+    template_name = "dashboard/information/edit_info.html"
 
     def get(self, request, pk):
         info = get_object_or_404(Information, pk=pk)
@@ -69,7 +78,7 @@ class InformationEditView(View):
 
 class ServiceView(ListView):
     model = Service
-    template_name = "dashboard/service_list.html"
+    template_name = "dashboard/service/service_list.html"
     context_object_name = "services"
 
     def get_queryset(self):
@@ -80,8 +89,50 @@ class ServiceView(ListView):
         return context
 
 
+class BannerView(ListView):
+    model = Banner
+    template_name = "dashboard/banner.html"
+    context_object_name = "banners"
+    form_class = BannerForm
+
+    def get_queryset(self):
+        return Banner.objects.all().order_by('-created')
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        return render(request, self.template_name, {'banners': self.get_queryset(), 'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('banner-list')
+        else:
+            return render(request, self.template_name, {'banners': self.get_queryset(), 'form': form})
+
+
+class BannerActionView(View):
+    def post(self, request, *args, **kwargs):
+        if 'action' not in request.POST:
+            return render(request, 'error.html', {'error_message': 'Action not specified'})
+
+        action = request.POST.get('action')
+
+        if action == 'toggle':
+            # Toggle the active status
+            banner = get_object_or_404(Banner, pk=kwargs['pk'])
+            banner.active = not banner.active
+            banner.save()
+        elif action == 'delete':
+            # Delete the banner
+            banner = get_object_or_404(Banner, pk=kwargs['pk'])
+            banner.delete()
+
+        return redirect('banner-list')
+
+
 class ServiceEditView(View):
-    template_name = "dashboard/edit_service.html"
+    template_name = "dashboard/service/edit_service.html"
 
     def get(self, request, pk):
         service = get_object_or_404(Service, pk=pk)
@@ -130,3 +181,105 @@ def bot(order):
         return response.text
     except Exception as e:
         return f"Error: {e}"
+
+
+class NewsListView(ListView):
+    model = News
+    template_name = "dashboard/news/news_list.html"
+    context_object_name = "news"
+
+    def get_queryset(self):
+        return News.objects.all().order_by('-pk')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class NewsCreateView(View):
+    template_name = "dashboard/news/news_create.html"
+
+    def get(self, request):
+        form = NewsForm()
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request):
+        form = NewsForm(request.POST, request.FILES)
+        print(request.FILES)  # Debugging statement
+        if form.is_valid():
+            print(form.cleaned_data)  # Debugging statement
+            form.save()
+            return redirect("news-list")
+        else:
+            print(form.errors)  # Debugging statement
+            return render(request, self.template_name, {"form": form})
+
+
+class NewsEditView(View):
+    template_name = "dashboard/news/edit_delete_news.html"
+
+    def get(self, request, pk):
+        news = get_object_or_404(News, pk=pk)
+        form = NewsEditForm(instance=news)
+        return render(request, self.template_name, {"form": form, "news": news})
+
+    def post(self, request, pk):
+        news = get_object_or_404(News, pk=pk)
+        form = NewsEditForm(request.POST, request.FILES, instance=news)
+
+        if "edit" in request.POST:
+            if form.is_valid():
+                form.save()
+                return redirect("news-list")
+            else:
+                print(form.errors)  # Print errors to console for debugging
+        elif "delete" in request.POST:
+            news = get_object_or_404(News, pk=pk)
+            news.delete()  # Delete the Phone instance
+            return redirect("news-list")  # Redirect to phone list
+
+        # If it's not a valid form or a delete action, render the form with the existing data
+        return render(request, self.template_name, {"form": form, "news": news})
+
+
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
+class OrdersView(DetailView):
+    model = Profile
+    template_name = "customer/orders/orders_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(OrdersView, self).get_context_data(**kwargs)
+        user = get_object_or_404(Profile, id=self.kwargs['pk'])
+        orders = Order.objects.filter(user=user)
+
+        if orders:
+            context["orders"] = orders
+            context["user"] = user
+        else:
+            context["no_orders_message"] = "Foydalanuvhi hali buyurtma qilmagan"
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        order_id = self.kwargs['pk']
+        order = get_object_or_404(Order, id=order_id)
+        new_status = request.POST.get('status')
+
+        if new_status in dict(order.STATUS_CHOICES):
+            order.status = new_status
+            order.save()
+
+        return HttpResponseRedirect(reverse('orders-list', kwargs={'pk': order.user.id}))
+
+def update_order_status(request, pk):
+    order = get_object_or_404(Order, id=pk)
+
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        if new_status in dict(order.STATUS_CHOICES):
+            order.status = new_status
+            order.save()
+
+    return HttpResponseRedirect(reverse('orders-list', kwargs={'pk': order.user.id}))

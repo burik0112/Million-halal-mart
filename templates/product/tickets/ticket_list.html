@@ -9,7 +9,7 @@
           <h5 class="card-title">Chiptalar ro'yhati oynasi</h5>
           <a href="{% url 'ticket_create' %}" class="btn btn-success">Chipta yaratish</a>
         </div>
-        <table class="table">
+        <table class="table table-borderless datatable">
           <thead>
             <tr>
               <th scope="col" class="text-center">#</th>
@@ -39,7 +39,7 @@
                   class="bi bi-clock"></i> {{ ticket.event_date|date:"H:i" }}</td>
               <td class="text-center">{{ ticket.product.old_price }} ₩</td>
               <td class="text-center">{{ ticket.product.new_price }} ₩</td>
-              <td class="text-center">{{ ticket.product.available_quantity }}</td>
+              <td class="text-center">{{ ticket.product.available_quantity }} {{ ticket.product.get_measure_display }}</td>
               {% if ticket.product.active %}
               <td class="text-center"><img src="{% static 'assets/img/check.png' %}" height="20" width="20"
                   alt="Mavjud"></td>

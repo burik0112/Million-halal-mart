@@ -31,10 +31,10 @@
                   class="bi bi-clock"></i> {{ good.start_date|date:"H:i" }}</td>
               <td class="text-center"><i class="bi bi-calendar-date"></i> {{ good.end_date|date:"d-m-Y" }} <br> <i
                   class="bi bi-clock"></i> {{ good.end_date|date:"H:i" }}</td>
-              <td class="text-center">{{ good.description_uz|truncatechars:100 }}</td>
+              <td class="text-center">{{ good.description_uz|truncatechars:50|safe }}</td>
               <td class="text-center">
                 <img src="{{ good.image.url }}" alt="{{ good.title }}" width="50" height="50" />
-              </td class="text-center">
+              </td>
               {% if good.active %}
               <td class="text-center"><img src="{% static 'assets/img/check.png' %}" height="20" width="20"
                   alt="Mavjud"></td>

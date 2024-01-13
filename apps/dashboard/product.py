@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView
 from apps.product.models import Phone, Ticket, Good, Category, SubCategory
-from apps.customer.models import News
 from django.views import View
 from django.views.generic.edit import CreateView
 from .forms import (
@@ -15,10 +14,9 @@ from .forms import (
     PhoneEditForm,
     GoodCategoryCreateForm,
     TicketEditForm,
-    NewsForm,
     GoodEditForm,
     GoodMainCategoryCreateForm,
-    NewsEditForm,
+
 )
 
 
@@ -274,54 +272,4 @@ class GoodDeleteView(View):
         return redirect("good-list")  # Redirect to phone list
 
 
-class NewsListView(ListView):
-    model = News
-    template_name = "customer/news/news_list.html"
-    context_object_name = "news"
 
-    def get_queryset(self):
-        return News.objects.all().order_by("-pk")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
-
-
-class NewsCreateView(View):
-    template_name = "customer/news/news_create.html"
-
-    def get(self, request):
-        form = NewsForm()
-        return render(request, self.template_name, {"form": form})
-
-    def post(self, request):
-        form = NewsForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect("news-list")
-        else:
-            return render(request, self.template_name, {"form": form})
-
-
-class NewsEditView(View):
-    template_name = "customer/news/edit_delete_news.html"
-
-    def get(self, request, pk):
-        news = get_object_or_404(News, pk=pk)
-        form = NewsEditForm(instance=news)
-        return render(request, self.template_name, {"form": form, "news": news})
-
-    def post(self, request, pk):
-        news = get_object_or_404(News, pk=pk)
-        form = NewsEditForm(request.POST, request.FILES, instance=news)
-
-        if "edit" in request.POST:
-            if form.is_valid():
-                form.save()
-                return redirect("news-list")
-        elif "delete" in request.POST:
-            print(news, "delete bolyaptimi")
-            news.delete()  # Delete the News instance
-            return redirect("news-list")  # Redirect to news list
-
-        return render(request, self.template_name, {"form": form, "news": news})
