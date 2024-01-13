@@ -90,13 +90,5 @@ urlpatterns = [
 
     path('bot/', index, name='bot'),
 
-    # info
-    path("edit-reminder/<int:pk>/", edit_reminder, name="edit_reminder"),
-    path("edit-agreement/<int:pk>/", edit_agreement, name="edit_agreement"),
-    path("edit-shipment/<int:pk>/", edit_shipment, name="edit_shipment"),
-    path("edit-privacy/<int:pk>/", edit_privacy, name="edit_privacy"),
-    path("edit-about_us/<int:pk>/", edit_aboutus, name="edit_aboutus"),
-    path("edit-support/<int:pk>/", edit_support, name="edit_support"),
-    path("edit-payment/<int:pk>/", edit_payment, name="edit_payment"),
     path("bot/", index, name="bot"),
 ]
