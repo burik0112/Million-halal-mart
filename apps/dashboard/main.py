@@ -1,18 +1,16 @@
 from apps.merchant.models import Information, Service, Order
-from apps.customer.models import Banner, Profile, News
-from apps.product.models import SoldProduct
+from apps.customer.models import Banner, Profile
 from decouple import config
 from django.core.exceptions import ImproperlyConfigured
 import requests
 import urllib.parse
 import json
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DeleteView, DetailView
 from django.views import View
 from .forms import ServiceEditForm, InformationEditForm
 from apps.dashboard.forms import BannerForm, NewsForm, NewsEditForm
-from django.http import HttpResponseRedirect
-from django.urls import reverse
+from apps.customer.models import News
 
 
 def get_env_value(env_variable):
@@ -33,14 +31,8 @@ def index(request):
     return render(request, "index.html")
 
 
-from django.db.models import Sum
 def dashboard(request):
-    orders = Order.objects.all()
-    customers = Profile.objects.all()
-    revenue = round(Order.objects.aggregate(total_amount_sum=Sum('total_amount'))['total_amount_sum']/1000, 2)
-    recent=orders.order_by('-created')[:25]
-    # top_sales=
-    return render(request, "base.html", {'orders': orders, 'customers':customers, 'revenue':revenue, 'recent':recent})
+    return render(request, "base.html")
 
 
 class InformationView(ListView):
@@ -243,6 +235,9 @@ class NewsEditView(View):
         return render(request, self.template_name, {"form": form, "news": news})
 
 
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
 class OrdersView(DetailView):
     model = Profile
     template_name = "customer/orders/orders_list.html"
@@ -270,7 +265,6 @@ class OrdersView(DetailView):
             order.save()
 
         return HttpResponseRedirect(reverse('orders-list', kwargs={'pk': order.user.id}))
-
 
 def update_order_status(request, pk):
     order = get_object_or_404(Order, id=pk)
