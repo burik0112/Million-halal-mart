@@ -31,8 +31,14 @@ def index(request):
     return render(request, "index.html")
 
 
+from django.db.models import Sum
 def dashboard(request):
-    return render(request, "base.html")
+    orders = Order.objects.all()
+    customers = Profile.objects.all()
+    revenue = round(Order.objects.aggregate(total_amount_sum=Sum('total_amount'))['total_amount_sum']/1000, 2)
+    recent=orders.order_by('-created')[:25]
+    # top_sales=
+    return render(request, "base.html", {'orders': orders, 'customers':customers, 'revenue':revenue, 'recent':recent})
 
 
 class InformationView(ListView):
