@@ -628,52 +628,58 @@
                   <table class="table table-borderless datatable">
                     <thead>
                       <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Customer</th>
-                        <th scope="col">Product</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Status</th>
+                        <th scope="col" class="text-center">#</th>
+                        <th scope="col" class="text-center">Foydalanuvchi</th>
+                        <th scope="col" class="text-center">Sana</th>
+                        <th scope="col" class="text-center">Manzil</th>
+                        <th scope="col" class="text-center">Umumiy narx</th>
+                        <th scope="col" class="text-center">Izoh</th>
+                        <th scope="col" class="text-center">Holati</th>
+                        <th scope="col" class="text-center">Batafsil</th>
                       </tr>
                     </thead>
                     <tbody>
+                      {% for c in orders %}
                       <tr>
-                        <th scope="row"><a href="#">#2457</a></th>
-                        <td>Brandon Jacob</td>
-                        <td><a href="#" class="text-primary">At praesentium minu</a></td>
-                        <td>$64</td>
-                        <td><span class="badge bg-success">Approved</span></td>
+                        <th scope="row" class="text-center">{{c.id}}</th>
+                        <th class="text-center">{{c.user.full_name}}</th>
+                        <td class="text-center">
+                          <i class="bi bi-calendar-date"></i> {{ c.created|date:"d-m-Y" }} <br>
+                          <i class="bi bi-clock"></i> {{ c.created|date:"H:i" }}
+                        </td>
+                        <td class="text-center">
+                          {% if c.user.location.exists %}
+                          {{ c.user.location.first.address }}
+                          {% else %}
+                          <span class="text-muted">No location available</span>
+                          {% endif %}
+                        </td>
+                        <td class="text-center">{{c.total_amount}} ₩</td>
+                        <td class="text-center">{{c.comment}}</td>
+                        <td class="text-center">
+                          {% if c.status == "in_cart" %}
+                          <span class="badge bg-warning">Savatchada</span>
+                          {% elif c.status == "pending" %}
+                          <span class="badge bg-warning">Kutilmoqda</span>
+                          {% elif c.status == "approved" %}
+                          <span class="badge bg-primary">To'lov tasdiqlandi</span>
+                          {% elif c.status == "sent" %}
+                          <span class="badge bg-success">Yuborildi</span>
+                          {% elif c.status == "cancelled" %}
+                          <span class="badge bg-danger">Bekor qilindi</span>
+                          {% else %}
+                          <span class="badge bg-secondary">{{ c.status }}</span>
+                          {% endif %}
+                        </td>
+                        <td class="text-center">
+                          <a href="{% url 'user-order-detail' c.id %}">
+                            <i class="bi bi-receipt" style="font-size: 2em;"></i>
+                          </a>
+                        </td>
                       </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2147</a></th>
-                        <td>Bridie Kessler</td>
-                        <td><a href="#" class="text-primary">Blanditiis dolor omnis similique</a></td>
-                        <td>$47</td>
-                        <td><span class="badge bg-warning">Pending</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2049</a></th>
-                        <td>Ashleigh Langosh</td>
-                        <td><a href="#" class="text-primary">At recusandae consectetur</a></td>
-                        <td>$147</td>
-                        <td><span class="badge bg-success">Approved</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2644</a></th>
-                        <td>Angus Grady</td>
-                        <td><a href="#" class="text-primar">Ut voluptatem id earum et</a></td>
-                        <td>$67</td>
-                        <td><span class="badge bg-danger">Rejected</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2644</a></th>
-                        <td>Raheem Lehner</td>
-                        <td><a href="#" class="text-primary">Sunt similique distinctio</a></td>
-                        <td>$165</td>
-                        <td><span class="badge bg-success">Approved</span></td>
-                      </tr>
-                    </tbody>
-                  </table>
-
+                      {% endfor %}
+                        </tbody>
+                      </table>
                 </div>
 
               </div>
