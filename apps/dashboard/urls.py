@@ -18,11 +18,14 @@ from .product import (
     GoodMainCategoryCreateView,
 )
 <<<<<<< HEAD
+<<<<<<< HEAD
 from .users import (UserListView, UserOrdersView,
                     UserOrderDetailView, OrdersListView, BlockActivateUserView)
 from .main import (dashboard, InformationView,
                    InformationEditView, ServiceView, ServiceEditView, BannerView, BannerActionView, NewsCreateView, NewsListView, NewsEditView, OrdersView, update_order_status)
 =======
+=======
+>>>>>>> 9cd1d2acd380b8f633d3423553844cc6a899b8e3
 from .users import (
     UserListView,
     UserOrdersView,
@@ -37,6 +40,9 @@ from .main import (
     ServiceView,
     ServiceEditView,
 )
+<<<<<<< HEAD
+>>>>>>> 9cd1d2acd380b8f633d3423553844cc6a899b8e3
+=======
 >>>>>>> 9cd1d2acd380b8f633d3423553844cc6a899b8e3
 from .bot import index
 
@@ -96,6 +102,7 @@ urlpatterns = [
         name="good_subcategory",
     ),
     path("product/goods/", GoodListView.as_view(), name="good-list"),
+<<<<<<< HEAD
 <<<<<<< HEAD
     path("product/good/edit-delete/<int:pk>/",
          GoodEditDeleteView.as_view(), name='edit-delete-good'),
@@ -157,6 +164,32 @@ urlpatterns = [
         name="block_activate_user",
     ),
     path("orders/", OrdersListView.as_view(), name="orders-list"),
+=======
+    path(
+        "product/good/edit-delete/<int:pk>/",
+        GoodEditDeleteView.as_view(),
+        name="edit-delete-good",
+    ),
+    path("product/good/<int:pk>/delete/", GoodDeleteView.as_view(), name="delete_good"),
+    path("product/news/", NewsListView.as_view(), name="news-list"),
+    path("product/news-create/", NewsCreateView.as_view(), name="news-create"),
+    path(
+        "product/news/edit/<int:pk>/", NewsEditView.as_view(), name="edit_delete_news"
+    ),
+    path("users/", UserListView.as_view(), name="users-list"),
+    path("users/<int:pk>/order", UserOrdersView.as_view(), name="user-orders-list"),
+    path(
+        "users/order-detail/<int:pk>/",
+        UserOrderDetailView.as_view(),
+        name="user-order-detail",
+    ),
+    path(
+        "block_activate_user/<int:pk>/",
+        BlockActivateUserView.as_view(),
+        name="block_activate_user",
+    ),
+    path("orders/", OrdersListView.as_view(), name="orders-list"),
+>>>>>>> 9cd1d2acd380b8f633d3423553844cc6a899b8e3
     path("info/list/", InformationView.as_view(), name="info-list"),
     path("info/edit/<int:pk>/", InformationEditView.as_view(), name="edit_info"),
     # info
@@ -170,5 +203,8 @@ urlpatterns = [
     path("service/list", ServiceView.as_view(), name="service-list"),
     path("service/edit/<int:pk>/", ServiceEditView.as_view(), name="edit_service"),
     path("bot/", index, name="bot"),
+<<<<<<< HEAD
+>>>>>>> 9cd1d2acd380b8f633d3423553844cc6a899b8e3
+=======
 >>>>>>> 9cd1d2acd380b8f633d3423553844cc6a899b8e3
 ]
