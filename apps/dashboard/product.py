@@ -316,7 +316,6 @@ class NewsEditView(View):
         form = NewsEditForm(request.POST, request.FILES, instance=news)
 
         if "edit" in request.POST:
-            print("editga kirdi")
             if form.is_valid():
                 form.save()
                 return redirect("news-list")
