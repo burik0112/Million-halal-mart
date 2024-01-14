@@ -56,7 +56,7 @@ class ProductItem(TimeStampedModel, models.Model):
     def sale(self):
         """Agar yangi narx eski narxdan past bo'lsa, foizni qaytaradi."""
         if self.old_price and self.new_price < self.old_price:
-            return round((1 - self.new_price / self.old_price) * 100)
+            return round(abs(1 - self.new_price / self.old_price) * 100)
         return 0
 
     def __str__(self) -> str:

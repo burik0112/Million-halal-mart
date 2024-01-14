@@ -145,7 +145,7 @@ class TicketsOnSaleListView(ListAPIView):
 
     def get_queryset(self):
         queryset = Ticket.objects.filter(
-            Q(product__bonus__gt=0) | Q(product__stock__gt=0)
+            Q(product__sale__gt=0) 
         )
         return queryset
 
@@ -156,7 +156,7 @@ class PhonesOnSaleListView(ListAPIView):
 
     def get_queryset(self):
         queryset = Phone.objects.filter(
-            Q(product__bonus__gt=0) | Q(product__stock__gt=0)
+            Q(product__sale__gt=0) 
         )
         return queryset
 
