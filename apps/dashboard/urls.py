@@ -124,7 +124,6 @@ urlpatterns = [
 
     path('bot/', index, name='bot'),
 
-    path("bot/", index, name="bot"),
     path("info/list/", InformationView.as_view(), name="info-list"),
     path("info/edit/<int:pk>/", InformationEditView.as_view(), name="edit_info"),
     # info
