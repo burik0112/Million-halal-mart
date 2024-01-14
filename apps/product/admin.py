@@ -48,7 +48,7 @@ admin.site.register(Good, GoodAdmin)
 
 
 class ImageAdmin(admin.ModelAdmin):
-    list_display = ["image", "name", "product"]
+    list_display = ["id","image", "name", "product"]
 
 
 admin.site.register(Image, ImageAdmin)
