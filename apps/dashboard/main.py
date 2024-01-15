@@ -1,16 +1,24 @@
+from django.urls import reverse
+from django.http import HttpResponseRedirect
+from django.db.models import Sum
 from apps.merchant.models import Information, Service, Order
 from apps.customer.models import Banner, Profile
+from apps.product.models import SoldProduct, ProductItem, Ticket, Good, Phone
 from decouple import config
 from django.core.exceptions import ImproperlyConfigured
 import requests
 import urllib.parse
 import json
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import ListView, DeleteView, DetailView
+from django.views.generic import ListView, DetailView
 from django.views import View
 from .forms import ServiceEditForm, InformationEditForm
 from apps.dashboard.forms import BannerForm, NewsForm, NewsEditForm
 from apps.customer.models import News
+from datetime import date
+from .users import UserOrderDetailView
+from django.db.models import Q
+from datetime import timedelta
 
 
 def get_env_value(env_variable):
@@ -31,14 +39,95 @@ def index(request):
     return render(request, "index.html")
 
 
-from django.db.models import Sum
 def dashboard(request):
+    today = date.today()
     orders = Order.objects.all()
+    order_today = Order.objects.filter(
+        Q(created__date=today) & Q(status='sent'))
     customers = Profile.objects.all()
-    revenue = round(Order.objects.aggregate(total_amount_sum=Sum('total_amount'))['total_amount_sum']/1000, 2)
-    recent=orders.order_by('-created')[:25]
-    # top_sales=
-    return render(request, "base.html", {'orders': orders, 'customers':customers, 'revenue':revenue, 'recent':recent})
+    customers_today_count = Profile.objects.filter(created__date=today).count()
+    revenue = round(Order.objects.filter(status='sent').aggregate(
+        total_amount_sum=Sum('total_amount'))['total_amount_sum']/1000, 2)
+
+    revenue_today = Order.objects.filter(Q(created__date=today) & Q(status='sent')).aggregate(
+        total_amount_sum=Sum('total_amount'))['total_amount_sum']
+    revenue_today = revenue_today / 1000 if revenue_today else 0.0
+    revenue_today = round(revenue_today, 2)
+
+    recent = orders.order_by('-created')[:25]
+    from collections import defaultdict
+
+    top_selling_products = SoldProduct.objects.all()
+    data = defaultdict(list)
+
+    for i in top_selling_products:
+        product_item = i.product
+        item_data = {
+            'quantity': i.quantity,
+            'revenue': product_item.new_price * i.quantity if product_item.new_price else product_item.old_price * i.quantity
+        }
+
+        if hasattr(product_item, 'tickets'):
+            t = Ticket.objects.get(product_id=product_item.pk)
+            item_data.update({
+                'title': t.event_name,
+                'price': product_item.new_price if product_item.new_price else product_item.old_price,
+                'image': get_first_image_url(product_item),
+            })
+
+            existing_item = next(
+                (item for item in data['tickets'] if item['title'] == t.event_name), None)
+            if existing_item:
+                existing_item['quantity'] += i.quantity
+                existing_item['revenue'] += item_data['revenue']
+            else:
+                data['tickets'].append(item_data)
+
+        elif hasattr(product_item, 'phones'):
+            p = Phone.objects.get(id=product_item.pk)
+            item_data.update({
+                'title': p.model_name,
+                'price': product_item.new_price if product_item.new_price else product_item.old_price,
+                'image': get_first_image_url(product_item),
+            })
+
+            existing_item = next(
+                (item for item in data['phones'] if item['title'] == p.model_name), None)
+            if existing_item:
+                existing_item['quantity'] += i.quantity
+                existing_item['revenue'] += item_data['revenue']
+            else:
+                data['phones'].append(item_data)
+
+        elif hasattr(product_item, 'goods'):
+            g = Good.objects.get(id=product_item.pk)
+            item_data.update({
+                'title': g.name,
+                'price': product_item.new_price if product_item.new_price else product_item.old_price,
+                'image': get_first_image_url(product_item),
+            })
+
+            existing_item = next(
+                (item for item in data['goods'] if item['title'] == g.name), None)
+            if existing_item:
+                existing_item['quantity'] += i.quantity
+                existing_item['revenue'] += item_data['revenue']
+            else:
+                data['goods'].append(item_data)
+
+        else:
+            print("This ProductItem is not associated with any specific type.")
+
+        product_item.available_quantity += i.quantity
+        product_item.save() 
+
+
+    return render(request, "base.html", {'top_products': top_selling_products, 'customers_today': customers_today_count, 'orders': orders, 'customers': customers, 'revenue': revenue, 'recent': recent, 'order_today': order_today, 'revenue_today': revenue_today, 'data': data})
+
+
+def get_first_image_url(product_item):
+    first_image = product_item.images.first()
+    return first_image.image.url if first_image else None
 
 
 class InformationView(ListView):
@@ -72,8 +161,6 @@ class InformationEditView(View):
             return redirect("info-list")
 
         return render(request, self.template_name, {"form": form, "info": info})
-
-
 
 
 class ServiceView(ListView):
@@ -242,9 +329,6 @@ class NewsEditView(View):
         return render(request, self.template_name, {"form": form, "news": news})
 
 
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-
 class OrdersView(DetailView):
     model = Profile
     template_name = "customer/orders/orders_list.html"
@@ -272,6 +356,7 @@ class OrdersView(DetailView):
             order.save()
 
         return HttpResponseRedirect(reverse('orders-list', kwargs={'pk': order.user.id}))
+
 
 def update_order_status(request, pk):
     order = get_object_or_404(Order, id=pk)

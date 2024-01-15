@@ -6,7 +6,6 @@ from django.views import View
 from django.views.generic.edit import CreateView
 from .forms import (
     PhoneProductItemForm,
-    NewsForm,
     TicketProductItemForm,
     GoodProductItemForm,
     PhoneCategoryCreateForm,
