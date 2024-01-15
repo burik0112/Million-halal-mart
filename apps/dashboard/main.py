@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.db.models import Sum
 from apps.merchant.models import Information, Service, Order
 from apps.customer.models import Banner, Profile
-from apps.product.models import SoldProduct, ProductItem, Ticket, Good, Phone
+from apps.product.models import SoldProduct, Ticket, Good, Phone, ProductItem
 from decouple import config
 from django.core.exceptions import ImproperlyConfigured
 import requests
@@ -16,10 +16,11 @@ from .forms import ServiceEditForm, InformationEditForm
 from apps.dashboard.forms import BannerForm, NewsForm, NewsEditForm
 from apps.customer.models import News
 from datetime import date
-from .users import UserOrderDetailView
 from django.db.models import Q
-from datetime import timedelta
-
+from collections import defaultdict
+from django.db.models import Sum
+from django.db.models.functions import Coalesce
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField
 
 def get_env_value(env_variable):
     try:
@@ -55,11 +56,11 @@ def dashboard(request):
     revenue_today = round(revenue_today, 2)
 
     recent = orders.order_by('-created')[:25]
-    from collections import defaultdict
 
     top_selling_products = SoldProduct.objects.all()
     data = defaultdict(list)
 
+    
     for i in top_selling_products:
         product_item = i.product
         item_data = {
@@ -119,10 +120,33 @@ def dashboard(request):
             print("This ProductItem is not associated with any specific type.")
 
         product_item.available_quantity += i.quantity
-        product_item.save() 
+        product_item.save()
 
+    comments=[]
+    for o in orders.order_by('-created'):
+        com={}
+        if len(o.comment)>0 and o.id not in com:
+            com['id']=o.id
+            com["user"]=o.user.full_name
+            com["date"]=o.created
+            com["comment"]=o.comment
+        comments.append(com)
+    most_expensive = []
+    for order in orders.filter(status='sent').order_by('-total_amount')[:5]:
+        order_info = {
+            'id': order.id,
+            'user': order.user.full_name,
+            'price': round(order.total_amount / 1000, 2),
+        }
+        most_expensive.append(order_info)
 
-    return render(request, "base.html", {'top_products': top_selling_products, 'customers_today': customers_today_count, 'orders': orders, 'customers': customers, 'revenue': revenue, 'recent': recent, 'order_today': order_today, 'revenue_today': revenue_today, 'data': data})
+    products_with_quantity = (
+    Good.objects.filter(product__available_quantity__lt=50)
+    .values('name_uz', 'product__available_quantity')
+    .order_by('-product__available_quantity')[:10]
+    )
+    print(products_with_quantity)
+    return render(request, "base.html", {'products_with_quantity':products_with_quantity,'most_expensive':most_expensive,'comments':comments,'top_products': top_selling_products, 'customers_today': customers_today_count, 'orders': orders, 'customers': customers, 'revenue': revenue, 'recent': recent, 'order_today': order_today, 'revenue_today': revenue_today, 'data': data})
 
 
 def get_first_image_url(product_item):
