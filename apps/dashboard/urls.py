@@ -16,6 +16,13 @@ from .product import (
     GoodEditDeleteView,
     GoodDeleteView,
     GoodMainCategoryCreateView,
+    CategoryCreateView,
+    CategoryListView,
+    CategoryEditView,
+    CategoryDeleteView,
+    SubCategoryListView,
+    SubCategoryEditView,
+    SubCategoryDeleteView,
 )
 
 from .users import (UserListView, UserOrdersView,
@@ -43,6 +50,14 @@ from .information import (
 
 urlpatterns = [
     path("", dashboard, name="dashboard"),
+    path("product/category/create/", CategoryCreateView.as_view(), name='category-create'),
+    path("product/category/list/", CategoryListView.as_view(), name='category-list'),
+    path('product/category/edit/<int:pk>/', CategoryEditView.as_view(), name='category-edit'),
+    path('product/category/<int:pk>/detelet', CategoryDeleteView.as_view(), name='category-delete'),
+    path("product/subcategory/list/", SubCategoryListView.as_view(), name='subcategory-list'),
+    path('product/subcategory/edit/<int:pk>/', SubCategoryEditView.as_view(), name='subcategory-edit'),
+    path('product/subcategory/<int:pk>/detelet', SubCategoryDeleteView.as_view(), name='subcategory-delete'),
+
     path("product/create-phone/", PhoneCreateView.as_view(), name="create_phone"),
     path(
         "product/phone-category/",
@@ -123,9 +138,6 @@ urlpatterns = [
          update_order_status, name='update-order-status'),
 
     path('bot/', index, name='bot'),
-
-    path("info/list/", InformationView.as_view(), name="info-list"),
-    path("info/edit/<int:pk>/", InformationEditView.as_view(), name="edit_info"),
     # info
     path("edit-reminder/<int:pk>/", edit_reminder, name="edit_reminder"),
     path("edit-agreement/<int:pk>/", edit_agreement, name="edit_agreement"),
@@ -134,7 +146,4 @@ urlpatterns = [
     path("edit-about_us/<int:pk>/", edit_aboutus, name="edit_aboutus"),
     path("edit-support/<int:pk>/", edit_support, name="edit_support"),
     path("edit-payment/<int:pk>/", edit_payment, name="edit_payment"),
-    path("service/list", ServiceView.as_view(), name="service-list"),
-    path("service/edit/<int:pk>/", ServiceEditView.as_view(), name="edit_service"),
-    path("bot/", index, name="bot"),
 ]

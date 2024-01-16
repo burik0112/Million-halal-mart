@@ -407,12 +407,6 @@ class TicketProductItemForm(forms.ModelForm):
     available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
     )
-    # stock = forms.IntegerField(
-    #     widget=forms.NumberInput(attrs={"class": "form-control"}), initial=0
-    # )
-    # bonus = forms.IntegerField(
-    #     widget=forms.NumberInput(attrs={"class": "form-control"}), initial=0
-    # )
     active = forms.BooleanField(
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}), initial=True
     )
@@ -1707,3 +1701,138 @@ class BannerForm(forms.ModelForm):
             'image': forms.FileInput(attrs={'class': 'form-control'}),
             'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+class CategoryEditForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['main_type',"name_uz", "name_ru", "name_en", "name_kr", "image", "active", "desc_uz", "desc_ru", "desc_en", "desc_kr"]
+        widgets = {
+            'main_type': forms.Select(attrs={'class': 'form-control'}),
+            "name_uz": forms.TextInput(attrs={"class": "form-control"}),
+            "name_ru": forms.TextInput(attrs={"class": "form-control"}),
+            "name_en": forms.TextInput(attrs={"class": "form-control"}),
+            "name_kr": forms.TextInput(attrs={"class": "form-control"}),
+            "desc_uz": forms.TextInput(attrs={"class": "form-control"}),
+            "desc_ru": forms.TextInput(attrs={"class": "form-control"}),
+            "desc_en": forms.TextInput(attrs={"class": "form-control"}),
+            "desc_kr": forms.TextInput(attrs={"class": "form-control"}),
+            "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+        labels = {
+            "name_uz": "Name (Uzbek)",
+            "name_ru": "Name (Russian)",
+            "name_en": "Name (English)",
+            "name_kr": "Name (Korean)",
+            "desc_uz": "Description (Uzbek)",
+            "desc_ru": "Description (Russian)",
+            "desc_en": "Description (English)",
+            "desc_kr": "Description (Korean)",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(CategoryEditForm, self).__init__(*args, **kwargs)
+        if self.instance:
+            self.fields["main_type"].initial = self.instance.main_type
+            self.fields["name_uz"].initial = self.instance.name_uz
+            self.fields["name_ru"].initial = self.instance.name_ru
+            self.fields["name_en"].initial = self.instance.name_en
+            self.fields["name_kr"].initial = self.instance.name_kr
+            self.fields["desc_uz"].initial = self.instance.desc_uz
+            self.fields["desc_ru"].initial = self.instance.desc_ru
+            self.fields["desc_en"].initial = self.instance.desc_en
+            self.fields["desc_kr"].initial = self.instance.name_kr
+            self.fields["image"].initial = self.instance.image
+            self.fields["active"].initial = self.instance.active
+
+class SubCategoryEditForm(forms.ModelForm):
+    class Meta:
+        model = SubCategory
+        fields = ["name_uz", "name_ru", "name_en", "name_kr", "image", "active", "desc_uz", "desc_ru", "desc_en", "desc_kr"]
+        widgets = {
+            "name_uz": forms.TextInput(attrs={"class": "form-control"}),
+            "name_ru": forms.TextInput(attrs={"class": "form-control"}),
+            "name_en": forms.TextInput(attrs={"class": "form-control"}),
+            "name_kr": forms.TextInput(attrs={"class": "form-control"}),
+            "desc_uz": forms.TextInput(attrs={"class": "form-control"}),
+            "desc_ru": forms.TextInput(attrs={"class": "form-control"}),
+            "desc_en": forms.TextInput(attrs={"class": "form-control"}),
+            "desc_kr": forms.TextInput(attrs={"class": "form-control"}),
+            "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+        labels = {
+            "name_uz": "Name (Uzbek)",
+            "name_ru": "Name (Russian)",
+            "name_en": "Name (English)",
+            "name_kr": "Name (Korean)",
+            "desc_uz": "Description (Uzbek)",
+            "desc_ru": "Description (Russian)",
+            "desc_en": "Description (English)",
+            "desc_kr": "Description (Korean)",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(SubCategoryEditForm, self).__init__(*args, **kwargs)
+        if self.instance:
+            self.fields["name_uz"].initial = self.instance.name_uz
+            self.fields["name_ru"].initial = self.instance.name_ru
+            self.fields["name_en"].initial = self.instance.name_en
+            self.fields["name_kr"].initial = self.instance.name_kr
+            self.fields["desc_uz"].initial = self.instance.desc_uz
+            self.fields["desc_ru"].initial = self.instance.desc_ru
+            self.fields["desc_en"].initial = self.instance.desc_en
+            self.fields["desc_kr"].initial = self.instance.desc_kr
+            self.fields["image"].initial = self.instance.image
+            self.fields["active"].initial = self.instance.active
+
+class CategoryCreateForm(forms.ModelForm):
+
+    class Meta:
+        model = Category
+        fields = [
+            'main_type',
+            "name_uz",
+            "name_ru",
+            "name_en",
+            "name_kr",
+            "image",
+            "active",
+        ]
+        widgets = {
+            'main_type': forms.Select(attrs={'class': 'form-control'}),
+            "name_uz": forms.TextInput(attrs={"class": "form-control"}),
+            "name_ru": forms.TextInput(attrs={"class": "form-control"}),
+            "name_en": forms.TextInput(attrs={"class": "form-control"}),
+            "name_kr": forms.TextInput(attrs={"class": "form-control"}),
+            "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+        labels = {
+            "name_uz": "Name (Uzbek)",
+            "name_ru": "Name (Russian)",
+            "name_en": "Name (English)",
+            "name_kr": "Name (Korean)",
+        }
+        required = {
+            "name_uz": True,
+            "name_ru": True,
+            "name_en": True,
+            "name_kr": True,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(CategoryCreateForm, self).__init__(*args, **kwargs)
+
+        # Set required attribute for each field
+        self.fields["name_uz"].required = True
+        self.fields["name_ru"].required = True
+        self.fields["name_en"].required = True
+        self.fields["name_kr"].required = True
+
+    def save(self, commit=True):
+        instance = super(CategoryCreateForm, self).save(commit=False)
+
+        if commit:
+            instance.save()
+        return instance

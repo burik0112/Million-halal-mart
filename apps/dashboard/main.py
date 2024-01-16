@@ -19,8 +19,7 @@ from datetime import date
 from django.db.models import Q
 from collections import defaultdict
 from django.db.models import Sum
-from django.db.models.functions import Coalesce
-from django.db.models import Sum, F, ExpressionWrapper, DecimalField
+from django.db.models import Sum
 
 def get_env_value(env_variable):
     try:
@@ -47,8 +46,11 @@ def dashboard(request):
         Q(created__date=today) & Q(status='sent'))
     customers = Profile.objects.all()
     customers_today_count = Profile.objects.filter(created__date=today).count()
-    revenue = round(Order.objects.filter(status='sent').aggregate(
-        total_amount_sum=Sum('total_amount'))['total_amount_sum']/1000, 2)
+
+    revenue = Order.objects.filter(status='sent').aggregate(
+        total_amount_sum=Sum('total_amount'))['total_amount_sum']
+    revenue = revenue/1000 if revenue else 0.0
+    revenue=round(revenue, 2)
 
     revenue_today = Order.objects.filter(Q(created__date=today) & Q(status='sent')).aggregate(
         total_amount_sum=Sum('total_amount'))['total_amount_sum']
@@ -145,7 +147,6 @@ def dashboard(request):
     .values('name_uz', 'product__available_quantity')
     .order_by('-product__available_quantity')[:10]
     )
-    print(products_with_quantity)
     return render(request, "base.html", {'products_with_quantity':products_with_quantity,'most_expensive':most_expensive,'comments':comments,'top_products': top_selling_products, 'customers_today': customers_today_count, 'orders': orders, 'customers': customers, 'revenue': revenue, 'recent': recent, 'order_today': order_today, 'revenue_today': revenue_today, 'data': data})
 
 

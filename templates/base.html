@@ -172,6 +172,18 @@
               data-bs-parent="#sidebar-nav">
               <!-- Mahsulotlar section content -->
               <li>
+                {% url 'category-list' as category_list %}
+                <a  class="{% if request.path == category_list %}active{% endif %}" href="{% url 'category-list' %}">
+                  <i class="bi bi-circle"></i><span>Bosh kategoriyalar</span>
+                </a>
+              </li>
+              <li>
+                {% url 'subcategory-list' as subcategory_list %}
+                <a  class="{% if request.path == subcategory_list %}active{% endif %}" href="{% url 'subcategory-list' %}">
+                  <i class="bi bi-circle"></i><span>Quyi kategoriyalar</span>
+                </a>
+              </li>
+              <li>
                 {% url 'good-list' as good_list %}
                 <a  class="{% if request.path == good_list %}active{% endif %}" href="{% url 'good-list' %}">
                   <i class="bi bi-circle"></i><span>Oziq-ovqat mahsulotlari</span>

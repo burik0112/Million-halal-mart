@@ -15,6 +15,9 @@ from .forms import (
     TicketEditForm,
     GoodEditForm,
     GoodMainCategoryCreateForm,
+    CategoryEditForm,
+    SubCategoryEditForm,
+    CategoryCreateForm,
 
 )
 
@@ -270,5 +273,90 @@ class GoodDeleteView(View):
         product_item.delete()  # Delete the associated ProductItem
         return redirect("good-list")  # Redirect to phone list
 
+class CategoryCreateView(CreateView):
+    model = Category
+    form_class = CategoryCreateForm
+    template_name = "product/category_create.html"
+    success_url = reverse_lazy("category-list")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["action"] = "Create New Good Category"
+        return context
 
+    def form_valid(self, form):
+        return super().form_valid(form)
+    
+class CategoryListView(ListView):
+    model = Category
+    template_name = "product/category_list.html"  # your template name
+    context_object_name = "categories"
+
+    def get_queryset(self):
+        return Category.objects.all().order_by("pk")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+    
+class CategoryEditView(View):
+    template_name = "product/category_edit.html"
+
+    def get(self, request, pk):
+        category = get_object_or_404(Category, pk=pk)
+        form = CategoryEditForm(instance=category)
+        return render(
+            request,
+            self.template_name,
+            {"form": form, "category": category},
+        )
+
+    def post(self, request, pk):
+        category = get_object_or_404(Category, pk=pk)
+        form = CategoryEditForm(request.POST, request.FILES, instance=category)
+        if form.is_valid():
+            form.save()
+            return redirect("category-list")
+        return render(request, self.template_name, {"form": form, "category": category})
+class CategoryDeleteView(View):
+    def post(self, request, pk):
+        category = get_object_or_404(Category, pk=pk)
+        category.delete()  # Delete the Phone instance
+        return redirect("category-list")  # Redirect to phone list
+    
+class SubCategoryListView(ListView):
+    model = SubCategory
+    template_name = "product/goods/subcategory_list.html"  # your template name
+    context_object_name = "subcategories"
+
+    def get_queryset(self):
+        return SubCategory.objects.all().order_by("pk")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+    
+class SubCategoryEditView(View):
+    template_name = "product/goods/subcategory_edit.html"
+
+    def get(self, request, pk):
+        subcategory = get_object_or_404(SubCategory, pk=pk)
+        form = SubCategoryEditForm(instance=subcategory)
+        return render(
+            request,
+            self.template_name,
+            {"form": form, "subcategory": subcategory},
+        )
+
+    def post(self, request, pk):
+        subcategory = get_object_or_404(SubCategory, pk=pk)
+        form = SubCategoryEditForm(request.POST, request.FILES, instance=subcategory)
+        if form.is_valid():
+            form.save()
+            return redirect("subcategory-list")
+        return render(request, self.template_name, {"form": form, "subcategory": subcategory})
+class SubCategoryDeleteView(View):
+    def post(self, request, pk):
+        subcategory = get_object_or_404(SubCategory, pk=pk)
+        subcategory.delete()  # Delete the Phone instance
+        return redirect("subcategory-list")  # Redirect to phone list
