@@ -110,8 +110,8 @@ urlpatterns = [
 
     path("product/news/", NewsListView.as_view(), name="news-list"),
     path("product/news-create/", NewsCreateView.as_view(), name="news-create"),
-    path('product/news/edit/<int:pk>/',
-         NewsEditView.as_view(), name='edit_delete_news'),
+    # path('product/news/edit/<int:pk>/',
+    #      NewsEditView.as_view(), name='edit_delete_news'),
 
     path("users/", UserListView.as_view(), name="users-list"),
     path("users/<int:pk>/order", UserOrdersView.as_view(), name="user-orders-list"),

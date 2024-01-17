@@ -338,10 +338,10 @@ class NewsEditView(View):
                 return redirect("news-list")
             else:
                 print(form.errors)  # Print errors to console for debugging
-        elif "delete" in request.POST:
+        if "delete" in request.POST:
             news = get_object_or_404(News, pk=pk)
-            news.delete()  # Delete the Phone instance
-            return redirect("news-list")  # Redirect to phone list
+            news.delete()
+            return redirect("news-list")
 
         # If it's not a valid form or a delete action, render the form with the existing data
         return render(request, self.template_name, {"form": form, "news": news})
