@@ -124,15 +124,7 @@ def dashboard(request):
         product_item.available_quantity += i.quantity
         product_item.save()
 
-    comments=[]
-    # for o in orders.order_by('-created'):
-    #     com={}
-    #     if o.comment and o.id not in com:
-    #         com['id']=o.id
-    #         com["user"]=o.user.full_name
-    #         com["date"]=o.created
-    #         com["comment"]=o.comment
-    #     comments.append(com)
+    
     orders_with_comments = Order.objects.exclude(comment='')
     most_expensive = []
     for order in orders.filter(status='sent').order_by('-total_amount')[:5]:
