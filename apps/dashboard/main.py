@@ -125,14 +125,15 @@ def dashboard(request):
         product_item.save()
 
     comments=[]
-    for o in orders.order_by('-created'):
-        com={}
-        if len(o.comment)>0 and o.id not in com:
-            com['id']=o.id
-            com["user"]=o.user.full_name
-            com["date"]=o.created
-            com["comment"]=o.comment
-        comments.append(com)
+    # for o in orders.order_by('-created'):
+    #     com={}
+    #     if o.comment and o.id not in com:
+    #         com['id']=o.id
+    #         com["user"]=o.user.full_name
+    #         com["date"]=o.created
+    #         com["comment"]=o.comment
+    #     comments.append(com)
+    orders_with_comments = Order.objects.exclude(comment='')
     most_expensive = []
     for order in orders.filter(status='sent').order_by('-total_amount')[:5]:
         order_info = {
@@ -147,7 +148,7 @@ def dashboard(request):
     .values('name_uz', 'product__available_quantity')
     .order_by('-product__available_quantity')[:10]
     )
-    return render(request, "base.html", {'products_with_quantity':products_with_quantity,'most_expensive':most_expensive,'comments':comments,'top_products': top_selling_products, 'customers_today': customers_today_count, 'orders': orders, 'customers': customers, 'revenue': revenue, 'recent': recent, 'order_today': order_today, 'revenue_today': revenue_today, 'data': data})
+    return render(request, "base.html", {'products_with_quantity':products_with_quantity,'most_expensive':most_expensive,'comments':orders_with_comments,'top_products': top_selling_products, 'customers_today': customers_today_count, 'orders': orders, 'customers': customers, 'revenue': revenue, 'recent': recent, 'order_today': order_today, 'revenue_today': revenue_today, 'data': data})
 
 
 def get_first_image_url(product_item):
