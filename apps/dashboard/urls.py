@@ -20,9 +20,10 @@ from .product import (
     CategoryListView,
     CategoryEditView,
     CategoryDeleteView,
+    SubCategoryCreateView,
     SubCategoryListView,
     SubCategoryEditView,
-    SubCategoryDeleteView,
+    SubCategoryDeleteView
 )
 
 from .users import (UserListView, UserOrdersView,
@@ -54,6 +55,7 @@ urlpatterns = [
     path("product/category/list/", CategoryListView.as_view(), name='category-list'),
     path('product/category/edit/<int:pk>/', CategoryEditView.as_view(), name='category-edit'),
     path('product/category/<int:pk>/detelet', CategoryDeleteView.as_view(), name='category-delete'),
+    path("product/subcategory/create/", SubCategoryCreateView.as_view(), name='subcategory-create'),
     path("product/subcategory/list/", SubCategoryListView.as_view(), name='subcategory-list'),
     path('product/subcategory/edit/<int:pk>/', SubCategoryEditView.as_view(), name='subcategory-edit'),
     path('product/subcategory/<int:pk>/detelet', SubCategoryDeleteView.as_view(), name='subcategory-delete'),

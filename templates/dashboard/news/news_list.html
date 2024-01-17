@@ -33,8 +33,13 @@
                   class="bi bi-clock"></i> {{ good.end_date|date:"H:i" }}</td>
               <td class="text-center">{{ good.description_uz|truncatechars:50|safe }}</td>
               <td class="text-center">
-                <img src="{{ good.image.url }}" alt="{{ good.title }}" width="50" height="50" />
-              </td>
+                {% if good.image %}
+                    <img src="{{ good.image.url }}" alt="{{ good.title }}" width="50" height="50" />
+                {% else %}
+                    <img src="{% static 'assets/img/no_image.png' %}" alt="No Image" width="50" height="50" />
+                {% endif %}
+            </td>
+            
               {% if good.active %}
               <td class="text-center"><img src="{% static 'assets/img/check.png' %}" height="20" width="20"
                   alt="Mavjud"></td>
