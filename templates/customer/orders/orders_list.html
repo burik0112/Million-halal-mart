@@ -46,23 +46,29 @@
                     <td class="text-center">{{c.comment}}</td>
                     <td class="text-center">
                       <form method="post" action="{% url 'update-order-status' c.id %}">
-                          {% csrf_token %}
-                          <div class="input-group">
-                              <select name="status" class="form-select" style="color:white; background-color: 
-                                  {% if c.status == 'in_cart' %}gray;
-                                  {% elif c.status == 'cancelled' %}red;
-                                  {% elif c.status == 'pending' %}orange;
-                                  {% elif c.status == 'approved' %}blue;
-                                  {% elif c.status == 'sent' %}green;
-                                  {% endif %}" onchange="this.form.submit()">
-                                  {% for choice_value, choice_label in c.STATUS_CHOICES %}
-                                      <option style="color: white;" value="{{ choice_value }}" {% if c.status == choice_value %}selected{% endif %}>
-                                          {{ choice_label }}
-                                      </option>
-                                  {% endfor %}
-                              </select>
-                          </div>
-                      </form>
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <select name="status" class="form-select" style="color:white; background-color: 
+                                {% if c.status == 'in_cart' %}gray;
+                                {% elif c.status == 'cancelled' %}red;
+                                {% elif c.status == 'pending' %}orange;
+                                {% elif c.status == 'approved' %}blue;
+                                {% elif c.status == 'sent' %}green;
+                                {% endif %}" onchange="this.form.submit()">
+                                
+                                <optgroup label="Buyurtma holati">
+                                    {% for choice_value, choice_label in c.STATUS_CHOICES %}
+                                        {% if choice_value != 'in_cart' %}
+                                            <option style="color: white;" value="{{ choice_value }}" {% if c.status == choice_value %}selected{% endif %}>
+                                                {{ choice_label }}
+                                            </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </optgroup>
+                                
+                            </select>
+                        </div>
+                    </form>
                   </td>
                     <td class="text-center">
                       <a href="{% url 'user-order-detail' c.id %}">

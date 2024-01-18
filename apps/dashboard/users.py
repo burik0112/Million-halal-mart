@@ -6,7 +6,8 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 from django.views.generic import ListView
 from django.db.models import Subquery, OuterRef
-
+from django.urls import reverse
+from django.http import HttpResponseRedirect
 
 class UserListView(ListView):
     model = Profile
@@ -133,3 +134,14 @@ class OrdersListView(ListView):
 
     def get_queryset(self):
         return Order.objects.all().order_by('-created')
+
+def update_order_status(request, pk):
+    order = get_object_or_404(Order, id=pk)
+
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        if new_status in dict(order.STATUS_CHOICES):
+            order.status = new_status
+            order.save()
+
+    return HttpResponseRedirect(reverse('all-orders-list'))
