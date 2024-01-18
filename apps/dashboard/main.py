@@ -124,7 +124,7 @@ def dashboard(request):
         product_item.available_quantity += i.quantity
         product_item.save()
 
-    
+    print(data)
     orders_with_comments = Order.objects.exclude(comment='')
     most_expensive = []
     for order in orders.filter(status='sent').order_by('-total_amount')[:5]:
@@ -138,7 +138,7 @@ def dashboard(request):
     products_with_quantity = (
     Good.objects.filter(product__available_quantity__lt=50)
     .values('name_uz', 'product__available_quantity')
-    .order_by('-product__available_quantity')[:10]
+    .order_by('-product__available_quantity')[:100]
     )
     return render(request, "base.html", {'products_with_quantity':products_with_quantity,'most_expensive':most_expensive,'comments':orders_with_comments,'top_products': top_selling_products, 'customers_today': customers_today_count, 'orders': orders, 'customers': customers, 'revenue': revenue, 'recent': recent, 'order_today': order_today, 'revenue_today': revenue_today, 'data': data})
 
