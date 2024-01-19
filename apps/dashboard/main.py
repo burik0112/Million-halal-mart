@@ -39,7 +39,7 @@ def index(request):
 
 
 def number_cutter(number):
-    if number in not None:
+    if number is not None:
         number=number.count()
         if number >= 100000:
             number = f"{round(number/1000000, 2)}M"
@@ -50,7 +50,7 @@ def number_cutter(number):
     else:
         return 0
 def decimal_cutter(number):
-    if number in not None:
+    if number is not None:
         if number >= Decimal('100000'):
             return f"{round(number / Decimal('1000000'), 2)}M"
         elif number >= Decimal('1000'):
