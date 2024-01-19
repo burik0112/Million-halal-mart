@@ -39,20 +39,27 @@ def index(request):
 
 
 def number_cutter(number):
-    number=number.count()
-    if number >= 100000:
-        number = f"{round(number/1000000, 2)}M"
-    elif number >= 1000:
-        return f"{round(number/1000, 2)}K"
+    if number in not None:
+        number=number.count()
+        if number >= 100000:
+            number = f"{round(number/1000000, 2)}M"
+        elif number >= 1000:
+            return f"{round(number/1000, 2)}K"
+        else:
+            return number
     else:
-        return number
+        return 0
 def decimal_cutter(number):
-    if number >= Decimal('100000'):
-        return f"{round(number / Decimal('1000000'), 2)}M"
-    elif number >= Decimal('1000'):
-        return f"{round(number / Decimal('1000'), 2)}K"
+    if number in not None:
+        if number >= Decimal('100000'):
+            return f"{round(number / Decimal('1000000'), 2)}M"
+        elif number >= Decimal('1000'):
+            return f"{round(number / Decimal('1000'), 2)}K"
+        else:
+            return number
     else:
-        return number
+        return 0
+        
 def dashboard(request):
     today = date.today()
     orders = Order.objects.all()
