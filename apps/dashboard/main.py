@@ -20,6 +20,7 @@ from collections import defaultdict
 from django.db.models import Sum
 from decimal import Decimal
 
+
 def get_env_value(env_variable):
     try:
         return config(env_variable)
@@ -34,13 +35,9 @@ BOT_TOKEN = get_env_value("BOT_TOKEN")
 CHANNEL_USERNAME = "@openai_chat_gpt_robot"
 
 
-def index(request):
-    return render(request, "index.html")
-
-
 def number_cutter(number):
     if number is not None:
-        number=number.count()
+        number = number.count()
         if number >= 100000:
             number = f"{round(number/1000000, 2)}M"
         elif number >= 1000:
@@ -49,6 +46,8 @@ def number_cutter(number):
             return number
     else:
         return 0
+
+
 def decimal_cutter(number):
     if number is not None:
         if number >= Decimal('100000'):
@@ -59,29 +58,30 @@ def decimal_cutter(number):
             return number
     else:
         return 0
-        
+
+
 def dashboard(request):
     today = date.today()
     orders = Order.objects.all()
     order_today = Order.objects.filter(
         Q(created__date=today) & Q(status='sent'))
-    orders=number_cutter(orders)
-    order_today=number_cutter(order_today)
-    
+    orders = number_cutter(orders)
+    order_today = number_cutter(order_today)
+
     customers = Profile.objects.all()
-    customers=number_cutter(customers)
+    customers = number_cutter(customers)
 
     customers_today_count = Profile.objects.filter(created__date=today)
-    customers_today_count=number_cutter(customers_today_count)
+    customers_today_count = number_cutter(customers_today_count)
 
     revenue = Order.objects.filter(status='sent').aggregate(
         total_amount_sum=Sum('total_amount'))['total_amount_sum']
-    revenue=decimal_cutter(revenue)
+    revenue = decimal_cutter(revenue)
 
     revenue_today = Order.objects.filter(Q(created__date=today) & Q(status='sent')).aggregate(
         total_amount_sum=Sum('total_amount'))['total_amount_sum']
-    revenue_today=decimal_cutter(revenue_today)
-    all_orders=Order.objects.all()
+    revenue_today = decimal_cutter(revenue_today)
+    all_orders = Order.objects.all()
 
     recent = all_orders.order_by('-created')[:25]
 
@@ -94,7 +94,6 @@ def dashboard(request):
             'quantity': i.quantity,
             'revenue': product_item.new_price * i.quantity if product_item.new_price else product_item.old_price * i.quantity
         }
-
         if hasattr(product_item, 'tickets'):
             try:
                 t = Ticket.objects.get(product_id=product_item.pk)
@@ -103,7 +102,6 @@ def dashboard(request):
                     'price': product_item.new_price if product_item.new_price else product_item.old_price,
                     'image': get_first_image_url(product_item),
                 })
-
                 existing_item = next(
                     (item for item in data['tickets'] if item['title'] == t.event_name), None)
                 if existing_item:
@@ -122,7 +120,6 @@ def dashboard(request):
                     'price': product_item.new_price if product_item.new_price else product_item.old_price,
                     'image': get_first_image_url(product_item),
                 })
-
                 existing_item = next(
                     (item for item in data['phones'] if item['title'] == p.model_name), None)
                 if existing_item:
@@ -133,7 +130,6 @@ def dashboard(request):
                 # Continue with your logic using the 'phone' object
             except Phone.DoesNotExist:
                 print(f"Phone with ID {product_item.pk} does not exist.")
-
         elif hasattr(product_item, 'goods'):
             try:
                 g = Good.objects.get(id=product_item.pk)
@@ -142,7 +138,6 @@ def dashboard(request):
                     'price': product_item.new_price if product_item.new_price else product_item.old_price,
                     'image': get_first_image_url(product_item),
                 })
-
                 existing_item = next(
                     (item for item in data['goods'] if item['title'] == g.name), None)
                 if existing_item:
@@ -152,7 +147,6 @@ def dashboard(request):
                     data['goods'].append(item_data)
             except Good.DoesNotExist:
                 print(f"Good with ID {product_item.pk} does not exist.")
-
         else:
             print("This ProductItem is not associated with any specific type.")
 
@@ -174,7 +168,7 @@ def dashboard(request):
         .values('name_uz', 'product__available_quantity')
         .order_by('-product__available_quantity')[:100]
     )
-    return render(request, "base.html", {'products_with_quantity': products_with_quantity, 'most_expensive': most_expensive, 'comments': orders_with_comments, 'top_products': top_selling_products, 'customers_today': customers_today_count, 'all_orders': all_orders, 'orders':orders, 'customers': customers, 'revenue': revenue, 'recent': recent, 'order_today': order_today, 'revenue_today': revenue_today, 'data': data})
+    return render(request, "base.html", {'products_with_quantity': products_with_quantity, 'most_expensive': most_expensive, 'comments': orders_with_comments, 'top_products': top_selling_products, 'customers_today': customers_today_count, 'all_orders': all_orders, 'orders': orders, 'customers': customers, 'revenue': revenue, 'recent': recent, 'order_today': order_today, 'revenue_today': revenue_today, 'data': data})
 
 
 def get_first_image_url(product_item):
@@ -371,9 +365,6 @@ class OrdersView(DetailView):
             order.save()
 
         return HttpResponseRedirect(reverse('orders-list', kwargs={'pk': order.user.id}))
-
-
-
 
 
 def bot(order):
