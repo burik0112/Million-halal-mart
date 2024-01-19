@@ -217,8 +217,8 @@
           </a>
       </li>
       <li class="nav-item">
-        {% url 'orders-list' as orders_list %}
-        <a class="nav-link {% if request.path == orders_list %}active{% endif %}" href="{% url 'orders-list' %}">
+        {% url 'all-orders-list' as orders_list %}
+        <a class="nav-link {% if request.path == orders_list %}active{% endif %}" href="{% url 'all-orders-list' %}">
           <i class="bi bi-gem"></i><span>Buyurtmalar</span><i></i>
             
         </a>
@@ -344,8 +344,8 @@
                       <i class="bi bi-cart"></i>
                     </div>
                     <div class="ps-3 text-center">
-                      <h6>{{orders.count}}</h6>
-                      <span class="text-success small pt-1 fw-bold">{{order_today.count}}</span> <span class="text-muted small pt-2 ps-1">Bugun</span>
+                      <h6>{{orders}}</h6>
+                      <span class="text-success small pt-1 fw-bold">{{order_today}}</span> <span class="text-muted small pt-2 ps-1">Bugun</span>
                     </div>
                   </div>
                 </div>
@@ -364,8 +364,8 @@
                       <i class="fas fa-won-sign"></i>
                     </div>
                     <div class="ps-3 text-center"> 
-                      <h6>{{revenue}}K</h6>
-                      <span class="text-success small pt-1 fw-bold">{{revenue_today}}k</span> <span class="text-muted small pt-2 ps-1">Bugun</span>
+                      <h6>{{revenue}}</h6>
+                      <span class="text-success small pt-1 fw-bold">{{revenue_today}}</span> <span class="text-muted small pt-2 ps-1">Bugun</span>
 
                     </div>
                   </div>
@@ -416,7 +416,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      {% for c in orders %}
+                      {% for c in all_orders %}
                         <tr>
                           <th scope="row" class="text-center">{{c.id}}</th>
                           <th class="text-center">{{c.user.full_name}}</th>

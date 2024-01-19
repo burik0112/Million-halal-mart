@@ -27,9 +27,9 @@ from .product import (
 )
 
 from .users import (UserListView, UserOrdersView,
-                    UserOrderDetailView, OrdersListView, BlockActivateUserView)
+                    UserOrderDetailView, OrdersListView, BlockActivateUserView, update_order_status)
 from .main import (dashboard, InformationView,
-                   InformationEditView, ServiceView, ServiceEditView, BannerView, BannerActionView, NewsCreateView, NewsListView, NewsEditView, OrdersView, update_order_status)
+                   InformationEditView, ServiceView, ServiceEditView, BannerView, BannerActionView, NewsCreateView, NewsListView, NewsEditView, OrdersView)
 from .users import (
     UserListView,
     UserOrdersView,
@@ -120,7 +120,7 @@ urlpatterns = [
     path("users/order-detail/<int:pk>/", UserOrderDetailView.as_view(), name="user-order-detail"),
     path('block_activate_user/<int:pk>/', BlockActivateUserView.as_view(), name='block_activate_user'),
     
-    path("orders/", OrdersListView.as_view(), name="orders-list"),
+    path("orders/", OrdersListView.as_view(), name="all-orders-list"),
 
     path("other/news/", NewsListView.as_view(), name="news-list"),
     path("other/news-create/", NewsCreateView.as_view(), name="news-create"),

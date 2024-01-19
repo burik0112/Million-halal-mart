@@ -151,7 +151,6 @@ class CheckoutView(APIView):
                     id=order_id, user=request.user.profile
                 )
 
-                # If Order is paid or approved, create a new Order
                 if original_order.status in ["approved", "sent", "cancelled"]:
                     new_order = Order.objects.create(
                         user=request.user.profile, status="pending"
@@ -166,7 +165,6 @@ class CheckoutView(APIView):
                 else:
                     order = original_order
 
-                # Accepting data sent by the client
                 update_data = request.data.copy()
                 update_data["status"] = "pending"
 
