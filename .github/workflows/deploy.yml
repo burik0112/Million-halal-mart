@@ -32,5 +32,5 @@ jobs:
           cd /home/manager/Million-halal-mart
           git pull
           # Bu yerda qo'shimcha buyruqlaringizni yozishingiz mumkin, masalan:
-          # docker-compose down
-          # docker-compose up -d
+          docker-compose -f docker-compose.prod.yml down
+          docker-compose -f docker-compose.prod.yml up --build -d
