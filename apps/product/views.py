@@ -203,3 +203,4 @@ class MultiProductSearchView(views.APIView):
         }
 
         return Response(results)
+
