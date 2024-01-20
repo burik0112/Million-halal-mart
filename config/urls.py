@@ -4,8 +4,7 @@ from django.contrib import admin
 from django.urls import include, path
 from .scheme import swagger_urlpatterns
 from django.shortcuts import redirect
-from apps.dashboard.main import index
-
+from apps.dashboard.users import user_login, user_logout
 
 def redirect_dashboard(request):
     return redirect("dashboard")
@@ -19,8 +18,9 @@ urlpatterns = [
     path(
         "dashboard/", include("apps.dashboard.urls"), name="dashboard"
     ),
-    path('index/', index),
-    path("", redirect_dashboard)
+    path("", user_login, name="login"),
+    path('logout/', user_logout, name='logout'),
+    path("dashboard/", redirect_dashboard),
 ] + swagger_urlpatterns
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
