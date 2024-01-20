@@ -2,25 +2,23 @@ name: Auto Deploy on Server
 
 on:
   push:
-    branches: 
-      - main  # Bu yerda sizning asosiy branch nomingizni ko'rsating
+    branches:
+      - main # Bu yerda sizning asosiy branch nomingizni ko'rsating
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-
-
-    - name: Deploy Commands on Server
-      uses: appleboy/ssh-action@master
-      with:
-        host: 144.91.124.45
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        port: 22
-        script: |
-          cd /home/manager/Million-halal-mart
-          git pull
-          # Bu yerda qo'shimcha buyruqlaringizni yozishingiz mumkin, masalan:
-          docker-compose -f docker-compose.prod.yml down
-          docker-compose -f docker-compose.prod.yml up --build -d
+      - name: Deploy Commands on Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: 144.91.124.45
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            cd /home/manager/Million-halal-mart
+            git pull
+            # Bu yerda qo'shimcha buyruqlaringizni yozishingiz mumkin, masalan:
+            docker-compose -f docker-compose.prod.yml down
+            docker-compose -f docker-compose.prod.yml up --build -d
