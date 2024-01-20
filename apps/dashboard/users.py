@@ -6,6 +6,8 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 from django.views.generic import ListView
 from django.db.models import Subquery, OuterRef
+from django.urls import reverse
+from django.http import HttpResponseRedirect
 
 
 class UserListView(ListView):
@@ -32,6 +34,7 @@ class UserListView(ListView):
         context["users"] = users_with_active_location
         return context
 
+
 class BlockActivateUserView(View):
     def get(self, request, pk):
         user = get_object_or_404(Profile, id=pk)
@@ -43,6 +46,7 @@ class BlockActivateUserView(View):
 class UserOrdersView(DetailView):
     model = Profile
     template_name = "customer/users/user_orders_list.html"
+
     def get_context_data(self, **kwargs):
         context = super(UserOrdersView, self).get_context_data(**kwargs)
         orders = Order.objects.filter(user__id=self.kwargs['pk'])
@@ -53,6 +57,7 @@ class UserOrdersView(DetailView):
         else:
             context["no_orders_message"] = "Foydalanuvhi hali buyurtma qilmagan"
         return context
+
 
 class UserOrderDetailView(DetailView):
     model = Order
@@ -96,10 +101,12 @@ class UserOrderDetailView(DetailView):
             context["no_orders_message"] = "This user has no orders."
 
         return context
+
     def get_first_image_url(self, product_item):
         # Get the first image URL for the product
         first_image = product_item.images.first()
         return first_image.image.url if first_image else None
+
     def get_product_type(self, product_item):
         if hasattr(product_item, "phones"):
             return "Phone", {
@@ -110,7 +117,7 @@ class UserOrderDetailView(DetailView):
                 "condition": product_item.phones.get_condition_display(),
             }
         elif hasattr(product_item, "tickets"):
-            x= "Ticket", {
+            x = "Ticket", {
                 "event_name": product_item.tickets.event_name,
                 "event_date": product_item.tickets.event_date,
                 "category": product_item.tickets.category.name if product_item.tickets.category else "Bilet",
@@ -133,3 +140,41 @@ class OrdersListView(ListView):
 
     def get_queryset(self):
         return Order.objects.all().order_by('-created')
+
+
+def update_order_status(request, pk):
+    order = get_object_or_404(Order, id=pk)
+
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        if new_status in dict(order.STATUS_CHOICES):
+            order.status = new_status
+            order.save()
+
+    return HttpResponseRedirect(reverse('all-orders-list'))
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout 
+from .forms import LoginForm
+from django.contrib import messages
+def user_login(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+
+            if user is not None:
+                login(request, user)
+                return redirect('dashboard')
+            else:
+                messages.error(request, 'Login yoki parol xato')
+    else:
+        form = LoginForm()
+
+    return render(request, 'login.html', {'form': form})
+# logout page
+def user_logout(request):
+    logout(request)
+    return redirect('login')

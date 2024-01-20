@@ -1,6 +1,5 @@
 from django.urls import reverse
 from django.http import HttpResponseRedirect
-from django.db.models import Sum
 from apps.merchant.models import Information, Service, Order
 from apps.customer.models import Banner, Profile
 from apps.product.models import SoldProduct, Ticket, Good, Phone, ProductItem
@@ -19,7 +18,8 @@ from datetime import date
 from django.db.models import Q
 from collections import defaultdict
 from django.db.models import Sum
-from django.db.models import Sum
+from decimal import Decimal
+
 
 def get_env_value(env_variable):
     try:
@@ -35,8 +35,29 @@ BOT_TOKEN = get_env_value("BOT_TOKEN")
 CHANNEL_USERNAME = "@openai_chat_gpt_robot"
 
 
-def index(request):
-    return render(request, "index.html")
+def number_cutter(number):
+    if number is not None:
+        number = number.count()
+        if number >= 100000:
+            number = f"{round(number/1000000, 2)}M"
+        elif number >= 1000:
+            return f"{round(number/1000, 2)}K"
+        else:
+            return number
+    else:
+        return 0
+
+
+def decimal_cutter(number):
+    if number is not None:
+        if number >= Decimal('100000'):
+            return f"{round(number / Decimal('1000000'), 2)}M"
+        elif number >= Decimal('1000'):
+            return f"{round(number / Decimal('1000'), 2)}K"
+        else:
+            return number
+    else:
+        return 0
 
 
 def dashboard(request):
@@ -44,90 +65,97 @@ def dashboard(request):
     orders = Order.objects.all()
     order_today = Order.objects.filter(
         Q(created__date=today) & Q(status='sent'))
+    orders = number_cutter(orders)
+    order_today = number_cutter(order_today)
+
     customers = Profile.objects.all()
-    customers_today_count = Profile.objects.filter(created__date=today).count()
+    customers = number_cutter(customers)
+
+    customers_today_count = Profile.objects.filter(created__date=today)
+    customers_today_count = number_cutter(customers_today_count)
 
     revenue = Order.objects.filter(status='sent').aggregate(
         total_amount_sum=Sum('total_amount'))['total_amount_sum']
-    revenue = revenue/1000 if revenue else 0.0
-    revenue=round(revenue, 2)
+    revenue = decimal_cutter(revenue)
 
     revenue_today = Order.objects.filter(Q(created__date=today) & Q(status='sent')).aggregate(
         total_amount_sum=Sum('total_amount'))['total_amount_sum']
-    revenue_today = revenue_today / 1000 if revenue_today else 0.0
-    revenue_today = round(revenue_today, 2)
+    revenue_today = decimal_cutter(revenue_today)
+    all_orders = Order.objects.all()
 
-    recent = orders.order_by('-created')[:25]
+    recent = all_orders.order_by('-created')[:25]
 
     top_selling_products = SoldProduct.objects.all()
     data = defaultdict(list)
 
-    
     for i in top_selling_products:
         product_item = i.product
         item_data = {
             'quantity': i.quantity,
             'revenue': product_item.new_price * i.quantity if product_item.new_price else product_item.old_price * i.quantity
         }
-
         if hasattr(product_item, 'tickets'):
-            t = Ticket.objects.get(product_id=product_item.pk)
-            item_data.update({
-                'title': t.event_name,
-                'price': product_item.new_price if product_item.new_price else product_item.old_price,
-                'image': get_first_image_url(product_item),
-            })
-
-            existing_item = next(
-                (item for item in data['tickets'] if item['title'] == t.event_name), None)
-            if existing_item:
-                existing_item['quantity'] += i.quantity
-                existing_item['revenue'] += item_data['revenue']
-            else:
-                data['tickets'].append(item_data)
+            try:
+                t = Ticket.objects.get(product_id=product_item.pk)
+                item_data.update({
+                    'title': t.event_name,
+                    'price': product_item.new_price if product_item.new_price else product_item.old_price,
+                    'image': get_first_image_url(product_item),
+                })
+                existing_item = next(
+                    (item for item in data['tickets'] if item['title'] == t.event_name), None)
+                if existing_item:
+                    existing_item['quantity'] += i.quantity
+                    existing_item['revenue'] += item_data['revenue']
+                else:
+                    data['tickets'].append(item_data)
+            except Ticket.DoesNotExist:
+                print(f"Ticket with ID {product_item.pk} does not exist.")
 
         elif hasattr(product_item, 'phones'):
-            p = Phone.objects.get(id=product_item.pk)
-            item_data.update({
-                'title': p.model_name,
-                'price': product_item.new_price if product_item.new_price else product_item.old_price,
-                'image': get_first_image_url(product_item),
-            })
-
-            existing_item = next(
-                (item for item in data['phones'] if item['title'] == p.model_name), None)
-            if existing_item:
-                existing_item['quantity'] += i.quantity
-                existing_item['revenue'] += item_data['revenue']
-            else:
-                data['phones'].append(item_data)
-
+            try:
+                p = Phone.objects.get(id=product_item.pk)
+                item_data.update({
+                    'title': p.model_name,
+                    'price': product_item.new_price if product_item.new_price else product_item.old_price,
+                    'image': get_first_image_url(product_item),
+                })
+                existing_item = next(
+                    (item for item in data['phones'] if item['title'] == p.model_name), None)
+                if existing_item:
+                    existing_item['quantity'] += i.quantity
+                    existing_item['revenue'] += item_data['revenue']
+                else:
+                    data['phones'].append(item_data)
+                # Continue with your logic using the 'phone' object
+            except Phone.DoesNotExist:
+                print(f"Phone with ID {product_item.pk} does not exist.")
         elif hasattr(product_item, 'goods'):
-            g = Good.objects.get(id=product_item.pk)
-            item_data.update({
-                'title': g.name,
-                'price': product_item.new_price if product_item.new_price else product_item.old_price,
-                'image': get_first_image_url(product_item),
-            })
-
-            existing_item = next(
-                (item for item in data['goods'] if item['title'] == g.name), None)
-            if existing_item:
-                existing_item['quantity'] += i.quantity
-                existing_item['revenue'] += item_data['revenue']
-            else:
-                data['goods'].append(item_data)
-
+            try:
+                g = Good.objects.get(id=product_item.pk)
+                item_data.update({
+                    'title': g.name,
+                    'price': product_item.new_price if product_item.new_price else product_item.old_price,
+                    'image': get_first_image_url(product_item),
+                })
+                existing_item = next(
+                    (item for item in data['goods'] if item['title'] == g.name), None)
+                if existing_item:
+                    existing_item['quantity'] += i.quantity
+                    existing_item['revenue'] += item_data['revenue']
+                else:
+                    data['goods'].append(item_data)
+            except Good.DoesNotExist:
+                print(f"Good with ID {product_item.pk} does not exist.")
         else:
             print("This ProductItem is not associated with any specific type.")
 
         product_item.available_quantity += i.quantity
         product_item.save()
 
-    
     orders_with_comments = Order.objects.exclude(comment='')
     most_expensive = []
-    for order in orders.filter(status='sent').order_by('-total_amount')[:5]:
+    for order in all_orders.filter(status='sent').order_by('-total_amount')[:5]:
         order_info = {
             'id': order.id,
             'user': order.user.full_name,
@@ -136,11 +164,11 @@ def dashboard(request):
         most_expensive.append(order_info)
 
     products_with_quantity = (
-    Good.objects.filter(product__available_quantity__lt=50)
-    .values('name_uz', 'product__available_quantity')
-    .order_by('-product__available_quantity')[:10]
+        Good.objects.filter(product__available_quantity__lt=50)
+        .values('name_uz', 'product__available_quantity')
+        .order_by('-product__available_quantity')[:100]
     )
-    return render(request, "base.html", {'products_with_quantity':products_with_quantity,'most_expensive':most_expensive,'comments':orders_with_comments,'top_products': top_selling_products, 'customers_today': customers_today_count, 'orders': orders, 'customers': customers, 'revenue': revenue, 'recent': recent, 'order_today': order_today, 'revenue_today': revenue_today, 'data': data})
+    return render(request, "base.html", {'products_with_quantity': products_with_quantity, 'most_expensive': most_expensive, 'comments': orders_with_comments, 'top_products': top_selling_products, 'customers_today': customers_today_count, 'all_orders': all_orders, 'orders': orders, 'customers': customers, 'revenue': revenue, 'recent': recent, 'order_today': order_today, 'revenue_today': revenue_today, 'data': data})
 
 
 def get_first_image_url(product_item):
@@ -254,40 +282,6 @@ class ServiceEditView(View):
         return render(request, self.template_name, {"form": form, "service": service})
 
 
-def bot(order):
-    text4channel = f"""🔰 <b>Buyurtma holati:</b> #<i>YANGI</i>\n\n 🔢 <b>Buyurtma raqami:</b> <i>{order.id}</i>\n👤 <b>Mijoz ismi:</b> <i>{order.user.full_name}</i>\n📞 <b>Tel raqami:</b> <i>{order.user.phone_number}</i>\n🏠 <b>Manzili:</b> """
-    for location in order.user.location.all():
-        text4channel += f"{location.address}\n"
-    text4channel += '🛒 <b>Mahsulotlar:</b> \n'
-    for order_item in order.get_order_items():
-        product_details = order.get_product_details(
-            order_item.product, order_item)
-        text4channel += f" 🟢 <i>{product_details}</i>\n"
-    text4channel += f"📝 <b>Izoh:</b> <i>{order.comment}</i>\n📅 <b>Sana:</b> <i>{order.created.strftime('%Y-%m-%d %H:%M')}</i>\n💸 <b>Jami:</b> <i>{order.total_amount} ₩</i>\n\n⁉️ <u>To`lov amalga oshirilganligini tasdiqlaysizmi?</u>"
-    inline_keyboard = [
-        [
-            {"text": "✅ Ha", "callback_data": f"yes|{order.id}"},
-            {"text": "❌ Yo'q", "callback_data": f"no|{order.id}"},
-        ]
-    ]
-    reply_markup = {
-        "inline_keyboard": inline_keyboard,
-        "resize_keyboard": True,
-        "one_time_keyboard": False,
-        "selective": False,
-        "row_width": 2,
-    }
-    encoded_reply_markup = urllib.parse.quote(json.dumps(reply_markup))
-    encoded_text4channel = urllib.parse.quote(text4channel)
-    url = f"""https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id={CHAT_ID}&text={encoded_text4channel}&reply_markup={encoded_reply_markup}&parse_mode=HTML"""
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        return response.text
-    except Exception as e:
-        return f"Error: {e}"
-
-
 class NewsListView(ListView):
     model = News
     template_name = "dashboard/news/news_list.html"
@@ -310,13 +304,10 @@ class NewsCreateView(View):
 
     def post(self, request):
         form = NewsForm(request.POST, request.FILES)
-        print(request.FILES)  # Debugging statement
         if form.is_valid():
-            print(form.cleaned_data)  # Debugging statement
             form.save()
             return redirect("news-list")
         else:
-            print(form.errors)  # Debugging statement
             return render(request, self.template_name, {"form": form})
 
 
@@ -376,13 +367,35 @@ class OrdersView(DetailView):
         return HttpResponseRedirect(reverse('orders-list', kwargs={'pk': order.user.id}))
 
 
-def update_order_status(request, pk):
-    order = get_object_or_404(Order, id=pk)
-
-    if request.method == 'POST':
-        new_status = request.POST.get('status')
-        if new_status in dict(order.STATUS_CHOICES):
-            order.status = new_status
-            order.save()
-
-    return HttpResponseRedirect(reverse('orders-list', kwargs={'pk': order.user.id}))
+def bot(order):
+    text4channel = f"""🔰 <b>Buyurtma holati:</b> #<i>YANGI</i>\n\n 🔢 <b>Buyurtma raqami:</b> <i>{order.id}</i>\n👤 <b>Mijoz ismi:</b> <i>{order.user.full_name}</i>\n📞 <b>Tel raqami:</b> <i>{order.user.phone_number}</i>\n🏠 <b>Manzili:</b> """
+    for location in order.user.location.all():
+        text4channel += f"{location.address}\n"
+    text4channel += '🛒 <b>Mahsulotlar:</b> \n'
+    for order_item in order.get_order_items():
+        product_details = order.get_product_details(
+            order_item.product, order_item)
+        text4channel += f" 🟢 <i>{product_details}</i>\n"
+    text4channel += f"📝 <b>Izoh:</b> <i>{order.comment}</i>\n📅 <b>Sana:</b> <i>{order.created.strftime('%Y-%m-%d %H:%M')}</i>\n💸 <b>Jami:</b> <i>{order.total_amount} ₩</i>\n\n⁉️ <u>To`lov amalga oshirilganligini tasdiqlaysizmi?</u>"
+    inline_keyboard = [
+        [
+            {"text": "✅ Ha", "callback_data": f"yes|{order.id}"},
+            {"text": "❌ Yo'q", "callback_data": f"no|{order.id}"},
+        ]
+    ]
+    reply_markup = {
+        "inline_keyboard": inline_keyboard,
+        "resize_keyboard": True,
+        "one_time_keyboard": False,
+        "selective": False,
+        "row_width": 2,
+    }
+    encoded_reply_markup = urllib.parse.quote(json.dumps(reply_markup))
+    encoded_text4channel = urllib.parse.quote(text4channel)
+    url = f"""https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id={CHAT_ID}&text={encoded_text4channel}&reply_markup={encoded_reply_markup}&parse_mode=HTML"""
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.text
+    except Exception as e:
+        return f"Error: {e}"

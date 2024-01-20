@@ -1836,3 +1836,63 @@ class CategoryCreateForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+    
+class SubCategoryCreateForm(forms.ModelForm):
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.filter(main_type="f"),
+        widget=forms.Select(attrs={"class": "form-select"}),
+    )
+
+    class Meta:
+        model = SubCategory
+        fields = [
+            "name_uz",
+            "name_ru",
+            "name_en",
+            "name_kr",
+            "image",
+            "category",
+            "active",
+        ]
+        widgets = {
+            "name_uz": forms.TextInput(attrs={"class": "form-control"}),
+            "name_ru": forms.TextInput(attrs={"class": "form-control"}),
+            "name_en": forms.TextInput(attrs={"class": "form-control"}),
+            "name_kr": forms.TextInput(attrs={"class": "form-control"}),
+            "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "category": forms.Select(attrs={"class": "form-control"}),
+            "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+        labels = {
+            "name_uz": "Name (Uzbek)",
+            "name_ru": "Name (Russian)",
+            "name_en": "Name (English)",
+            "name_kr": "Name (Korean)",
+        }
+        required = {
+            "name_uz": True,
+            "name_ru": True,
+            "name_en": True,
+            "name_kr": True,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(SubCategoryCreateForm, self).__init__(*args, **kwargs)
+
+        # Set required attribute for each field
+        self.fields["name_uz"].required = True
+        self.fields["name_ru"].required = True
+        self.fields["name_en"].required = True
+        self.fields["name_kr"].required = True
+
+    def save(self, commit=True):
+        instance = super(SubCategoryCreateForm, self).save(commit=False)
+        instance.main_type = "f"
+
+        if commit:
+            instance.save()
+        return instance
+
+class LoginForm(forms.Form):
+    username = forms.CharField()
+    password = forms.CharField(widget=forms.PasswordInput)

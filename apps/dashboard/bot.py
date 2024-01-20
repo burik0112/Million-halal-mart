@@ -6,6 +6,7 @@ from telebot import types
 from decouple import config
 from django.core.exceptions import ImproperlyConfigured
 from apps.merchant.models import Order
+from apps.product.models import SoldProduct
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -98,8 +99,20 @@ def handle_callback_query(call):
     order_id = int(call.data[-1])
     try:
         order = Order.objects.get(id=order_id)
-        order.status = "sent"
-        order.save()
+
+        for order_item in order.orderitem.all():
+            try:
+                sold_product = SoldProduct.objects.get(product=order_item.product, user=order.user)
+                sold_product.quantity += order_item.quantity
+                sold_product.amount += order_item.product.new_price * order_item.quantity
+                sold_product.save()
+            except SoldProduct.DoesNotExist:
+                SoldProduct.objects.create(
+                    product=order_item.product,
+                    quantity=order_item.quantity,
+                    amount=order_item.product.new_price * order_item.quantity,
+                    user=order.user,
+                )
         text4channel = f"""🚚 <b>Buyurtma holati:</b> #<i>{order.get_status_display_value().upper()}</i>\n\n 🔢 <b>Buyurtma raqami:</b> <i>{order.id}</i>\n👤 <b>Mijoz ismi:</b> <i>{order.user.full_name}</i>\n📞 <b>Tel raqami:</b> <i>{order.user.phone_number}</i>\n🏠 <b>Manzili:</b> """
         for location in order.user.location.all():
             text4channel += f"{location.address}\n"

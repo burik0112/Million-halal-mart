@@ -18,6 +18,7 @@ from .forms import (
     CategoryEditForm,
     SubCategoryEditForm,
     CategoryCreateForm,
+    SubCategoryCreateForm,
 
 )
 
@@ -323,7 +324,19 @@ class CategoryDeleteView(View):
         category = get_object_or_404(Category, pk=pk)
         category.delete()  # Delete the Phone instance
         return redirect("category-list")  # Redirect to phone list
-    
+class SubCategoryCreateView(CreateView):
+    model = SubCategory
+    form_class = SubCategoryCreateForm
+    template_name = "product/goods/subcategory_create.html"
+    success_url = reverse_lazy("subcategory-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["action"] = "Create New Good Category"
+        return context
+
+    def form_valid(self, form):
+        return super().form_valid(form)
 class SubCategoryListView(ListView):
     model = SubCategory
     template_name = "product/goods/subcategory_list.html"  # your template name
