@@ -9,23 +9,12 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    # - name: Checkout Repository
-    #   uses: actions/checkout@v2
 
-    # - name: Copy Repository to Server
-    #   uses: appleboy/scp-action@master
-    #   with:
-    #     host: ${{ secrets.SERVER_HOST }}
-    #     username: ${{ secrets.SERVER_USER }}
-    #     key: ${{ secrets.SERVER_SSH_KEY }}
-    #     port: 22
-    #     source: "."
-    #     target: "/path/to/your/project"
 
     - name: Deploy Commands on Server
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.SERVER_HOST }}
+        host: 144.91.124.45
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         port: 22
