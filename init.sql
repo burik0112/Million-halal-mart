@@ -1,0 +1,2 @@
+CREATE USER username WITH PASSWORD 'strongpassword';
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO username;
