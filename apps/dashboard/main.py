@@ -1,6 +1,6 @@
 from django.urls import reverse
 from django.http import HttpResponseRedirect
-from apps.merchant.models import Information, Service, Order
+from apps.merchant.models import Information, Service, Order, Bonus
 from apps.customer.models import Banner, Profile
 from apps.product.models import SoldProduct, Ticket, Good, Phone, ProductItem
 from decouple import config
@@ -219,8 +219,14 @@ class ServiceView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        return context
 
+        # Fetch Bonus objects separately
+        bonuses = Bonus.objects.all()
+
+        # Add the Bonus objects to the context
+        context['bonuses'] = bonuses
+
+        return context
 
 class BannerView(ListView):
     model = Banner
@@ -399,3 +405,4 @@ def bot(order):
         return response.text
     except Exception as e:
         return f"Error: {e}"
+

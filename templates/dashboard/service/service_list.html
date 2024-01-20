@@ -9,7 +9,7 @@
             <div class="col-12">
               <div class="card recent-sales overflow-auto">
                 <div class="card-body">
-                  <h5 class="card-title">Xizmatlar</h5>
+                  <h5 class="card-title">Yetkazib berish ximati</h5>
                   <td class="text-center">
                     {% for service in services%}
                     
@@ -19,16 +19,14 @@
                   <table class="table">
                       <thead>
                           <tr>
-                              <th scope="col" rowspan="1" style="width: 50px; min-width: 50px;">#</th>
                               <th scope="col" colspan="3" style="width: 100px; min-width: 100px;">Nomi</th>
                               <th scope="col" colspan="6" style="width: 200px; min-width: 200px;">Narxi</th>
-                              <th scope="col" colspan="2" style="width: 200px; min-width: 200px;">Narxi</th>
+                              <th scope="col" colspan="2" style="width: 200px; min-width: 200px;">Qo'shimcha</th>
                           </tr>
                       </thead>
                       <tbody>
                           <tr>
-                              <th scope="row">1</th>
-                              <td colspan="3">Yetkazib berish ximati</td>
+                              <td colspan="3">Pochta</td>
                               <td colspan="6">{{service.delivery_fee}} ₩</td>
                               <td colspan="2"><a href="{% url 'edit_service' service.id %}" class="btn btn-primary btn-sm">Tahrirlash</a></td>
                           </tr>
@@ -39,7 +37,43 @@
               
 
               </div>
-            </div><!-- End Recent Sales -->
+            </div>
+            <div class="col-12">
+              <div class="card recent-sales overflow-auto">
+                <div class="card-body">
+                  <h5 class="card-title">Bonus toifalari</h5>
+                  <td class="text-center">
+                    
+                    
+                  </td>
+                </tr>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col" colspan="3" style="width: 100px; min-width: 100px;">Turi</th>
+                      <th scope="col" colspan="6" style="width: 200px; min-width: 200px;">Narx chegarasi</th>
+                      <th scope="col" colspan="6" style="width: 200px; min-width: 200px;">Chegirma foizi</th>
+                      <th scope="col" colspan="6" style="width: 200px; min-width: 200px;">Xolati</th>
+                      <th scope="col" colspan="2" style="width: 200px; min-width: 200px;">Qo'shimcha</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                        {% for bonus in bonuses%}
+                          <tr>
+                              <td colspan="3">{{bonus.title}}</td>
+                              <td colspan="6">{{bonus.amount}} ₩</td>
+                              <td colspan="6">{{bonus.percentage}} %</td>
+                              <td colspan="6">{{bonus.active}}</td>
+                              <td colspan="2"><a href="{% url 'edit_service' bonus.id %}" class="btn btn-primary btn-sm">Tahrirlash</a></td>
+                          </tr>
+                    {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
+              
+
+              </div>
+            </div>
       </div>
     </div>
   </div>
