@@ -12,7 +12,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.views import View
 from .forms import ServiceEditForm, InformationEditForm
-from apps.dashboard.forms import BannerForm, NewsForm, NewsEditForm
+from apps.dashboard.forms import BannerForm, NewsForm, NewsEditForm, BonusEditForm
 from apps.customer.models import News
 from datetime import date
 from django.db.models import Q
@@ -173,7 +173,7 @@ class ServiceView(ListView):
         context = super().get_context_data(**kwargs)
 
         # Fetch Bonus objects separately
-        bonuses = Bonus.objects.all()
+        bonuses = Bonus.objects.all().order_by('pk')
 
         # Add the Bonus objects to the context
         context['bonuses'] = bonuses
@@ -358,3 +358,20 @@ def bot(order):
         return response.text
     except Exception as e:
         return f"Error: {e}"
+class BonusEditView(View):
+    template_name = "dashboard/service/edit_bonus.html"
+
+    def get(self, request, pk):
+        bonus = get_object_or_404(Bonus, pk=pk)
+        form = BonusEditForm(instance=bonus)
+        return render(request, self.template_name, {"form": form, "bonus": bonus})
+
+    def post(self, request, pk):
+        bonus = get_object_or_404(Bonus, pk=pk)
+        form = BonusEditForm(request.POST, instance=bonus)
+
+        if form.is_valid():
+            form.save()
+            return redirect("service-list")
+
+        return render(request, self.template_name, {"form": form, "bonus": bonus})

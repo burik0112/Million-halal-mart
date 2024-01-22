@@ -157,4 +157,4 @@ class Bonus(TimeStampedModel, models.Model):
     active = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return self.title if len(self.title) > 0 else self.amoint
+        return self.title if len(self.title) > 0 else str(self.amount)

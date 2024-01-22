@@ -63,8 +63,14 @@
                               <td colspan="3">{{bonus.title}}</td>
                               <td colspan="6">{{bonus.amount}} ₩</td>
                               <td colspan="6">{{bonus.percentage}} %</td>
-                              <td colspan="6">{{bonus.active}}</td>
-                              <td colspan="2"><a href="{% url 'edit_service' bonus.id %}" class="btn btn-primary btn-sm">Tahrirlash</a></td>
+                              {% if bonus.active %}
+                                <td colspan="6" ><img src="{% static 'assets/img/check.png' %}" height="20" width="20"
+                                    alt="Faol"></td>
+                                {% else %}
+                                <td colspan="6" ><img src="{% static 'assets/img/cancel.png' %}" height="20" width="20"
+                                    alt="Faol emas"></td>
+                                {% endif %}
+                              <td colspan="2"><a href="{% url 'edit_bonus' bonus.id %}" class="btn btn-primary btn-sm">Tahrirlash</a></td>
                           </tr>
                     {% endfor %}
                       </tbody>

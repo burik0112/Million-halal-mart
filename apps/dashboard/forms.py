@@ -10,9 +10,9 @@ from apps.product.models import (
     Good,
     Category,
 )
-
+from django.core.validators import MinValueValidator
 from apps.customer.models import News, Banner
-from apps.merchant.models import Information, Service
+from apps.merchant.models import Information, Service, Bonus
 from django.utils import timezone
 from ckeditor.widgets import CKEditorWidget
 
@@ -1896,3 +1896,40 @@ class SubCategoryCreateForm(forms.ModelForm):
 class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
+
+class BonusEditForm(forms.ModelForm):
+    title = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), label='Toifasi')
+    amount = forms.DecimalField(
+        decimal_places=0,
+        max_digits=10,
+        required=False,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+        label='Buyurtma qiymati'
+    )
+    percentage = forms.IntegerField(
+        validators=[MinValueValidator(0)],
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+        label='Chegirma foizi qiymati'
+    )
+    active = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        required=False,
+        initial=True
+    )
+
+    class Meta:
+        model = Bonus
+        fields = ['title', 'amount', 'percentage', 'active']
+    def __init__(self, *args, **kwargs):
+        super(BonusEditForm, self).__init__(*args, **kwargs)
+        if self.instance:
+            self.fields["title"].initial = self.instance.title
+            self.fields["amount"].initial = self.instance.amount
+            self.fields["percentage"].initial = self.instance.percentage
+            self.fields["active"].initial = self.instance.active
+
+    def save(self, commit=True):
+        bonus = super(BonusEditForm, self).save(commit=False)
+        if commit:
+            bonus.save()
+        return bonus
