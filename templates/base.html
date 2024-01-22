@@ -385,7 +385,7 @@
                       <i class="bi bi-people"></i>
                     </div>
                     <div class="ps-3 text-center">
-                      <h6>{{customers.count}}</h6>
+                      <h6>{{customers}}</h6>
                       <span class="text-success small pt-1 fw-bold">{{customers_today}}</span> <span class="text-muted small pt-2 ps-1">Bugun</span>
 
                     </div>
@@ -496,7 +496,7 @@
             <div class="col-12">
               <div class="card top-selling overflow-auto">
                   <div class="card-body pb-0">
-                      <h5 class="card-title">Ombordagi mahsulotlar qoldig'i <span>| Barchasi</span></h5>
+                      <h5 class="card-title">Ombordagi mahsulotlar qoldig'i <span>| mahsulot qoldi < 100 </span></h5>
                       <table class="table table-borderless datatable">
                           <thead>
                               <tr>
@@ -523,8 +523,7 @@
             <!-- End Top Selling -->
             <div class="card">
               <div class="card-body">
-                  <h5 class="card-title">Kam miqdorda qolgan mahsulotlar</h5>
-                  
+                  <h5 class="card-title">So'ngi 1 oy ichida eng ko'p sotilgan mahsulotlar</h5>
                   <!-- Bar Chart -->
                   <div style="overflow-x: auto;">
                       <canvas id="barChart" width="800" height="200"></canvas>
@@ -536,12 +535,10 @@
                         var totalQuantities = [];
                         var randomColors = [];
                 
-                        {% for product_type, items in data.items %}
-                            {% for item in items %} 
-                                productNames.push("{{ item.title|default:'' }}");
-                                totalQuantities.push({{ item.quantity }});
-                                randomColors.push(getRandomColor());
-                            {% endfor %}
+                        {% for title, quantity in data %}
+                            productNames.push("{{ title|default:'' }}");
+                            totalQuantities.push({{ quantity|default:0 }});
+                            randomColors.push(getRandomColor());
                         {% endfor %}
                 
                         console.log('Product Names:', productNames);
@@ -577,11 +574,23 @@
                                     y: {
                                         beginAtZero: true
                                     }
-                                }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    }
+                                },
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scrollX: true  // Enable horizontal scrolling
                             }
                         });
                     });
                 </script>
+                
+                
+                
+                
           
                   <!-- End Bar Chart -->
               </div>

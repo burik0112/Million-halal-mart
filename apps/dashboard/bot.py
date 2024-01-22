@@ -1,3 +1,5 @@
+from django.utils import timezone
+from datetime import datetime, timedelta
 import telebot
 from django.shortcuts import HttpResponse
 from django.utils.translation import gettext_lazy as _
@@ -102,10 +104,17 @@ def handle_callback_query(call):
 
         for order_item in order.orderitem.all():
             try:
-                sold_product = SoldProduct.objects.get(product=order_item.product, user=order.user)
-                sold_product.quantity += order_item.quantity
-                sold_product.amount += order_item.product.new_price * order_item.quantity
-                sold_product.save()
+                sold_product = SoldProduct.objects.get(
+                    product=order_item.product, user=order.user)
+                time_difference = timezone.now() - sold_product.created
+                if time_difference < timedelta(days=30):
+                    sold_product.quantity += order_item.quantity
+                    sold_product.amount += order_item.product.new_price * order_item.quantity
+                    sold_product.save()
+                else:
+                    sold_product.quantity = order_item.quantity
+                    sold_product.amount = order_item.product.new_price * order_item.quantity
+                    sold_product.save()
             except SoldProduct.DoesNotExist:
                 SoldProduct.objects.create(
                     product=order_item.product,
