@@ -13,4 +13,5 @@ urlpatterns = [
     path("information/", views.InformationListAPIView.as_view(), name="info"),
     path("service/", views.ServiceListAPIView.as_view(), name="service"),
     path("social-media-urls/", views.SocialMeadiaAPIView.as_view()),
+    path("bonus-list/", views.BonusPIView.as_view()),
 ]
