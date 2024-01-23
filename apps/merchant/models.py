@@ -130,13 +130,13 @@ class Information(TimeStampedModel, models.Model):
         return str(self.created)
 
 
-class SecialMedia(TimeStampedModel, models.Model):
-    telegram = models.URLField(blank=True, null=True)
-    instagram = models.URLField(blank=True, null=True)
-    whatsapp = models.URLField(blank=True, null=True)
+class SocialMedia(TimeStampedModel, models.Model):
+    telegram = models.CharField(blank=True, null=True)
+    instagram = models.CharField(blank=True, null=True)
+    whatsapp = models.CharField(blank=True, null=True)
     phone_number = models.CharField(blank=True, null=True)
-    imo = models.URLField(blank=True, null=True)
-    kakao = models.URLField(blank=True, null=True)
+    imo = models.CharField(blank=True, null=True)
+    kakao = models.CharField(blank=True, null=True)
 
     def __str__(self) -> str:
         return "SocialMedias"

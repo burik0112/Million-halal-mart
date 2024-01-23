@@ -19,9 +19,9 @@ class ServiceAdmin(admin.ModelAdmin):
 admin.site.register(Service, ServiceAdmin)
 
 
-class SecialMediaAdmin(admin.ModelAdmin):
+class SocialMediaAdmin(admin.ModelAdmin):
     list_display = ["telegram", "instagram", "whatsapp", "phone_number", "imo", "kakao"]
-admin.site.register(SecialMedia, SecialMediaAdmin)
+admin.site.register(SocialMedia, SocialMediaAdmin)
 
 
 admin.site.register(Information, InformationAdmin)

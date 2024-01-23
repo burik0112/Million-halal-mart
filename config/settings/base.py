@@ -48,7 +48,7 @@ SECRET_KEY = get_env_value("SECRET_KEY")
 # DEBUG = True
 
 ALLOWED_HOSTS = [get_env_value("ALLOWED_HOSTS")]
-
+LOGIN_REDIRECT_URL = 'dashboard'
 
 # Application definition
 LOCAL_APPS = [
@@ -86,23 +86,13 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
 ]
-# CKEDITOR_CONFIGS = {
-#     'default': {
-#         'toolbar': [
-#             {'name': 'styles', 'items': ['Styles', 'Format']},
-#         ],
-#         'height': 300,
-#         'width': 800,
-#         'allowedContent': True,
-#         'extraPlugins': ','.join(['image2', 'codesnippet', 'styles']),
-#     },
-# }
+
 CKEDITOR_UPLOAD_PATH = "uploads/"
 REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"]
 }
 CORS_ALLOW_ALL_ORIGINS = True
-# CORS ORIGIN
+
 
 
 CORS_ALLOW_CREDENTIALS = True
