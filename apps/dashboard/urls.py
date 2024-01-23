@@ -28,7 +28,7 @@ from .product import (
 
 from .users import (UserListView, UserOrdersView,
                     UserOrderDetailView, OrdersListView, BlockActivateUserView, update_order_status, login)
-from .main import (dashboard, InformationView,
+from .main import (dashboard, InformationView,BonusEditView,
                    InformationEditView, ServiceView, ServiceEditView, BannerView, BannerActionView, NewsCreateView, NewsListView, NewsEditView, OrdersView)
 from .users import (
     UserListView,
@@ -148,6 +148,7 @@ urlpatterns = [
     path("edit-about_us/<int:pk>/", login_required(edit_aboutus), name="edit_aboutus"),
     path("edit-support/<int:pk>/", login_required(edit_support), name="edit_support"),
     path("edit-payment/<int:pk>/", login_required(edit_payment), name="edit_payment"),
+    path("bonus-edit/<int:pk>/", login_required(BonusEditView.as_view()), name="edit_bonus"),
 
 
     

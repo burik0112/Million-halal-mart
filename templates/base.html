@@ -385,7 +385,7 @@
                       <i class="bi bi-people"></i>
                     </div>
                     <div class="ps-3 text-center">
-                      <h6>{{customers.count}}</h6>
+                      <h6>{{customers}}</h6>
                       <span class="text-success small pt-1 fw-bold">{{customers_today}}</span> <span class="text-muted small pt-2 ps-1">Bugun</span>
 
                     </div>
@@ -496,47 +496,24 @@
             <div class="col-12">
               <div class="card top-selling overflow-auto">
                   <div class="card-body pb-0">
-                      <h5 class="card-title">Eng ko'p sotilganlar mahsulotlar <span>| Barchasi</span></h5>
+                      <h5 class="card-title">Ombordagi mahsulotlar qoldig'i <span>| mahsulot qoldi < 100 </span></h5>
                       <table class="table table-borderless datatable">
                           <thead>
                               <tr>
-                                  <th scope="col">Foto</th>
+                                  <th scope="col">№</th>
                                   <th scope="col">Maxsulot</th>
-                                  <th scope="col">Narxi</th>
-                                  <th scope="col">Soni</th>
-                                  <th scope="col">Daromad</th>
+                                  <th scope="col">Miqdori(Kg/L/Dona)</th>
                               </tr>
                           </thead>
                           <tbody>
-                              {% for product_data in data.tickets %}
+                              {% for product_data in products_with_quantity %}
                                   <tr>
-                                      <th scope="row"><img src="{{ product_data.image }}" alt=""></th>
-                                      <td><a href="#" class="text-primary fw-bold">{{ product_data.title }}</a></td>
-                                      <td>${{ product_data.price }}</td>
-                                      <td class="fw-bold">{{ product_data.quantity }}</td>
-                                      <td>${{ product_data.revenue }}</td>
+                                      <th class="text-center">{{product_data.id}}</th>
+                                      <td><a href="#" class="text-primary fw-bold">{{ product_data.name_uz }}</a></td>
+                                      <td class="fw-bold">{{ product_data.product__available_quantity }}</td>
                                   </tr>
                               {% endfor %}
           
-                              {% for product_data in data.phones %}
-                                  <tr>
-                                      <th scope="row"><a href="#"><img src="{{ product_data.image }}" alt=""></a></th>
-                                      <td><a href="#" class="text-primary fw-bold">{{ product_data.title }}</a></td>
-                                      <td>${{ product_data.price }}</td>
-                                      <td class="fw-bold">{{ product_data.quantity }}</td>
-                                      <td>${{ product_data.revenue }}</td>
-                                  </tr>
-                              {% endfor %}
-          
-                              {% for product_data in data.goods %}
-                                  <tr>
-                                      <th scope="row"><a href="#"><img src="{{ product_data.image }}" alt=""></a></th>
-                                      <td><a href="#" class="text-primary fw-bold">{{ product_data.title }}</a></td>
-                                      <td>${{ product_data.price }}</td>
-                                      <td class="fw-bold">{{ product_data.quantity }}</td>
-                                      <td>${{ product_data.revenue }}</td>
-                                  </tr>
-                              {% endfor %}
                           </tbody>
                       </table>
                   </div>
@@ -546,63 +523,79 @@
             <!-- End Top Selling -->
             <div class="card">
               <div class="card-body">
-                  <h5 class="card-title">Kam miqdorda qolgan mahsulotlar</h5>
-          
+                  <h5 class="card-title">So'ngi 1 oy ichida eng ko'p sotilgan mahsulotlar</h5>
                   <!-- Bar Chart -->
                   <div style="overflow-x: auto;">
                       <canvas id="barChart" width="800" height="200"></canvas>
                   </div>
+          
                   <script>
-                      document.addEventListener("DOMContentLoaded", () => {
-                          var productNames = [];
-                          var totalQuantities = [];
-                          var randomColors = [];
-          
-                          {% for product_data in products_with_quantity %}
-                              productNames.push("{{ product_data.name_uz|default:'' }}");
-                              totalQuantities.push({{ product_data.product__available_quantity }});
-                              // Generate random colors for each bar
-                              randomColors.push(getRandomColor());
-                          {% endfor %}
-          
-                          function getRandomColor() {
-                              var letters = '0123456789ABCDEF';
-                              var color = '#';
-                              for (var i = 0; i < 6; i++) {
-                                  color += letters[Math.floor(Math.random() * 16)];
-                              }
-                              return color;
-                          }
-          
-                          new Chart(document.querySelector('#barChart'), {
-                              type: 'bar',
-                              data: {
-                                  labels: productNames,
-                                  datasets: [{
-                                      label: 'Qoldiq',
-                                      data: totalQuantities,
-                                      backgroundColor: randomColors,
-                                      borderColor: 'rgb(75, 192, 192)',
-                                      borderWidth: 1
-                                  }]
-                              },
-                              options: {
-                                  scales: {
-                                      x: {
-                                          beginAtZero: true
-                                      },
-                                      y: {
-                                          beginAtZero: true
-                                      }
-                                  }
-                              }
-                          });
-                      });
-                  </script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                        var productNames = [];
+                        var totalQuantities = [];
+                        var randomColors = [];
+                
+                        {% for title, quantity in data %}
+                            productNames.push("{{ title|default:'' }}");
+                            totalQuantities.push({{ quantity|default:0 }});
+                            randomColors.push(getRandomColor());
+                        {% endfor %}
+                
+                        console.log('Product Names:', productNames);
+                        console.log('Total Quantities:', totalQuantities);
+                        console.log('Random Colors:', randomColors);
+                
+                        function getRandomColor() {
+                            var letters = '0123456789ABCDEF';
+                            var color = '#';
+                            for (var i = 0; i < 6; i++) {
+                                color += letters[Math.floor(Math.random() * 16)];
+                            }
+                            return color;
+                        }
+                
+                        new Chart(document.querySelector('#barChart'), {
+                            type: 'bar',
+                            data: {
+                                labels: productNames,
+                                datasets: [{
+                                    label: 'Qoldiq',
+                                    data: totalQuantities,
+                                    backgroundColor: randomColors,
+                                    borderColor: 'rgb(75, 192, 192)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    x: {
+                                        beginAtZero: true
+                                    },
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    }
+                                },
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scrollX: true  // Enable horizontal scrolling
+                            }
+                        });
+                    });
+                </script>
+                
+                
+                
+                
           
                   <!-- End Bar Chart -->
               </div>
           </div>
+            
           
           </div>
         </div><!-- End Left side columns -->

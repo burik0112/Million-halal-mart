@@ -3,6 +3,7 @@ from rest_framework.pagination import PageNumberPagination
 from apps.product.serializers import (
     ProductItemSerializer,
 )
+from .models import Bonus
 from apps.product.models import Phone, Ticket, Good
 from .models import Order, OrderItem, Information, Service, SecialMedia
 
@@ -159,4 +160,10 @@ class ServiceSerializer(serializers.ModelSerializer):
 class SocialMediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = SecialMedia
+        fields = "__all__"
+
+
+class BonusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bonus
         fields = "__all__"

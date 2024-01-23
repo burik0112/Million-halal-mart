@@ -1,8 +1,5 @@
 from django.contrib import admin
-from modeltranslation.admin import TranslationAdmin
 from .models import *
-
-# Register your models here.
 
 
 class InformationAdmin(admin.ModelAdmin):
@@ -19,16 +16,20 @@ class InformationAdmin(admin.ModelAdmin):
 
 class ServiceAdmin(admin.ModelAdmin):
     list_display = ["delivery_fee"]
+admin.site.register(Service, ServiceAdmin)
 
 
 class SecialMediaAdmin(admin.ModelAdmin):
     list_display = ["telegram", "instagram", "whatsapp", "phone_number", "imo", "kakao"]
+admin.site.register(SecialMedia, SecialMediaAdmin)
 
 
 admin.site.register(Information, InformationAdmin)
+class BonusaAdmin(admin.ModelAdmin):
+    list_display = ["amount", "percentage", "title", "created", "modified", 'active']
+admin.site.register(Bonus, BonusaAdmin)
+
 admin.site.register(OrderItem)
-admin.site.register(Service, ServiceAdmin)
-admin.site.register(SecialMedia, SecialMediaAdmin)
 
 
 class OrderItemInline(admin.TabularInline):
@@ -42,6 +43,4 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ("user__full_name", "status")
     list_filter = ("status",)
 
-
-# Ro'yxatdan o'tkazish
 admin.site.register(Order, OrderAdmin)

@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, permissions
 from django.db import transaction
 from rest_framework.response import Response
-from .models import Order, OrderItem, Information, Service, SecialMedia
+from .models import Order, OrderItem, Information, Service, SecialMedia, Bonus
 from .serializers import (
     CustomPageNumberPagination,
     OrderItemSerializer,
@@ -22,6 +22,7 @@ from .serializers import (
     OrderListSerializer,
     OrderCreateSerializer,
     SocialMediaSerializer,
+    BonusSerializer,
 )
 from apps.dashboard.main import bot
 
@@ -168,7 +169,8 @@ class CheckoutView(APIView):
                 update_data = request.data.copy()
                 update_data["status"] = "pending"
 
-                serializer = OrderStatusUpdateSerializer(order, data=update_data)
+                serializer = OrderStatusUpdateSerializer(
+                    order, data=update_data)
                 if serializer.is_valid():
                     serializer.save()
                     # Logic for sending message to a bot
@@ -205,3 +207,8 @@ class ServiceListAPIView(ListAPIView):
 class SocialMeadiaAPIView(ListAPIView):
     queryset = SecialMedia.objects.all().order_by("-pk")
     serializer_class = SocialMediaSerializer
+
+
+class BonusPIView(ListAPIView):
+    queryset = Bonus.objects.all().order_by("pk")
+    serializer_class = BonusSerializer

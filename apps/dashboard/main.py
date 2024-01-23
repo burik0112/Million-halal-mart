@@ -1,6 +1,6 @@
 from django.urls import reverse
 from django.http import HttpResponseRedirect
-from apps.merchant.models import Information, Service, Order
+from apps.merchant.models import Information, Service, Order, Bonus
 from apps.customer.models import Banner, Profile
 from apps.product.models import SoldProduct, Ticket, Good, Phone, ProductItem
 from decouple import config
@@ -12,7 +12,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.views import View
 from .forms import ServiceEditForm, InformationEditForm
-from apps.dashboard.forms import BannerForm, NewsForm, NewsEditForm
+from apps.dashboard.forms import BannerForm, NewsForm, NewsEditForm, BonusEditForm
 from apps.customer.models import News
 from datetime import date
 from django.db.models import Q
@@ -67,10 +67,9 @@ def dashboard(request):
         Q(created__date=today) & Q(status='sent'))
     orders = number_cutter(orders)
     order_today = number_cutter(order_today)
-
     customers = Profile.objects.all()
     customers = number_cutter(customers)
-
+    print(customers)
     customers_today_count = Profile.objects.filter(created__date=today)
     customers_today_count = number_cutter(customers_today_count)
 
@@ -86,72 +85,24 @@ def dashboard(request):
     recent = all_orders.order_by('-created')[:25]
 
     top_selling_products = SoldProduct.objects.all()
-    data = defaultdict(list)
+    sold_products_info = defaultdict(int)
 
-    for i in top_selling_products:
-        product_item = i.product
-        item_data = {
-            'quantity': i.quantity,
-            'revenue': product_item.new_price * i.quantity if product_item.new_price else product_item.old_price * i.quantity
-        }
-        if hasattr(product_item, 'tickets'):
-            try:
-                t = Ticket.objects.get(product_id=product_item.pk)
-                item_data.update({
-                    'title': t.event_name,
-                    'price': product_item.new_price if product_item.new_price else product_item.old_price,
-                    'image': get_first_image_url(product_item),
-                })
-                existing_item = next(
-                    (item for item in data['tickets'] if item['title'] == t.event_name), None)
-                if existing_item:
-                    existing_item['quantity'] += i.quantity
-                    existing_item['revenue'] += item_data['revenue']
-                else:
-                    data['tickets'].append(item_data)
-            except Ticket.DoesNotExist:
-                print(f"Ticket with ID {product_item.pk} does not exist.")
+    for sold_product in top_selling_products:
+        product_instance = sold_product.product
 
-        elif hasattr(product_item, 'phones'):
-            try:
-                p = Phone.objects.get(id=product_item.pk)
-                item_data.update({
-                    'title': p.model_name,
-                    'price': product_item.new_price if product_item.new_price else product_item.old_price,
-                    'image': get_first_image_url(product_item),
-                })
-                existing_item = next(
-                    (item for item in data['phones'] if item['title'] == p.model_name), None)
-                if existing_item:
-                    existing_item['quantity'] += i.quantity
-                    existing_item['revenue'] += item_data['revenue']
-                else:
-                    data['phones'].append(item_data)
-                # Continue with your logic using the 'phone' object
-            except Phone.DoesNotExist:
-                print(f"Phone with ID {product_item.pk} does not exist.")
-        elif hasattr(product_item, 'goods'):
-            try:
-                g = Good.objects.get(id=product_item.pk)
-                item_data.update({
-                    'title': g.name,
-                    'price': product_item.new_price if product_item.new_price else product_item.old_price,
-                    'image': get_first_image_url(product_item),
-                })
-                existing_item = next(
-                    (item for item in data['goods'] if item['title'] == g.name), None)
-                if existing_item:
-                    existing_item['quantity'] += i.quantity
-                    existing_item['revenue'] += item_data['revenue']
-                else:
-                    data['goods'].append(item_data)
-            except Good.DoesNotExist:
-                print(f"Good with ID {product_item.pk} does not exist.")
-        else:
-            print("This ProductItem is not associated with any specific type.")
+        title = ""
+        if hasattr(product_instance, 'goods'):
+            title = product_instance.goods.name
+        elif hasattr(product_instance, 'tickets'):
+            title = product_instance.tickets.event_name
+        elif hasattr(product_instance, 'phones'):
+            title = product_instance.phones.model_name
 
-        product_item.available_quantity += i.quantity
-        product_item.save()
+        quantity = sold_product.quantity
+        sold_products_info[title] += quantity
+
+    sorted_sold_products = sorted(
+        sold_products_info.items(), key=lambda x: -x[1])
 
     orders_with_comments = Order.objects.exclude(comment='')
     most_expensive = []
@@ -164,11 +115,12 @@ def dashboard(request):
         most_expensive.append(order_info)
 
     products_with_quantity = (
-        Good.objects.filter(product__available_quantity__lt=50)
-        .values('name_uz', 'product__available_quantity')
+        Good.objects.filter(product__available_quantity__lt=100)
+        .values('id', 'name_uz', 'product__available_quantity')
         .order_by('-product__available_quantity')[:100]
     )
-    return render(request, "base.html", {'products_with_quantity': products_with_quantity, 'most_expensive': most_expensive, 'comments': orders_with_comments, 'top_products': top_selling_products, 'customers_today': customers_today_count, 'all_orders': all_orders, 'orders': orders, 'customers': customers, 'revenue': revenue, 'recent': recent, 'order_today': order_today, 'revenue_today': revenue_today, 'data': data})
+
+    return render(request, "base.html", {'data': sorted_sold_products, 'products_with_quantity': products_with_quantity, 'most_expensive': most_expensive, 'comments': orders_with_comments, 'top_products': top_selling_products, 'customers_today': customers_today_count, 'all_orders': all_orders, 'orders': orders, 'customers': customers, 'revenue': revenue, 'recent': recent, 'order_today': order_today, 'revenue_today': revenue_today})
 
 
 def get_first_image_url(product_item):
@@ -219,6 +171,13 @@ class ServiceView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        # Fetch Bonus objects separately
+        bonuses = Bonus.objects.all().order_by('pk')
+
+        # Add the Bonus objects to the context
+        context['bonuses'] = bonuses
+
         return context
 
 
@@ -399,3 +358,20 @@ def bot(order):
         return response.text
     except Exception as e:
         return f"Error: {e}"
+class BonusEditView(View):
+    template_name = "dashboard/service/edit_bonus.html"
+
+    def get(self, request, pk):
+        bonus = get_object_or_404(Bonus, pk=pk)
+        form = BonusEditForm(instance=bonus)
+        return render(request, self.template_name, {"form": form, "bonus": bonus})
+
+    def post(self, request, pk):
+        bonus = get_object_or_404(Bonus, pk=pk)
+        form = BonusEditForm(request.POST, instance=bonus)
+
+        if form.is_valid():
+            form.save()
+            return redirect("service-list")
+
+        return render(request, self.template_name, {"form": form, "bonus": bonus})
