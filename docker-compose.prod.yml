@@ -20,7 +20,7 @@ services:
     image: postgres:13
     restart: always
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres_data:/var/lib/postgresql/data2/
     environment:
       - POSTGRES_USER=${DB_USERNAME}
