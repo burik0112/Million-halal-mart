@@ -18,12 +18,12 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
 
-#"https://688110a55be44f2eaf7b1e0c8f7549b9@o1113688.ingest.sentry.io/6144432"
+# "https://688110a55be44f2eaf7b1e0c8f7549b9@o1113688.ingest.sentry.io/6144432"
 sentry_sdk.init(
     dsn="https://a3fdf4caf4765a08afd9dd01c0d11f41@o4506424091934720.ingest.sentry.io/4506424100323328",
     integrations=[DjangoIntegration()],
     traces_sample_rate=1.0,
-    send_default_pii=True
+    send_default_pii=True,
 )
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,7 +48,7 @@ SECRET_KEY = get_env_value("SECRET_KEY")
 # DEBUG = True
 
 ALLOWED_HOSTS = [get_env_value("ALLOWED_HOSTS")]
-LOGIN_REDIRECT_URL = 'dashboard'
+LOGIN_REDIRECT_URL = "dashboard"
 
 # Application definition
 LOCAL_APPS = [
@@ -72,8 +72,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
-    'ckeditor',
-    'ckeditor_uploader',
+    "ckeditor",
+    "ckeditor_uploader",
 ] + LOCAL_APPS
 
 MIDDLEWARE = [
@@ -91,8 +91,12 @@ CKEDITOR_UPLOAD_PATH = "uploads/"
 REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"]
 }
-CORS_ALLOW_ALL_ORIGINS = True
+CSRF_TRUSTED_ORIGINS = [
+    "https://millionmart.uz",
+    "https://millionmart.uz/",
+]
 
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 CORS_ALLOW_CREDENTIALS = True
