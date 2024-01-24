@@ -46,7 +46,9 @@ from .information import (
     edit_privacy,
     edit_aboutus,
     edit_support,
-    edit_payment
+    edit_payment,
+    SocialMediaListView,
+    SocialMediaEditView,
 )
 
 urlpatterns = [
@@ -149,6 +151,8 @@ urlpatterns = [
     path("edit-support/<int:pk>/", login_required(edit_support), name="edit_support"),
     path("edit-payment/<int:pk>/", login_required(edit_payment), name="edit_payment"),
     path("bonus-edit/<int:pk>/", login_required(BonusEditView.as_view()), name="edit_bonus"),
+    path("socialmedia/", login_required(SocialMediaListView.as_view()), name="socialmedia"),
+    path("socialmedia-edit/<int:pk>/", login_required(SocialMediaEditView.as_view()), name="edit_media"),
 
 
     

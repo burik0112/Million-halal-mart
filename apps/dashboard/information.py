@@ -1,13 +1,9 @@
-from apps.merchant.models import Information, Service
+from apps.merchant.models import Information, Service, SocialMedia
 from decouple import config
-from django.core.exceptions import ImproperlyConfigured
-import requests
-import urllib.parse
-import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView
 from django.views import View
-from .forms import ReminderForm, AgrementForm, ShipmentForm, PrivacyForm, AboutUsForm, SupportForm, PaymentForm
+from .forms import ReminderForm, AgrementForm, ShipmentForm, PrivacyForm, AboutUsForm, SupportForm, PaymentForm, SocialMediaEditForm
 
 
 def edit_reminder(request, pk):
@@ -95,3 +91,33 @@ def edit_payment(request, pk):
         form = PaymentForm(instance=info)
 
     return render(request, "information/edit_payment.html", {"form": form})
+
+class SocialMediaListView(ListView):
+    model = SocialMedia
+    template_name = "information/socialmedia.html"
+    context_object_name = "socialmedias"
+
+    def get_queryset(self):
+        return SocialMedia.objects.all().first()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+    
+class SocialMediaEditView(View):
+    template_name = "information/socialmedia_edit.html"
+
+    def get(self, request, pk):
+        media = get_object_or_404(SocialMedia, pk=pk)
+        form = SocialMediaEditForm(instance=media)
+        return render(request, self.template_name, {"form": form, "media": media})
+
+    def post(self, request, pk):
+        media = get_object_or_404(SocialMedia, pk=pk)
+        form = SocialMediaEditForm(request.POST, instance=media)
+        
+        if form.is_valid():
+            form.save()
+            return redirect("socialmedia")
+
+        return render(request, self.template_name, {"form": form, "media": media})

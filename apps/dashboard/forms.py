@@ -12,7 +12,7 @@ from apps.product.models import (
 )
 from django.core.validators import MinValueValidator
 from apps.customer.models import News, Banner
-from apps.merchant.models import Information, Service, Bonus
+from apps.merchant.models import Information, Service, Bonus, SocialMedia
 from django.utils import timezone
 from ckeditor.widgets import CKEditorWidget
 
@@ -48,7 +48,8 @@ class MultipleFileField(forms.ImageField):
 class PhoneProductItemForm(forms.ModelForm):
     class Meta:
         model = Phone
-        fields = ["model_name", "ram", "storage", "category", "color", "condition"]
+        fields = ["model_name", "ram", "storage",
+                  "category", "color", "condition"]
         widgets = {
             "model_name": forms.TextInput(attrs={"class": "form-control"}),
             "ram": forms.Select(attrs={"class": "form-control"}),
@@ -206,7 +207,8 @@ class PhoneEditForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
     product_measure = forms.ChoiceField(
-        choices=ProductItem.CHOICES, widget=forms.Select(attrs={"class": "form-select"})
+        choices=ProductItem.CHOICES, widget=forms.Select(
+            attrs={"class": "form-select"})
     )
     product_available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
@@ -321,7 +323,8 @@ class PhoneEditForm(forms.ModelForm):
 class TicketCategoryCreateForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ["name_uz", "name_ru", "name_en", "name_kr", "image", "desc", "active"]
+        fields = ["name_uz", "name_ru", "name_en",
+                  "name_kr", "image", "desc", "active"]
         widgets = {
             # 'main_type': forms.Select(attrs={'class': 'form-control'}),
             "name_uz": forms.TextInput(attrs={"class": "form-control"}),
@@ -360,7 +363,8 @@ class TicketCategoryCreateForm(forms.ModelForm):
 class TicketProductItemForm(forms.ModelForm):
     class Meta:
         model = Ticket
-        fields = ["event_name_uz", "event_name_ru", "event_name_en", "event_name_kr"]
+        fields = ["event_name_uz", "event_name_ru",
+                  "event_name_en", "event_name_kr"]
         widgets = {
             "category": forms.Select(attrs={"class": "form-control"}),
             "event_name_uz": forms.TextInput(attrs={"class": "form-control"}),
@@ -375,7 +379,8 @@ class TicketProductItemForm(forms.ModelForm):
     )
     event_date = forms.DateTimeField(
         input_formats=["%Y-%m-%d"],  # Adjust the format as needed
-        widget=forms.DateTimeInput(attrs={"type": "date", "class": "form-control"}),
+        widget=forms.DateTimeInput(
+            attrs={"type": "date", "class": "form-control"}),
     )
     desc_uz = forms.CharField(
         required=False, widget=forms.Textarea(attrs={"class": "form-control"})
@@ -583,7 +588,8 @@ class TicketEditForm(forms.ModelForm):
 class GoodMainCategoryCreateForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ["name_uz", "name_ru", "name_en", "name_kr", "image", "active"]
+        fields = ["name_uz", "name_ru", "name_en",
+                  "name_kr", "image", "active"]
         widgets = {
             "name_uz": forms.TextInput(attrs={"class": "form-control"}),
             "name_ru": forms.TextInput(attrs={"class": "form-control"}),
@@ -618,7 +624,8 @@ class GoodMainCategoryCreateForm(forms.ModelForm):
 
         # Filter the category queryset to main_type='f'
         if "category" in self.fields:
-            self.fields["category"].queryset = Category.objects.filter(main_type="f")
+            self.fields["category"].queryset = Category.objects.filter(
+                main_type="f")
 
     def save(self, commit=True):
         # Save the category with main_type='f'
@@ -760,7 +767,8 @@ class GoodProductItemForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
     measure = forms.ChoiceField(
-        choices=ProductItem.CHOICES, widget=forms.Select(attrs={"class": "form-select"})
+        choices=ProductItem.CHOICES, widget=forms.Select(
+            attrs={"class": "form-select"})
     )
     available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"})
@@ -779,7 +787,8 @@ class GoodProductItemForm(forms.ModelForm):
     )  # New field for multiple images # New field for multiple images
     expire_date = forms.DateTimeField(
         input_formats=["%Y-%m-%d"],  # Adjust the format as needed
-        widget=forms.DateTimeInput(attrs={"type": "date", "class": "form-control"}),
+        widget=forms.DateTimeInput(
+            attrs={"type": "date", "class": "form-control"}),
     )
 
     def save(self, commit=True):
@@ -821,10 +830,14 @@ class GoodProductItemForm(forms.ModelForm):
 
 class GoodEditForm(forms.ModelForm):
     # Fields for the Good model
-    name_uz = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
-    name_ru = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
-    name_en = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
-    name_kr = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
+    name_uz = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "form-control"}))
+    name_ru = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "form-control"}))
+    name_en = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "form-control"}))
+    name_kr = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "form-control"}))
     expire_date = forms.DateField(
         widget=forms.DateInput(attrs={"class": "form-control", "type": "date"})
     )
@@ -963,11 +976,13 @@ class NewsForm(forms.ModelForm):
 
     start_date = forms.DateTimeField(
         input_formats=["%Y-%m-%d"],  # Adjust the format as needed
-        widget=forms.DateTimeInput(attrs={"type": "date", "class": "form-control"}),
+        widget=forms.DateTimeInput(
+            attrs={"type": "date", "class": "form-control"}),
     )
     end_date = forms.DateTimeField(
         input_formats=["%Y-%m-%d"],  # Adjust the format as needed
-        widget=forms.DateTimeInput(attrs={"type": "date", "class": "form-control"}),
+        widget=forms.DateTimeInput(
+            attrs={"type": "date", "class": "form-control"}),
     )
 
     def save(self, commit=True):
@@ -1385,6 +1400,7 @@ class PaymentForm(forms.ModelForm):
             attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100}
         ),
     )
+
     class Meta:
         model = Information
         fields = [
@@ -1625,6 +1641,7 @@ class InformationEditForm(forms.ModelForm):
             "payment_data_en",
             "payment_data_kr",
         ]
+
     def __init__(self, *args, **kwargs):
         super(InformationEditForm, self).__init__(*args, **kwargs)
         if self.instance:
@@ -1702,10 +1719,12 @@ class BannerForm(forms.ModelForm):
             'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
+
 class CategoryEditForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ['main_type',"name_uz", "name_ru", "name_en", "name_kr", "image", "active", "desc_uz", "desc_ru", "desc_en", "desc_kr"]
+        fields = ['main_type', "name_uz", "name_ru", "name_en", "name_kr",
+                  "image", "active", "desc_uz", "desc_ru", "desc_en", "desc_kr"]
         widgets = {
             'main_type': forms.Select(attrs={'class': 'form-control'}),
             "name_uz": forms.TextInput(attrs={"class": "form-control"}),
@@ -1745,10 +1764,12 @@ class CategoryEditForm(forms.ModelForm):
             self.fields["image"].initial = self.instance.image
             self.fields["active"].initial = self.instance.active
 
+
 class SubCategoryEditForm(forms.ModelForm):
     class Meta:
         model = SubCategory
-        fields = ["name_uz", "name_ru", "name_en", "name_kr", "image", "active", "desc_uz", "desc_ru", "desc_en", "desc_kr"]
+        fields = ["name_uz", "name_ru", "name_en", "name_kr", "image",
+                  "active", "desc_uz", "desc_ru", "desc_en", "desc_kr"]
         widgets = {
             "name_uz": forms.TextInput(attrs={"class": "form-control"}),
             "name_ru": forms.TextInput(attrs={"class": "form-control"}),
@@ -1785,6 +1806,7 @@ class SubCategoryEditForm(forms.ModelForm):
             self.fields["desc_kr"].initial = self.instance.desc_kr
             self.fields["image"].initial = self.instance.image
             self.fields["active"].initial = self.instance.active
+
 
 class CategoryCreateForm(forms.ModelForm):
 
@@ -1836,7 +1858,8 @@ class CategoryCreateForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
-    
+
+
 class SubCategoryCreateForm(forms.ModelForm):
     category = forms.ModelChoiceField(
         queryset=Category.objects.filter(main_type="f"),
@@ -1893,12 +1916,15 @@ class SubCategoryCreateForm(forms.ModelForm):
             instance.save()
         return instance
 
+
 class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
 
+
 class BonusEditForm(forms.ModelForm):
-    title = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), label='Toifasi')
+    title = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "form-control"}), label='Toifasi')
     amount = forms.DecimalField(
         decimal_places=0,
         max_digits=10,
@@ -1920,6 +1946,7 @@ class BonusEditForm(forms.ModelForm):
     class Meta:
         model = Bonus
         fields = ['title', 'amount', 'percentage', 'active']
+
     def __init__(self, *args, **kwargs):
         super(BonusEditForm, self).__init__(*args, **kwargs)
         if self.instance:
@@ -1933,3 +1960,51 @@ class BonusEditForm(forms.ModelForm):
         if commit:
             bonus.save()
         return bonus
+
+
+class SocialMediaEditForm(forms.ModelForm):
+    telegram = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "form-control"}), label='Telegram', required=False)
+    instagram = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "form-control"}), label='Instagram', required=False)
+    whatsapp = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "form-control"}), label='Whatsapp', required=False)
+    phone_number = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "form-control"}), label='Telefon nomer', required=False)
+    imo = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "form-control"}), label='IMO', required=False)
+    kakao = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "form-control"}), label='Kakao talk', required=False)
+
+    class Meta:
+        model = SocialMedia
+        fields = ['telegram', 'instagram', 'whatsapp',
+                  'phone_number', 'imo', 'kakao']
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        for field_name in ['telegram', 'instagram', 'whatsapp']:
+            if cleaned_data.get(field_name) and cleaned_data[field_name] != getattr(self.instance, field_name):
+                if field_name == 'telegram':
+                    cleaned_data[field_name] = f"https://t.me/{cleaned_data[field_name]}"
+                elif field_name == 'instagram':
+                    cleaned_data[field_name] = f"https://{field_name}.com/{cleaned_data[field_name]}"
+                elif field_name == 'whatsapp':
+                    cleaned_data[field_name] = f"https://wa.me/{cleaned_data[field_name]}"
+
+        return cleaned_data
+
+    def __init__(self, *args, **kwargs):
+        super(SocialMediaEditForm, self).__init__(*args, **kwargs)
+        if self.instance:
+            self.fields["telegram"].initial = self.instance.telegram
+            self.fields["instagram"].initial = self.instance.instagram
+            self.fields["whatsapp"].initial = self.instance.whatsapp
+            self.fields["phone_number"].initial = self.instance.phone_number
+            self.fields["imo"].initial = self.instance.imo
+            self.fields["kakao"].initial = self.instance.kakao
+
+    def save(self, commit=True):
+        media = super(SocialMediaEditForm, self).save(commit=commit)
+        return media

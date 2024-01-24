@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, permissions
 from django.db import transaction
 from rest_framework.response import Response
-from .models import Order, OrderItem, Information, Service, SecialMedia, Bonus
+from .models import Order, OrderItem, Information, Service, SocialMedia, Bonus
 from .serializers import (
     CustomPageNumberPagination,
     OrderItemSerializer,
@@ -205,7 +205,7 @@ class ServiceListAPIView(ListAPIView):
 
 
 class SocialMeadiaAPIView(ListAPIView):
-    queryset = SecialMedia.objects.all().order_by("-pk")
+    queryset = SocialMedia.objects.all().order_by("-pk")
     serializer_class = SocialMediaSerializer
 
 

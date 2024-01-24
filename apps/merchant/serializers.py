@@ -5,7 +5,7 @@ from apps.product.serializers import (
 )
 from .models import Bonus
 from apps.product.models import Phone, Ticket, Good
-from .models import Order, OrderItem, Information, Service, SecialMedia
+from .models import Order, OrderItem, Information, Service, SocialMedia
 
 
 class CustomPageNumberPagination(PageNumberPagination):
@@ -159,7 +159,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 class SocialMediaSerializer(serializers.ModelSerializer):
     class Meta:
-        model = SecialMedia
+        model = SocialMedia
         fields = "__all__"
 
 
