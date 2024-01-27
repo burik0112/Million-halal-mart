@@ -1,8 +1,5 @@
 from django.db import models
 from model_utils.models import TimeStampedModel
-from django.urls import reverse
-from django.utils.text import slugify
-from django.utils import timezone
 
 
 class Category(TimeStampedModel, models.Model):
@@ -46,6 +43,7 @@ class ProductItem(TimeStampedModel, models.Model):
     new_price = models.DecimalField(
         decimal_places=0, max_digits=10, null=True, blank=True, default=0
     )
+    weight = models.FloatField(default=0, blank=True)
     measure = models.IntegerField(choices=CHOICES, default=0)
     available_quantity = models.PositiveIntegerField(default=0)
     bonus = models.IntegerField(default=0)
@@ -79,7 +77,7 @@ class Ticket(models.Model):
 
     def __str__(self) -> str:
         return self.event_name
-    
+
     def save(self, *args, **kwargs):
         self.product.measure = 1  # Assuming 1 corresponds to "DONA" in the CHOICES tuple
         self.product.save()
@@ -153,11 +151,12 @@ class Phone(models.Model):
 
     def __str__(self) -> str:
         return self.model_name
-    
+
     def save(self, *args, **kwargs):
-        self.product.measure = 1 
+        self.product.measure = 1
         self.product.save()
         super().save(*args, **kwargs)
+
 
 class Good(models.Model):
     name = models.CharField(max_length=255)

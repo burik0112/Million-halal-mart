@@ -1922,7 +1922,7 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
 
-class BonusEditForm(forms.ModelForm):
+class BonusEditForm(forms.ModelForm):   
     title = forms.CharField(widget=forms.TextInput(
         attrs={"class": "form-control"}), label='Toifasi')
     amount = forms.DecimalField(
@@ -1963,47 +1963,50 @@ class BonusEditForm(forms.ModelForm):
 
 
 class SocialMediaEditForm(forms.ModelForm):
-    telegram = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}), label='Telegram', required=False)
-    instagram = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}), label='Instagram', required=False)
-    whatsapp = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}), label='Whatsapp', required=False)
-    phone_number = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}), label='Telefon nomer', required=False)
-    imo = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}), label='IMO', required=False)
-    kakao = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}), label='Kakao talk', required=False)
+    telegram = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), label='Telegram', required=False)
+    instagram = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), label='Instagram', required=False)
+    whatsapp = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), label='Whatsapp', required=False)
+    phone_number = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), label='Telefon nomer', required=False)
+    imo = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), label='IMO', required=False)
+    kakao = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), label='Kakao talk', required=False)
+    tiktok = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), label='TikTok', required=False)
 
     class Meta:
         model = SocialMedia
-        fields = ['telegram', 'instagram', 'whatsapp',
-                  'phone_number', 'imo', 'kakao']
+        fields = ['telegram', 'instagram', 'whatsapp', 'phone_number', 'imo', 'kakao', 'tiktok']
 
     def clean(self):
         cleaned_data = super().clean()
 
-        for field_name in ['telegram', 'instagram', 'whatsapp']:
+        for field_name in ['telegram', 'instagram', 'whatsapp', 'tiktok']:
             if cleaned_data.get(field_name) and cleaned_data[field_name] != getattr(self.instance, field_name):
-                if field_name == 'telegram':
-                    cleaned_data[field_name] = f"https://t.me/{cleaned_data[field_name]}"
-                elif field_name == 'instagram':
-                    cleaned_data[field_name] = f"https://{field_name}.com/{cleaned_data[field_name]}"
-                elif field_name == 'whatsapp':
-                    cleaned_data[field_name] = f"https://wa.me/{cleaned_data[field_name]}"
+                original_value = getattr(self.instance, field_name)
+                cleaned_data[field_name] = self.get_cleaned_url(field_name, cleaned_data[field_name], original_value)
 
         return cleaned_data
+
+    def get_cleaned_url(self, field_name, value, original_value):
+        # Check if the original value already contains any of the prefixes
+        if any(original_value.startswith(prefix) for prefix in [f"https://{field_name}.com/", f"https://www.{field_name}.com/", "https://t.me/", "https://wa.me/"]):
+            return value  # Don't add the prefix again
+        else:
+            # Add the prefix based on the social media platform
+            if field_name == 'telegram':
+                return f"https://t.me/{value}"
+            elif field_name == 'instagram':
+                return f"https://www.instagram.com/{value}"
+            elif field_name == 'whatsapp':
+                return f"https://wa.me/{value}"
+            elif field_name == 'tiktok':
+                return f"https://www.tiktok.com/@{value}"
+            else:
+                return value
 
     def __init__(self, *args, **kwargs):
         super(SocialMediaEditForm, self).__init__(*args, **kwargs)
         if self.instance:
-            self.fields["telegram"].initial = self.instance.telegram
-            self.fields["instagram"].initial = self.instance.instagram
-            self.fields["whatsapp"].initial = self.instance.whatsapp
-            self.fields["phone_number"].initial = self.instance.phone_number
-            self.fields["imo"].initial = self.instance.imo
-            self.fields["kakao"].initial = self.instance.kakao
+            for field_name in ['telegram', 'instagram', 'whatsapp', 'phone_number', 'imo', 'kakao', 'tiktok']:
+                self.fields[field_name].initial = getattr(self.instance, field_name)
 
     def save(self, commit=True):
         media = super(SocialMediaEditForm, self).save(commit=commit)

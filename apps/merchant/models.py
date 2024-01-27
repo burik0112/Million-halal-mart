@@ -137,6 +137,7 @@ class SocialMedia(TimeStampedModel, models.Model):
     phone_number = models.CharField(blank=True, null=True)
     imo = models.CharField(blank=True, null=True)
     kakao = models.CharField(blank=True, null=True)
+    tiktok = models.CharField(blank=True, null=True)
 
     def __str__(self) -> str:
         return "SocialMedias"
