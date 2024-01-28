@@ -15,6 +15,15 @@
 
       <!-- First Column -->
       <div class="col-md-6">
+        <div class="row">
+
+        <div class="col-md-9 mb-3">
+          {{ form.category.label_tag }} {{ form.category }}
+        </div>
+        <div class="col-md-3 d-flex align-items-center">
+          <a href="{% url 'good_subcategory' %}" class="btn btn-success btn-sm">Kategoriya yaratish</a>
+        </div>
+      </div>
         <div class="mb-3">
           {{ form.name_uz.label_tag }} {{ form.name_uz }}
         </div>
@@ -23,9 +32,7 @@
         </div>
         <div class="mb-3">{{ form.measure.label_tag }} {{ form.measure }}</div>
         <div class="mb-3">{{ form.old_price.label_tag }} {{ form.old_price }}</div>
-        <div class="mb-3">
-          <label for="id_images">Images:</label>{{ form.images }}
-        </div>
+      
         <div class="mb-3">
           {{ form.expire_date.label_tag }} {{ form.expire_date }}
         </div>
@@ -37,25 +44,23 @@
       <div class="col-md-6">
         <div class="row">
           <div class="mb-3">
+            <label for="id_images">Images:</label>{{ form.images }}
+          </div>
+          <div class="mb-3">
             {{ form.name_en.label_tag }} {{ form.name_en }}
           </div>
           <div class="mb-3">
             {{ form.name_kr.label_tag }} {{ form.name_kr }}
           </div>
-          <div class="col-md-9 mb-3">
-            {{ form.category.label_tag }} {{ form.category }}
-          </div>
-          <div class="col-md-3 d-flex align-items-center">
-            <a href="{% url 'good_subcategory' %}" class="btn btn-success btn-sm">Kategoriya yaratish</a>
-          </div>
+        
         </div>
-        <div class="mb-3">{{ form.new_price.label_tag }} {{ form.new_price }}</div>
         <div class="mb-3">
           {{ form.available_quantity.label_tag }} {{ form.available_quantity }}
         </div>
-        <br>
-        <br>
-        <br>
+        <div class="mb-3">{{ form.new_price.label_tag }} {{ form.new_price }}</div>
+        <div class="mb-3">
+          {{ form.weight.label_tag }} {{ form.weight }}
+        </div>
           <div class="mb-3">{{ form.desc_en.label_tag }} {{ form.desc_en }}</div>
           <div class="mb-3">{{ form.desc_kr.label_tag }} {{ form.desc_kr }}</div>
       </div>

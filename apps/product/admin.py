@@ -6,7 +6,7 @@ from .models import *
 
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ["main_type", "name", "desc"]
+    list_display = ["main_type", "name", "desc", 'created']
 
 
 admin.site.register(Category, CategoryAdmin)

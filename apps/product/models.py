@@ -3,7 +3,7 @@ from model_utils.models import TimeStampedModel
 
 
 class Category(TimeStampedModel, models.Model):
-    PRODUCT_TYPE = (("f", "Food"), ("p", "Phone"), ("t", "Ticket"))
+    PRODUCT_TYPE = (("f", "Oziq-ovqat"), ("p", "Telefon"), ("t", "Chipta"))
     main_type = models.CharField(
         max_length=1, choices=PRODUCT_TYPE, default="f")
     name = models.CharField(blank=True, max_length=255)
@@ -14,6 +14,9 @@ class Category(TimeStampedModel, models.Model):
     def __str__(self) -> str:
         return self.name
 
+    def get_type_display(self):
+        """Get the human-readable main_type label."""
+        return dict(self.PRODUCT_TYPE).get(self.main_type, "Unknown")
 
 class SubCategory(TimeStampedModel, models.Model):
     category = models.ForeignKey(
@@ -43,7 +46,7 @@ class ProductItem(TimeStampedModel, models.Model):
     new_price = models.DecimalField(
         decimal_places=0, max_digits=10, null=True, blank=True, default=0
     )
-    weight = models.FloatField(default=0, blank=True)
+    weight = models.FloatField(default=1, blank=True)
     measure = models.IntegerField(choices=CHOICES, default=0)
     available_quantity = models.PositiveIntegerField(default=0)
     bonus = models.IntegerField(default=0)
@@ -110,12 +113,13 @@ class Phone(models.Model):
         ("white", "White"),
         ("gold", "Gold"),
         ("silver", "Silver"),
+        ("other", "Boshqa"),
     )
     CONDITION = (
-        ("good", "Good"),
-        ("exc", "Excellent"),
-        ("used", "Used"),
-        ("new", "New"),
+        ("good", "Yaxshi"),
+        ("exc", "A'lo"),
+        ("used", "Foydalanilgan"),
+        ("new", "Yangi"),
     )
     color = models.CharField(
         max_length=10,

@@ -15,9 +15,8 @@
           <thead>
             <tr>
               <th scope="col" class="text-center">#</th>
-              <th scope="col" class="text-center">Nomi</th>
+              <th scope="col">Nomi</th>
               <th scope="col" class="text-center">Foto</th>
-              <th scope="col" class="text-center">Izoh</th>
               <th scope="col" class="text-center">Yaratilgan</th>
               <th scope="col" class="text-center">Aktivligi</th>
               <th scope="col" class="text-center">Qo'shimcha</th>
@@ -27,11 +26,10 @@
             {% for c in subcategories %}
             <tr>
               <th scope="row" class="text-center">{{ c.id }}</th>
-              <td class="text-center">{{ c.name_uz }}</td>
+              <td >{{ c.name_uz }}</td>
               <td class="text-center">
                 <img src="{{ c.image.url }}" alt="{{ c.name }}" width="50" height="50" />
               </td>
-              <td class="text-center">{{c.desc_uz}}</td>
               <td class="text-center">
                   <i class="bi bi-calendar-date"></i> {{ c.created|date:"d-m-Y" }} <br>
                   <i class="bi bi-clock"></i> {{ c.created|date:"H:i" }}

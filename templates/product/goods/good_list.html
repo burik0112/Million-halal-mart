@@ -19,6 +19,7 @@
               <th scope="col" class="text-center">Tasnif</th>
               <th scope="col" class="text-center">Eski narxi</th>
               <th scope="col" class="text-center">Yangi narxi</th>
+              <th scope="col" class="text-center">Og'irligi</th>
               <th scope="col" class="text-center">Mavjud</th>
               <th scope="col" class="text-center">Yaroqliligi</th>
               <th scope="col" class="text-center">Faol</th>
@@ -38,6 +39,7 @@
               <td class="text-center">{{ good.product.desc_uz|truncatechars:40 }}</td>
               <td class="text-center">{{ good.product.old_price }} ₩</td>
               <td class="text-center">{{ good.product.new_price }} ₩</td>
+              <td class="text-center">{{ good.product.weight }} KG</td>
               <td class="text-center">{{ good.product.available_quantity }} {{ good.product.get_measure_display }}</td>
               <td class="text-center"><i class="bi bi-calendar-date"></i> {{ good.expire_date|date:"d-m-Y" }}</td>
               {% if good.product.active %}
