@@ -1903,6 +1903,7 @@ class CategoryCreateForm(forms.ModelForm):
             "name_ru": "Nomi (RU)",
             "name_en": "Nomi (EN)",
             "name_kr": "Nomi (KR)",
+            "main_type": "Qaysi turga mansubligi",
         }
         required = {
             "name_uz": True,
