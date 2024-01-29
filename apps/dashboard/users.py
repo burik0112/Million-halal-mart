@@ -179,7 +179,6 @@ def user_login(request):
             if user is not None:
                 login(request, user)
                 next_url = request.POST.get("next", "dashboard")
-                print(next_url, "bu nima")
                 if next_url == "":
                     return redirect("dashboard")
                     # Agar 'next' mavjud bo'lmasa, 'dashboard'ga yo'naltiradi
