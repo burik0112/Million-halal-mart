@@ -13,7 +13,12 @@
         </div>
 
         <div class="mb-3">{{ form.condition.label_tag }} {{ form.condition }}</div>
-        <div class="mb-3">{{ form.ram.label_tag }} {{ form.ram }}</div>
+        <div class="mb-3" style="display: inline-block; margin-right: 200px;">
+          {{ form.ram.label_tag }} {{ form.ram }}
+      </div>
+      <div class="mb-3" style="display: inline-block;">
+          {{ form.weight.label_tag }} {{ form.weight }}
+      </div>
         <div class="mb-3">{{ form.old_price.label_tag }} {{ form.old_price }}</div>
         <div class="mb-3">
           <label for="id_images">Rasmlar:</label>{{ form.images }}

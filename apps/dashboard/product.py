@@ -69,7 +69,6 @@ class PhoneCategoryCreateView(CreateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        print("Formada xatolar mavjud:", form.errors)
         return super().form_invalid(form)
 
 
@@ -100,7 +99,6 @@ class TicketCreateView(View):
             form.save()
             return redirect("ticket-list")
         else:
-            print(form.errors)
             return render(request, self.template_name, {"form": form})
 
 
@@ -196,7 +194,6 @@ class GoodEditDeleteView(View):
             form = GoodEditForm(request.POST, request.FILES, instance=good)
             if form.is_valid():
                 form.save()
-                print(form.data)
                 return redirect("good-list")
         else:
             form = GoodEditForm(instance=good)

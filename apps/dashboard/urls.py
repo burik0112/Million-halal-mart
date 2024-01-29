@@ -151,7 +151,7 @@ urlpatterns = [
     path("edit-support/<int:pk>/", login_required(edit_support), name="edit_support"),
     path("edit-payment/<int:pk>/", login_required(edit_payment), name="edit_payment"),
     path("bonus-edit/<int:pk>/", login_required(BonusEditView.as_view()), name="edit_bonus"),
-    path("socialmedia/", login_required(SocialMediaListView.as_view()), name="socialmedia"),
+    path("other/socialmedia/", login_required(SocialMediaListView.as_view()), name="socialmedia"),
     path("socialmedia-edit/<int:pk>/", login_required(SocialMediaEditView.as_view()), name="edit_media"),
 
 
