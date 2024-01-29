@@ -18,9 +18,9 @@ urlpatterns = [
     path(
         "dashboard/", include("apps.dashboard.urls"), name="dashboard"
     ),
-    path("", user_login, name="login_page"),
+    path("login/", user_login, name="login_page"),
     path('logout/', user_logout, name='logout'),
-    path("dashboard/", redirect_dashboard),
+    path("", redirect_dashboard),
 ] + swagger_urlpatterns
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
