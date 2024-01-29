@@ -152,7 +152,7 @@ class GoodCategoryCreateView(CreateView):
 class GoodMainCategoryCreateView(CreateView):
     model = Category
     form_class = GoodMainCategoryCreateForm
-    template_name = "product/category_create.html"
+    template_name = "product/goods/category_create.html"
     success_url = reverse_lazy("good_subcategory")
 
     def get_context_data(self, **kwargs):
@@ -332,7 +332,7 @@ class SubCategoryCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["action"] = "Create New Good Category"
+        context["action"] = "Create New Good SubCategory"
         return context
 
     def form_valid(self, form):
