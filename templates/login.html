@@ -74,6 +74,7 @@
                   </div>
                   <form method="POST" class="row g-3 needs-validation" novalidate>
                     {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.GET.next }}">
                     <div class="col-12">
                         <label for="yourUsername" class="form-label">Login</label>
                         <div class="input-group has-validation">

@@ -174,8 +174,9 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "../", "media/")
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
+from django.urls import reverse_lazy
 
-
+LOGIN_URL = reverse_lazy("login_page")
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "../", "mediafiles/")
 
@@ -192,3 +193,4 @@ OTP_EXPIRE_TIME = 10  # mins
 TWILIO_ACCOUNT_SID = config("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = config("TWILIO_AUTH_TOKEN")
 TWILIO_PHONE_NUMBER = config("TWILIO_PHONE_NUMBER")
+FCM_SERVER_KEY = config("FCM_SERVER_KEY")

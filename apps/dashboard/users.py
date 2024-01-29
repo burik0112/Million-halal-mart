@@ -16,7 +16,7 @@ class UserListView(ListView):
     context_object_name = "users"
 
     def get_queryset(self):
-        return Profile.objects.all().order_by('pk')
+        return Profile.objects.all().order_by("pk")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -40,7 +40,7 @@ class BlockActivateUserView(View):
         user = get_object_or_404(Profile, id=pk)
         user.origin.is_active = not user.origin.is_active
         user.origin.save()
-        return redirect('users-list')
+        return redirect("users-list")
 
 
 class UserOrdersView(DetailView):
@@ -49,8 +49,8 @@ class UserOrdersView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(UserOrdersView, self).get_context_data(**kwargs)
-        orders = Order.objects.filter(user__id=self.kwargs['pk'])
-        user = Profile.objects.get(id=self.kwargs['pk'])
+        orders = Order.objects.filter(user__id=self.kwargs["pk"])
+        user = Profile.objects.get(id=self.kwargs["pk"])
         if orders:
             context["orders"] = orders
             context["user"] = user
@@ -65,8 +65,8 @@ class UserOrderDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(UserOrderDetailView, self).get_context_data(**kwargs)
-        order = Order.objects.get(id=self.kwargs['pk'])
-        order_items = OrderItem.objects.filter(order__id=self.kwargs['pk'])
+        order = Order.objects.get(id=self.kwargs["pk"])
+        order_items = OrderItem.objects.filter(order__id=self.kwargs["pk"])
         user = order.user
         cargo = Service.objects.all().first().delivery_fee
 
@@ -84,13 +84,15 @@ class UserOrderDetailView(DetailView):
                 total_price = 0
 
             # Add data for each OrderItem to the list
-            order_items_data.append({
-                "order_item": order_item,
-                "product_type": product_type,
-                "details": details,
-                "total_price": total_price,
-                "first_image_url": first_image_url,
-            })
+            order_items_data.append(
+                {
+                    "order_item": order_item,
+                    "product_type": product_type,
+                    "details": details,
+                    "total_price": total_price,
+                    "first_image_url": first_image_url,
+                }
+            )
 
         if order_items:
             context["order_items_data"] = order_items_data
@@ -120,8 +122,12 @@ class UserOrderDetailView(DetailView):
             x = "Ticket", {
                 "event_name": product_item.tickets.event_name,
                 "event_date": product_item.tickets.event_date,
-                "category": product_item.tickets.category.name if product_item.tickets.category else "Bilet",
-                "price": product_item.new_price if product_item.new_price else product_item.old_price,
+                "category": product_item.tickets.category.name
+                if product_item.tickets.category
+                else "Bilet",
+                "price": product_item.new_price
+                if product_item.new_price
+                else product_item.old_price,
             }
             return x
         elif hasattr(product_item, "goods"):
@@ -129,7 +135,9 @@ class UserOrderDetailView(DetailView):
                 "name": product_item.goods.name,
                 "ingredients": product_item.goods.ingredients,
                 "expire_date": product_item.goods.expire_date,
-                "sub_cat": product_item.goods.sub_cat.name if product_item.goods.sub_cat else None,
+                "sub_cat": product_item.goods.sub_cat.name
+                if product_item.goods.sub_cat
+                else None,
             }
         return None, None
 
@@ -139,42 +147,51 @@ class OrdersListView(ListView):
     context_object_name = "orders"
 
     def get_queryset(self):
-        return Order.objects.all().order_by('-created')
+        return Order.objects.all().order_by("-created")
 
 
 def update_order_status(request, pk):
     order = get_object_or_404(Order, id=pk)
 
-    if request.method == 'POST':
-        new_status = request.POST.get('status')
+    if request.method == "POST":
+        new_status = request.POST.get("status")
         if new_status in dict(order.STATUS_CHOICES):
             order.status = new_status
             order.save()
 
-    return HttpResponseRedirect(reverse('all-orders-list'))
+    return HttpResponseRedirect(reverse("all-orders-list"))
+
 
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout 
+from django.contrib.auth import authenticate, login, logout
 from .forms import LoginForm
 from django.contrib import messages
+
+
 def user_login(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
+            username = form.cleaned_data["username"]
+            password = form.cleaned_data["password"]
             user = authenticate(request, username=username, password=password)
 
             if user is not None:
                 login(request, user)
-                return redirect('dashboard')
+                next_url = request.POST.get("next", "dashboard")
+                print(
+                    next_url
+                )  # Agar 'next' mavjud bo'lmasa, 'dashboard'ga yo'naltiradi
+                return redirect(next_url)
             else:
-                messages.error(request, 'Login yoki parol xato')
+                messages.error(request, "Login yoki parol xato")
     else:
         form = LoginForm()
 
-    return render(request, 'login.html', {'form': form})
+    return render(request, "login.html", {"form": form})
+
+
 # logout page
 def user_logout(request):
     logout(request)
-    return redirect('login')
+    return redirect("login_page")

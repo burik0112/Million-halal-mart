@@ -18,7 +18,7 @@ urlpatterns = [
     path(
         "dashboard/", include("apps.dashboard.urls"), name="dashboard"
     ),
-    path("", user_login, name="login"),
+    path("", user_login, name="login_page"),
     path('logout/', user_logout, name='logout'),
     path("dashboard/", redirect_dashboard),
 ] + swagger_urlpatterns

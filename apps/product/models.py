@@ -4,8 +4,7 @@ from model_utils.models import TimeStampedModel
 
 class Category(TimeStampedModel, models.Model):
     PRODUCT_TYPE = (("f", "Oziq-ovqat"), ("p", "Telefon"), ("t", "Chipta"))
-    main_type = models.CharField(
-        max_length=1, choices=PRODUCT_TYPE, default="f")
+    main_type = models.CharField(max_length=1, choices=PRODUCT_TYPE, default="f")
     name = models.CharField(blank=True, max_length=255)
     image = models.ImageField(upload_to="category")
     desc = models.TextField(blank=True)
@@ -17,6 +16,7 @@ class Category(TimeStampedModel, models.Model):
     def get_type_display(self):
         """Get the human-readable main_type label."""
         return dict(self.PRODUCT_TYPE).get(self.main_type, "Unknown")
+
 
 class SubCategory(TimeStampedModel, models.Model):
     category = models.ForeignKey(
@@ -60,6 +60,10 @@ class ProductItem(TimeStampedModel, models.Model):
             return round(abs(1 - self.new_price / self.old_price) * 100)
         return 0
 
+    def price_changed(self):
+        """Narx o'zgarganligini tekshiradi."""
+        return self.old_price > self.new_price
+
     def __str__(self) -> str:
         return str(self.created)
 
@@ -82,7 +86,9 @@ class Ticket(models.Model):
         return self.event_name
 
     def save(self, *args, **kwargs):
-        self.product.measure = 1  # Assuming 1 corresponds to "DONA" in the CHOICES tuple
+        self.product.measure = (
+            1  # Assuming 1 corresponds to "DONA" in the CHOICES tuple
+        )
         self.product.save()
         super().save(*args, **kwargs)
 
@@ -192,8 +198,7 @@ class SoldProduct(TimeStampedModel, models.Model):
     product = models.ForeignKey(
         ProductItem, on_delete=models.SET_NULL, null=True, related_name="sold_products"
     )
-    user = models.ForeignKey(
-        "customer.Profile", on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey("customer.Profile", on_delete=models.SET_NULL, null=True)
     amount = models.DecimalField(decimal_places=0, default=0, max_digits=20)
     quantity = models.PositiveIntegerField(default=0)
 

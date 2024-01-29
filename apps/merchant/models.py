@@ -22,11 +22,28 @@ class Order(TimeStampedModel, models.Model):
         "product.ProductItem", through="OrderItem", related_name="order"
     )
     comment = models.TextField(blank=True)
-    status = models.CharField(
-        max_length=10, choices=STATUS_CHOICES, default="in_cart")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="in_cart")
 
-    total_amount = models.DecimalField(
-        decimal_places=0, max_digits=20, default=0.00)
+    total_amount = models.DecimalField(decimal_places=0, max_digits=20, default=0.00)
+
+    @property
+    def delivery_fee(self):
+        total_weight = 0
+        for item in self.orderitem.all():
+            total_weight += item.product.weight * item.quantity
+
+        # Pochta xarajatlarini hisoblash
+        service = Service.objects.first()  # Pochta xizmati olish
+        if service:
+            delivery_fee = service.delivery_fee
+            weight_factor = (
+                total_weight // 20
+            )  # Har 20 kg uchun qo'shimcha pochta xarajati
+            total_delivery_fee = delivery_fee * (weight_factor + 1)
+        else:
+            total_delivery_fee = 0
+
+        return total_delivery_fee
 
     def get_product_details(self, product_item, order_item):
         total_amount = product_item.new_price * order_item.quantity
@@ -89,6 +106,17 @@ class Order(TimeStampedModel, models.Model):
         total = 0
         for item in self.orderitem.all():
             total += item.product.new_price * item.quantity
+
+        # Bonuslarni tekshirish
+        applicable_bonus = (
+            Bonus.objects.filter(amount__lte=total, active=True)
+            .order_by("-amount")
+            .first()
+        )
+        if applicable_bonus:
+            discount = total * (applicable_bonus.percentage / 100.0)
+            total -= discount
+
         self.total_amount = total
         self.save(update_fields=["total_amount"])
 
@@ -106,8 +134,7 @@ class Order(TimeStampedModel, models.Model):
 
 
 class OrderItem(TimeStampedModel, models.Model):
-    order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name="orderitem")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="orderitem")
     product = models.ForeignKey(
         "product.ProductItem",
         on_delete=models.CASCADE,
@@ -144,8 +171,7 @@ class SocialMedia(TimeStampedModel, models.Model):
 
 
 class Service(TimeStampedModel, models.Model):
-    delivery_fee = models.DecimalField(
-        max_digits=10, decimal_places=0, default=0)
+    delivery_fee = models.DecimalField(max_digits=10, decimal_places=0, default=0)
 
     def __str__(self) -> str:
         return "Service"

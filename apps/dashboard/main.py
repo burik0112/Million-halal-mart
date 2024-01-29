@@ -69,7 +69,6 @@ def dashboard(request):
     order_today = number_cutter(order_today)
     customers = Profile.objects.all()
     customers = number_cutter(customers)
-    print(customers)
     customers_today_count = Profile.objects.filter(created__date=today)
     customers_today_count = number_cutter(customers_today_count)
 
