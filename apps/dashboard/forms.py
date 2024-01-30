@@ -96,7 +96,13 @@ class PhoneProductItemForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={"class": "form-control"}),
         label='Chegirmadagi narxi'
     )
-
+    weight = forms.DecimalField(
+        decimal_places=0,
+        max_digits=10,
+        required=False,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+        label='Maxsulot og`irligi (KG)'
+    )
     # Eski narx maydoni (agar kerak bo'lsa)
     old_price = forms.DecimalField(
         decimal_places=0,
@@ -118,7 +124,9 @@ class PhoneProductItemForm(forms.ModelForm):
 
     def save(self, commit=True):
         phone = super().save(commit=False)
+        get_weight=self.cleaned_data.get('weight', None)
         product_item = ProductItem(
+            weight=get_weight if get_weight else 1,
             desc_uz=self.cleaned_data["desc_uz"],
             desc_ru=self.cleaned_data["desc_ru"],
             desc_en=self.cleaned_data["desc_en"],
@@ -214,10 +222,11 @@ class PhoneEditForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={"class": "form-control"}),
         label='Chegirmadagi narxi'
     )
-    product_measure = forms.ChoiceField(
-        choices=ProductItem.CHOICES, widget=forms.Select(
-            attrs={"class": "form-select"}),
-        label='O`lchov birligi'
+    weight = forms.DecimalField(
+        decimal_places=0,
+        max_digits=10,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+        label='Maxsulot og`irligi (KG)'
     )
     product_available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"}),
@@ -245,8 +254,8 @@ class PhoneEditForm(forms.ModelForm):
             "images",
             "product_old_price",
             "product_new_price",
-            "product_measure",
             "product_available_quantity",
+            "weight",
             "product_desc_uz",
             "product_desc_ru",
             "product_desc_en",
@@ -276,9 +285,9 @@ class PhoneEditForm(forms.ModelForm):
         super(PhoneEditForm, self).__init__(*args, **kwargs)
         if self.instance and self.instance.product:
             product = self.instance.product
+            self.fields["weight"].initial = product.weight
             self.fields["product_old_price"].initial = product.old_price
             self.fields["product_new_price"].initial = product.new_price
-            self.fields["product_measure"].initial = product.measure
             self.fields[
                 "product_available_quantity"
             ].initial = product.available_quantity
@@ -292,15 +301,14 @@ class PhoneEditForm(forms.ModelForm):
         phone = super(PhoneEditForm, self).save(commit=False)
         if not phone.product_id:
             phone.product = ProductItem()
+        get_weight=self.cleaned_data.get('weight', None)
         product_item = phone.product
         product_item.old_price = self.cleaned_data["product_old_price"]
         product_item.new_price = self.cleaned_data["product_new_price"]
-        product_item.measure = self.cleaned_data["product_measure"]
+        product_item.weight = get_weight if get_weight else 1
         product_item.available_quantity = self.cleaned_data[
             "product_available_quantity"
         ]
-        # product_item.stock = self.cleaned_data["product_stock"]
-        # product_item.bonus = self.cleaned_data["product_bonus"]
         product_item.desc_uz = self.cleaned_data["product_desc_uz"]
         product_item.desc_ru = self.cleaned_data["product_desc_ru"]
         product_item.desc_en = self.cleaned_data["product_desc_en"]
@@ -417,7 +425,13 @@ class TicketProductItemForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={"class": "form-control"}),
         label='Chegirmadagi narxi'
     )
-
+    weight = forms.DecimalField(
+        decimal_places=0,
+        max_digits=10,
+        required=False,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+        label='Og`irligi'
+    )
     # Eski narx maydoni (agar kerak bo'lsa)
     old_price = forms.DecimalField(
         decimal_places=0,
@@ -440,12 +454,14 @@ class TicketProductItemForm(forms.ModelForm):
 
     def save(self, commit=True):
         ticket = super().save(commit=False)
+        get_weight=self.cleaned_data.get('weight', None)
         product_item = ProductItem(
             desc_uz=self.cleaned_data["desc_uz"],
             desc_ru=self.cleaned_data["desc_ru"],
             desc_en=self.cleaned_data["desc_en"],
             desc_kr=self.cleaned_data["desc_kr"],
             new_price=self.cleaned_data["new_price"],
+            weight=get_weight if get_weight else 0.5,
             old_price=self.cleaned_data.get("old_price"),
             available_quantity=self.cleaned_data["available_quantity"],
             active=self.cleaned_data["active"],
@@ -497,6 +513,12 @@ class TicketEditForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={"class": "form-control"}),
         label='Maxsulot narxi'
     )
+    weight = forms.DecimalField(
+        decimal_places=0,
+        max_digits=10,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+        label='Maxsulot og`irligi (KG)'
+    )
     images = MultipleFileField(required=False)
     product_available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"}),
@@ -525,6 +547,7 @@ class TicketEditForm(forms.ModelForm):
             "product_old_price",
             "product_new_price",
             "product_available_quantity",
+            "weight",
             "product_desc_uz",
             "product_desc_ru",
             "product_desc_en",
@@ -562,6 +585,7 @@ class TicketEditForm(forms.ModelForm):
         super(TicketEditForm, self).__init__(*args, **kwargs)
         if self.instance and self.instance.product:
             product = self.instance.product
+            self.fields["weight"].initial = product.weight
             self.fields["product_desc_uz"].initial = product.desc_uz
             self.fields["product_desc_ru"].initial = product.desc_ru
             self.fields["product_desc_en"].initial = product.desc_en
@@ -577,11 +601,10 @@ class TicketEditForm(forms.ModelForm):
         ticket = super(TicketEditForm, self).save(commit=False)
 
         if not ticket.product_id:
-            # If there is no product associated with the ticket, create a new one
             ticket.product = ProductItem()
-
-        # Populate the product fields with form data
         product_item = ticket.product
+        get_weight=self.cleaned_data.get('weight', None)
+        product_item.weight = get_weight if get_weight else 1
         product_item.desc_uz = self.cleaned_data["product_desc_uz"]
         product_item.desc_ru = self.cleaned_data["product_desc_ru"]
         product_item.desc_en = self.cleaned_data["product_desc_en"]
@@ -596,24 +619,14 @@ class TicketEditForm(forms.ModelForm):
         if commit:
             product_item.save()
             ticket.product = product_item
-
-            # Update ticket category
             ticket.category = self.cleaned_data["category"]
-
-            # Save the ticket
             ticket.save()
-
-            # Save or update multiple images
             existing_images = ticket.product.images.all()
-
-            # Delete existing images if not present in the form data
             form_images = self.files.getlist("images")
             if form_images:
                 for existing_image in existing_images:
                     if existing_image.image.name not in form_images:
                         existing_image.delete()
-
-                # Save new images
                 for img in form_images:
                     image = Image(
                         image=img,
@@ -854,6 +867,7 @@ class GoodProductItemForm(forms.ModelForm):
     )
 
     def save(self, commit=True):
+        get_weight=self.cleaned_data.get('weight', None)
         good = super().save(commit=False)
         good.name_en = self.cleaned_data.get("name_en")
         good.name_uz = self.cleaned_data.get("name_uz")
@@ -863,6 +877,7 @@ class GoodProductItemForm(forms.ModelForm):
         good.ingredients_uz = self.cleaned_data.get("ingredients_uz")
         good.ingredients_ru = self.cleaned_data.get("ingredients_ru")
         product_item = ProductItem(
+            weight=get_weight if get_weight else 1,
             desc_uz=self.cleaned_data["desc_uz"],
             desc_ru=self.cleaned_data["desc_ru"],
             desc_en=self.cleaned_data["desc_en"],
@@ -2066,8 +2081,6 @@ class SocialMediaEditForm(forms.ModelForm):
         return cleaned_data
 
     def get_cleaned_url(self, field_name, value, original_value):
-        print(field_name)
-        # Check if the original value already contains any of the prefixes
         if any(original_value.startswith(prefix) for prefix in [f"https://{field_name}.com/", f"https://www.{field_name}.com/", "https://t.me/", "https://wa.me/"]):
             return value  # Don't add the prefix again
         else:
