@@ -4,6 +4,7 @@ from django.db.models import F
 from ckeditor.fields import RichTextField
 from rest_framework.response import Response
 from rest_framework import status
+from decimal import Decimal
 from django.db.models import F, fields, ExpressionWrapper
 
 
@@ -36,12 +37,12 @@ class Order(TimeStampedModel, models.Model):
         service = Service.objects.first()  # Pochta xizmati olish
         if service:
             delivery_fee = service.delivery_fee
-            weight_factor = (
+            weight_factor = Decimal(
                 total_weight // 20
             )  # Har 20 kg uchun qo'shimcha pochta xarajati
-            total_delivery_fee = delivery_fee * (weight_factor + 1)
+            total_delivery_fee = delivery_fee * (weight_factor + Decimal(1))
         else:
-            total_delivery_fee = 0
+            total_delivery_fee = Decimal(0)
 
         return total_delivery_fee
 
