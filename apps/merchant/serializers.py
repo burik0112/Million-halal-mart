@@ -55,6 +55,7 @@ class OrderItemDetailsSerializer(serializers.ModelSerializer):
 
 class OrderListSerializer(serializers.ModelSerializer):
     # products = ProductItemSerializer(read_only=True, many=True)
+    delivery_fee = serializers.SerializerMethodField()
     orderitem = OrderItemDetailsSerializer(
         many=True, read_only=True, source="get_order_items"
     )
@@ -63,6 +64,9 @@ class OrderListSerializer(serializers.ModelSerializer):
         model = Order
         fields = "__all__"
         read_only_fields = ("delivery_fee",)
+    
+    def get_delivery_fee(self, obj):
+        return obj.delivery_fee
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
