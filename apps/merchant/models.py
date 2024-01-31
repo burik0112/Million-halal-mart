@@ -102,7 +102,19 @@ class Order(TimeStampedModel, models.Model):
                 "new_available_quantity"
             ]
             product_item.save()
+    @property
+    def bonus_amount(self):
+        total = 0
+        for item in self.orderitem.all():
+            total += item.product.new_price * item.quantity
 
+        # Bonuslarni tekshirish
+        applicable_bonus = (
+            Bonus.objects.filter(amount__lte=total, active=True)
+            .order_by("-amount")
+            .first()
+        )
+        return applicable_bonus
     def update_total_amount(self):
         total = 0
         for item in self.orderitem.all():

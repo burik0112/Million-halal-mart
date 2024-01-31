@@ -59,16 +59,18 @@ class OrderListSerializer(serializers.ModelSerializer):
     orderitem = OrderItemDetailsSerializer(
         many=True, read_only=True, source="get_order_items"
     )
+    bonus_amount = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
         fields = "__all__"
-        read_only_fields = ("delivery_fee",)
+        read_only_fields = ("delivery_fee","bonus_amount")
     
     def get_delivery_fee(self, obj):
         return obj.delivery_fee
 
-
+    def get_bonus_amount(self, obj):
+        return obj.bonus_amount
 class OrderItemSerializer(serializers.ModelSerializer):
     order = serializers.PrimaryKeyRelatedField(read_only=True)
 
