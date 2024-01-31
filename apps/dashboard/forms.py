@@ -97,11 +97,12 @@ class PhoneProductItemForm(forms.ModelForm):
         label='Chegirmadagi narxi'
     )
     weight = forms.DecimalField(
-        decimal_places=0,
+        decimal_places=1,
         max_digits=10,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Maxsulot og`irligi (KG)'
+        label='Maxsulot og`irligi (KG)',
+        initial=1
     )
     # Eski narx maydoni (agar kerak bo'lsa)
     old_price = forms.DecimalField(
@@ -223,10 +224,12 @@ class PhoneEditForm(forms.ModelForm):
         label='Chegirmadagi narxi'
     )
     weight = forms.DecimalField(
-        decimal_places=0,
+        decimal_places=1,
         max_digits=10,
+        required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Maxsulot og`irligi (KG)'
+        label='Maxsulot og`irligi (KG)',
+        initial=1
     )
     product_available_quantity = forms.IntegerField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"}),
@@ -426,11 +429,12 @@ class TicketProductItemForm(forms.ModelForm):
         label='Chegirmadagi narxi'
     )
     weight = forms.DecimalField(
-        decimal_places=0,
+        decimal_places=1,
         max_digits=10,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Og`irligi'
+        label='Og`irligi',
+        initial=1
     )
     # Eski narx maydoni (agar kerak bo'lsa)
     old_price = forms.DecimalField(
@@ -514,10 +518,12 @@ class TicketEditForm(forms.ModelForm):
         label='Maxsulot narxi'
     )
     weight = forms.DecimalField(
-        decimal_places=0,
+        decimal_places=1,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Maxsulot og`irligi (KG)'
+        label='Maxsulot og`irligi (KG)',
+        required=False,
+        initial=1
     )
     images = MultipleFileField(required=False)
     product_available_quantity = forms.IntegerField(
@@ -843,9 +849,12 @@ class GoodProductItemForm(forms.ModelForm):
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"}),
         label='Mavjud miqdori'
     )
-    weight = forms.IntegerField(
+    weight = forms.DecimalField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Maxsulot og`irligi (KG)'
+        label='Maxsulot og`irligi (KG)',
+        required=False,
+        initial=1,
+        decimal_places=1
     )
     # stock = forms.IntegerField(
     #     widget=forms.NumberInput(attrs={"class": "form-control"})
@@ -854,7 +863,8 @@ class GoodProductItemForm(forms.ModelForm):
     #     widget=forms.NumberInput(attrs={"class": "form-control"})
     # )
     active = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}), initial=True
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}), initial=True,
+        required=False
     )
     images = (
         MultipleFileField()
@@ -942,9 +952,12 @@ class GoodEditForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={"class": "form-control"}),
         label='Chegirmadagi narxi'
     )
-    weight = forms.IntegerField(
+    weight = forms.DecimalField(
         min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Maxsulot og`irligi (KG)'
+        label='Maxsulot og`irligi (KG)',
+        required=False,
+        initial=1,
+        decimal_places=1
     )
     images = MultipleFileField(required=False)
 
@@ -1037,7 +1050,7 @@ class GoodEditForm(forms.ModelForm):
                     image.save()
         return good
 
-
+from django.core.files.uploadedfile import InMemoryUploadedFile
 class NewsForm(forms.ModelForm):
     class Meta:
         model = News
@@ -1089,10 +1102,9 @@ class NewsForm(forms.ModelForm):
 
         new_image = self.cleaned_data.get('image', None)
         if new_image:
-            news.image = new_image
-        if "image" in self.files:
-            news.image.delete()  # Delete the old image
-            news.image = self.files["image"]  # Assign the new image
+            # If the new image is an instance of InMemoryUploadedFile, use its content directly
+            if isinstance(new_image, InMemoryUploadedFile):
+                news.image.save(new_image.name, new_image)
         if commit:
             news.save()
         return news
@@ -1201,6 +1213,11 @@ class NewsEditForm(forms.ModelForm):
             news.start_date = self.cleaned_data['start_date']
         if not news.end_date:
             news.end_date = self.cleaned_data['end_date']
+        new_image = self.cleaned_data.get('image', None)
+        if new_image:
+            # If the new image is an instance of InMemoryUploadedFile, use its content directly
+            if isinstance(new_image, InMemoryUploadedFile):
+                news.image.save(new_image.name, new_image)
         if commit:
             news.save()
 
@@ -2081,7 +2098,7 @@ class SocialMediaEditForm(forms.ModelForm):
         return cleaned_data
 
     def get_cleaned_url(self, field_name, value, original_value):
-        if any(original_value.startswith(prefix) for prefix in [f"https://{field_name}.com/", f"https://www.{field_name}.com/", "https://t.me/", "https://wa.me/"]):
+        if any(original_value.startswith(prefix) for prefix in [f"https://www.tiktok.com/@{value}", f"https://www.{field_name}.com/", "https://t.me/", "https://wa.me/"]):
             return value  # Don't add the prefix again
         else:
             # Add the prefix based on the social media platform
