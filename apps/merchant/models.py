@@ -115,7 +115,8 @@ class Order(TimeStampedModel, models.Model):
             .first()
         )
         if applicable_bonus:
-            discount = total * (applicable_bonus.percentage / 100.0)
+            discount_percentage = Decimal(applicable_bonus.percentage) / Decimal(100)
+            discount = total * discount_percentage
             total -= discount
 
         self.total_amount = total
