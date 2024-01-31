@@ -114,7 +114,12 @@ class Order(TimeStampedModel, models.Model):
             .order_by("-amount")
             .first()
         )
-        return applicable_bonus
+        if applicable_bonus:
+            return {
+                "amount": applicable_bonus.amount,
+                "percentage": applicable_bonus.percentage
+            }
+        return None
     def update_total_amount(self):
         total = 0
         for item in self.orderitem.all():
