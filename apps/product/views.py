@@ -5,6 +5,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework import views, status
 from django.db.models import Sum, Count
 from rest_framework.response import Response
+from django.db.models import F
 from django.db.models import Q
 from .models import Category, Good, Image, Phone, SubCategory, Ticket
 from .serializers import (
@@ -144,9 +145,8 @@ class TicketsOnSaleListView(ListAPIView):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-        queryset = Ticket.objects.filter(
-            Q(product__sale__gt=0) 
-        )
+
+        queryset = Ticket.objects.filter(product__new_price__lt=F("product__old_price"))
         return queryset
 
 
@@ -155,9 +155,7 @@ class PhonesOnSaleListView(ListAPIView):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-        queryset = Phone.objects.filter(
-            Q(product__sale__gt=0) 
-        )
+        queryset = Phone.objects.filter(product__new_price__lt=F("product__old_price"))
         return queryset
 
 
@@ -166,9 +164,7 @@ class GoodsOnSaleListView(ListAPIView):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-        queryset = Good.objects.filter(
-            Q(product__sale__gt=0) 
-        )
+        queryset = Good.objects.filter(product__new_price__lt=F("product__old_price"))
         return queryset
 
 
