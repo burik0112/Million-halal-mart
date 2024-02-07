@@ -120,7 +120,7 @@ TEMPLATES = [
         },
     },
 ]
-SECURE_SSL_REDIRECT =True
+
 WSGI_APPLICATION = "config.wsgi.application"
 
 
