@@ -11,50 +11,26 @@
     <meta content="" name="keywords" />
 
     <!-- Favicons -->
+
     <link href="{% static 'assets/img/favicon.png' %}" rel="icon" />
     <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon" />
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect" />
-    <link
-      href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet" />
+    <script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
+    <script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
     <script src="https://kit.fontawesome.com/4f85f74c22.js" crossorigin="anonymous"></script>
 
     <!-- Vendor CSS Files -->
-    <link
-      href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}"
-      rel="stylesheet"
-    />
-    <link
-      href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}"
-      rel="stylesheet"
-    />
-    <link
-      href="{% static 'assets/vendor/boxicons/css/boxicons.min.css' %}"
-      rel="stylesheet"
-    />
-    <link
-      href="{% static 'assets/vendor/quill/quill.snow.css' %}"
-      rel="stylesheet"
-    />
-    <link
-      href="{% static 'assets/vendor/quill/quill.bubble.css' %}"
-      rel="stylesheet"
-    />
-    <link
-      href="{% static 'assets/vendor/remixicon/remixicon.css' %}"
-      rel="stylesheet"
-    />
-    <link
-      href="{% static 'assets/vendor/simple-datatables/style.css' %}"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/vendor/quill/quill.snow.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/vendor/quill/quill.bubble.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/vendor/remixicon/remixicon.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/vendor/simple-datatables/style.css' %}" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 
     <!-- Template Main CSS File -->
     <link href="{% static 'assets/css/style.css' %}" rel="stylesheet" />
@@ -73,20 +49,9 @@
       <!-- End Logo -->
 
       <div class="search-bar">
-        <form
-          class="search-form d-flex align-items-center"
-          method="POST"
-          action="#"
-        >
-          <input
-            type="text"
-            name="query"
-            placeholder="Search"
-            title="Enter search keyword"
-          />
-          <button type="submit" title="Search">
-            <i class="bi bi-search"></i>
-          </button>
+        <form class="search-form d-flex align-items-center" method="POST" action="#">
+          <input type="text" name="query" placeholder="Search" title="Enter search keyword" />
+          <button type="submit" title="Search"><i class="bi bi-search"></i></button>
         </form>
       </div>
       <!-- End Search Bar -->
@@ -94,35 +59,20 @@
       <nav class="header-nav ms-auto">
         <ul class="d-flex align-items-center">
           <li class="nav-item d-block d-lg-none">
-            <a class="nav-link nav-icon search-bar-toggle" href="#">
-              <i class="bi bi-search"></i>
-            </a>
+            <a class="nav-link nav-icon search-bar-toggle" href="#"><i class="bi bi-search"></i></a>
           </li>
-
 
           <!-- End Messages Nav -->
 
           <li class="nav-item dropdown pe-3">
-            <a
-              class="nav-link nav-profile d-flex align-items-center pe-0"
-              href="#"
-              data-bs-toggle="dropdown"
-            >
-              <img
-                src="{% static 'assets/img/admin-logo.jpg' %}"
-                alt="Profile"
-                class="rounded-circle"
-              />
-              <span class="d-none d-md-block dropdown-toggle ps-2"
-                >ADMIN</span
-              > </a
-            ><!-- End Profile Iamge Icon -->
+            <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+              <img src="{% static 'assets/img/admin-logo.jpg' %}" alt="Profile" class="rounded-circle" />
+              <span class="d-none d-md-block dropdown-toggle ps-2">ADMIN</span>
+            </a><!-- End Profile Iamge Icon -->
 
-            <ul
-              class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile"
-            >
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
               <li class="dropdown-header">
-                <h6> Million Admin</h6>
+                <h6>Million Admin</h6>
                 <span>Halal mart</span>
               </li>
               <li>
@@ -152,123 +102,97 @@
     <aside id="sidebar" class="sidebar">
       <ul class="sidebar-nav" id="sidebar-nav">
         <li class="nav-item">
-          
-          <a class="nav-link {% if request.path == dashboard_url %} active {% endif %}" href="{% url 'dashboard' %}">
+          <a class="nav-link {% if request.path == dashboard_url %}{% endif %}" href="{% url 'dashboard' %}">
             <i class="bi bi-grid"></i>
             <span>Dashboard</span>
           </a>
         </li>
 
-
         <li class="nav-item">
-          <a class="nav-link {% if not 'dashboard/product' in request.path  %}collapsed {% else %}active{% endif %}"
-             data-bs-target="#mahsulotlar-nav"
-             data-bs-toggle="collapse"
-             href="#">
-              <i class="bi bi-journal-text"></i><span style="color: #4154f1;">Mahsulotlar</span>
-              <i class="bi bi-chevron-down ms-auto"></i>
-          </a>
-          <ul id="mahsulotlar-nav" class="nav-content {% if not 'dashboard/product' in request.path  %}collapse{% endif %}"
-              data-bs-parent="#sidebar-nav">
-              <!-- Mahsulotlar section content -->
-              <li>
-                {% url 'category-list' as category_list %}
-                <a  class="{% if request.path == category_list %}active{% endif %}" href="{% url 'category-list' %}">
-                  <i class="bi bi-circle"></i><span>Bosh kategoriyalar</span>
-                </a>
-              </li>
-              <li>
-                {% url 'subcategory-list' as subcategory_list %}
-                <a  class="{% if request.path == subcategory_list %}active{% endif %}" href="{% url 'subcategory-list' %}">
-                  <i class="bi bi-circle"></i><span>Quyi kategoriyalar</span>
-                </a>
-              </li>
-              <li>
-                {% url 'good-list' as good_list %}
-                <a  class="{% if request.path == good_list %}active{% endif %}" href="{% url 'good-list' %}">
-                  <i class="bi bi-circle"></i><span>Oziq-ovqat mahsulotlari</span>
-                </a>
-              </li>
-              <li>
-                  {% url 'phone_list' as phone_list %}
-                  <a class="{% if request.path == phone_list %}active{% endif %}" href="{% url 'phone_list'  %}">
-                      <i class="bi bi-circle"></i><span>Mobil qurilmalar</span>
-                  </a>
-              </li>
+          <a class="nav-link {% if not 'dashboard/product' in request.path %}
 
+            {% endif %}"
+            data-bs-target="#mahsulotlar-nav"
+            data-bs-toggle="collapse"
+            href="#">
+            <i class="bi bi-journal-text"></i><span style="color: #4154f1;">Mahsulotlar</span>
+            <i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          <ul id="mahsulotlar-nav" class="nav-content {% if not 'dashboard/product' in request.path %}{% endif %}" data-bs-parent="#sidebar-nav">
+            <!-- Mahsulotlar section content -->
+            <li>
+              {% url 'category-list' as category_list %}
+              <a class="{% if request.path == category_list %}{% endif %}" href="{% url 'category-list' %}"><i class="bi bi-circle"></i><span>Bosh kategoriyalar</span></a>
+            </li>
+            <li>
+              {% url 'subcategory-list' as subcategory_list %}
+              <a class="{% if request.path == subcategory_list %}{% endif %}" href="{% url 'subcategory-list' %}"><i class="bi bi-circle"></i><span>Quyi kategoriyalar</span></a>
+            </li>
+            <li>
+              {% url 'good-list' as good_list %}
+              <a class="{% if request.path == good_list %}{% endif %}" href="{% url 'good-list' %}"><i class="bi bi-circle"></i><span>Oziq-ovqat mahsulotlari</span></a>
+            </li>
+            <li>
+              {% url 'phone_list' as phone_list %}
+              <a class="{% if request.path == phone_list %}{% endif %}" href="{% url 'phone_list' %}"><i class="bi bi-circle"></i><span>Mobil qurilmalar</span></a>
+            </li>
 
             <li>
               {% url 'ticket-list' as ticket_list %}
-              <a class="{% if request.path == ticket_list %}active{% endif %}" href="{% url 'ticket-list'  %}">
-                <i class="bi bi-circle"></i><span>Chiptalar</span>
-              </a>
+              <a class="{% if request.path == ticket_list %}{% endif %}" href="{% url 'ticket-list' %}"><i class="bi bi-circle"></i><span>Chiptalar</span></a>
             </li>
           </ul>
         </li>
         <!-- End Forms Nav -->
 
-        
-
         <li class="nav-item">
           {% url 'users-list' as users_list %}
-          <a class="nav-link {% if request.path == users_list %}active{% endif %}" href="{% url 'users-list' %}">
-              <i class="bi bi-person"></i>
-              <span>Foydalanuvchilar</span>
+          <a class="nav-link {% if request.path == users_list %}{% endif %}" href="{% url 'users-list' %}">
+            <i class="bi bi-person"></i>
+            <span>Foydalanuvchilar</span>
           </a>
-      </li>
-      <li class="nav-item">
-        {% url 'all-orders-list' as orders_list %}
-        <a class="nav-link {% if request.path == orders_list %}active{% endif %}" href="{% url 'all-orders-list' %}">
-          <i class="bi bi-gem"></i><span>Buyurtmalar</span><i></i>
-            
-        </a>
-    </li>
-        <!-- End Profile Page Nav -->
-        
-        <li class="nav-item">
-    <a class="nav-link {% if not 'dashboard/news' in request.path  %}collapsed {% else %}active{% endif %}"
-       data-bs-target="#qoshimchalar-nav"
-       data-bs-toggle="collapse"
-       href="#">
-        <i class="bi bi-question-circle"></i><span style="color: #4154f1;">Qo'shimchalar</span>
-        <i class="bi bi-chevron-down ms-auto"></i>
-    </a>
-    <ul id="qoshimchalar-nav" class="nav-content collapse {% if 'dashboard/other' in request.path  %}show{% endif %}"
-        data-bs-parent="#sidebar-nav">
-        <!-- Qo'shimchalar section content -->
-        <li>
-            {% url 'info-list' as info_list %}
-            <a class="nav-link {% if request.path == info_list %}active{% endif %}" href="{% url 'info-list' %}">
-                <i class="bi bi-circle"></i><span>Ma'lumotnomalar</span>
-            </a>
         </li>
+        <li class="nav-item">
+          {% url 'all-orders-list' as orders_list %}
+          <a class="nav-link {% if request.path == orders_list %}{% endif %}" href="{% url 'all-orders-list' %}"><i class="bi bi-gem"></i><span>Buyurtmalar</span><i></i></a>
+        </li>
+        <!-- End Profile Page Nav -->
+
+        <li class="nav-item">
+          <a class="nav-link {% if not 'dashboard/news' in request.path %}
+
+            {% endif %}"
+            data-bs-target="#qoshimchalar-nav"
+            data-bs-toggle="collapse"
+            href="#">
+            <i class="bi bi-question-circle"></i><span style="color: #4154f1;">Qo'shimchalar</span>
+            <i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          <ul id="qoshimchalar-nav" class="nav-content collapse {% if 'dashboard/other' in request.path %}{% endif %}" data-bs-parent="#sidebar-nav">
+            <!-- Qo'shimchalar section content -->
+            <li>
+              {% url 'info-list' as info_list %}
+              <a class="nav-link {% if request.path == info_list %}{% endif %}" href="{% url 'info-list' %}"><i class="bi bi-circle"></i><span>Ma'lumotnomalar</span></a>
+            </li>
             <li>
               {% url 'service-list' as service_list %}
-              <a class="{% if request.path == service_list %}active{% endif %}" href="{% url 'service-list' %}">
-                <i class="bi bi-circle"></i><span>Xizmatlar</span>
-              </a>
+              <a class="{% if request.path == service_list %}{% endif %}" href="{% url 'service-list' %}"><i class="bi bi-circle"></i><span>Xizmatlar</span></a>
             </li>
             <li>
               {% url 'banner-list' as banner_list %}
-              <a  class="{% if request.path == banner_list %}active{% endif %}" href="{% url 'banner-list' %}">
-                <i class="bi bi-circle"></i><span>Bannerlar</span>
-              </a>
+              <a class="{% if request.path == banner_list %}{% endif %}" href="{% url 'banner-list' %}"><i class="bi bi-circle"></i><span>Bannerlar</span></a>
             </li>
-            <li>  
+            <li>
               {% url 'news-list' as news_list %}
-              <a class="{% if request.path == news_list %}active{% endif %}" href="{% url 'news-list' %}">
-                <i class="bi bi-circle"></i><span>E'lonlar</span>
-              </a>
+              <a class="{% if request.path == news_list %}{% endif %}" href="{% url 'news-list' %}"><i class="bi bi-circle"></i><span>E'lonlar</span></a>
             </li>
             <li>
               {% url 'socialmedia' as socialmedia %}
-              <a class="{% if request.path == socialmedia %}active{% endif %}" href="{% url 'socialmedia' %}">
-                <i class="bi bi-circle"></i><span>Ijtimoiy tarmoqlar</span>
-              </a>
+              <a class="{% if request.path == socialmedia %}{% endif %}" href="{% url 'socialmedia' %}"><i class="bi bi-circle"></i><span>Ijtimoiy tarmoqlar</span></a>
             </li>
           </ul>
         </li>
-        <!-- <li class="nav-item">
+        <!--  <li class="nav-item">
           <a class="nav-link collapsed" href="pages-error-404.html">
             <i class="bi bi-dash-circle"></i>
             <span>Error 404</span>
@@ -280,10 +204,10 @@
             <i class="bi bi-file-earmark"></i>
             <span>Blank</span>
           </a>
-        </li> -->
+        </li>  -->
       </ul>
     </aside>
-    <!-- End Sidebar-->
+    <!-- End Sidebar -->
 
     <main id="main" class="main">
       <div class="pagetitle">
@@ -294,216 +218,209 @@
           </ol>
         </nav>
       </div>
-      <br>
+      <br />
       <!-- End Page Title -->
-      
+
       <section class="section">
         {% block content %}
-        
-    <section class="section dashboard">
-      <div class="row">
+          <section class="section dashboard">
+            <div class="row">
+              <!-- Left side columns -->
+              <div class="col-lg-8">
+                <div class="row">
+                  <!-- Sales Card -->
+                  <div class="col-xxl-4 col-md-6">
+                    <div class="card info-card sales-card">
+                      <div class="card-body">
+                        <h5 class="card-title">Buyurtmalar soni<span>| Jami</span></h5>
 
-        <!-- Left side columns -->
-        <div class="col-lg-8">
-          <div class="row">
-
-            <!-- Sales Card -->
-            <div class="col-xxl-4 col-md-6">
-              <div class="card info-card sales-card">
-                <div class="card-body">
-                  <h5 class="card-title">Buyurtmalar soni<span> | Jami</span></h5>
-
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-cart"></i>
-                    </div>
-                    <div class="ps-3 text-center">
-                      <h6>{{orders}}</h6>
-                      <span class="text-success small pt-1 fw-bold">{{order_today}}</span> <span class="text-muted small pt-2 ps-1">Bugun</span>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div><!-- End Sales Card -->
-
-            <!-- Revenue Card -->
-            <div class="col-xxl-4 col-md-6">
-              <div class="card info-card revenue-card">
-                <div class="card-body">
-                  <h5 class="card-title">Daromad qiymati <span> | Jami</span></h5>
-
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="fas fa-won-sign"></i>
-                    </div>
-                    <div class="ps-3 text-center"> 
-                      <h6>{{revenue}}</h6>
-                      <span class="text-success small pt-1 fw-bold">{{revenue_today}}</span> <span class="text-muted small pt-2 ps-1">Bugun</span>
-
+                        <div class="d-flex align-items-center">
+                          <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="bi bi-cart"></i>
+                          </div>
+                          <div class="ps-3 text-center">
+                            <h6>{{ orders }}</h6>
+                            <span class="text-success small pt-1 fw-bold">{{ order_today }}</span> <span class="text-muted small pt-2 ps-1">Bugun</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                  <!-- End Sales Card -->
 
-              </div>
-            </div><!-- End Revenue Card -->
+                  <!-- Revenue Card -->
+                  <div class="col-xxl-4 col-md-6">
+                    <div class="card info-card revenue-card">
+                      <div class="card-body">
+                        <h5 class="card-title">Daromad qiymati <span>| Jami</span></h5>
 
-            <!-- Customers Card -->
-            <div class="col-xxl-4 col-xl-12">
-              <div class="card info-card customers-card">
-                <div class="card-body">
-                  <h5 class="card-title">Foydalanuvchilar <span>| Jami</span></h5>
-
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-people"></i>
-                    </div>
-                    <div class="ps-3 text-center">
-                      <h6>{{customers}}</h6>
-                      <span class="text-success small pt-1 fw-bold">{{customers_today}}</span> <span class="text-muted small pt-2 ps-1">Bugun</span>
-
+                        <div class="d-flex align-items-center">
+                          <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="fas fa-won-sign"></i>
+                          </div>
+                          <div class="ps-3 text-center">
+                            <h6>{{ revenue }}</h6>
+                            <span class="text-success small pt-1 fw-bold">{{ revenue_today }}</span> <span class="text-muted small pt-2 ps-1">Bugun</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
+                  <!-- End Revenue Card -->
 
-                </div>
-              </div>
+                  <!-- Customers Card -->
+                  <div class="col-xxl-4 col-xl-12">
+                    <div class="card info-card customers-card">
+                      <div class="card-body">
+                        <h5 class="card-title">Foydalanuvchilar <span>| Jami</span></h5>
 
-            </div><!-- End Customers Card -->
+                        <div class="d-flex align-items-center">
+                          <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="bi bi-people"></i>
+                          </div>
+                          <div class="ps-3 text-center">
+                            <h6>{{ customers }}</h6>
+                            <span class="text-success small pt-1 fw-bold">{{ customers_today }}</span> <span class="text-muted small pt-2 ps-1">Bugun</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- End Customers Card -->
 
-            <!-- Recent Sales -->
-            <div class="col-12">
-              <div class="card recent-sales overflow-auto">
-                <div class="card-body">
-                  <h5 class="card-title">So'nggi buyurtmalar</h5>
+                  <!-- Recent Sales -->
+                  <div class="col-12">
+                    <div class="card recent-sales overflow-auto">
+                      <div class="card-body">
+                        <h5 class="card-title">So'nggi buyurtmalar</h5>
 
-                  <table class="table table-borderless datatable">
-                    <thead>
-                      <tr>
-                        <th scope="col" class="text-center">#</th>
-                        <th scope="col" class="text-center">Foydalanuvchi</th>
-                        <th scope="col" class="text-center">Sana</th>
-                        <th scope="col" class="text-center">Manzil</th>
-                        <th scope="col" class="text-center">Umumiy narx</th>
-                        <th scope="col" class="text-center">Izoh</th>
-                        <th scope="col" class="text-center">Holati</th>
-                        <th scope="col" class="text-center">Batafsil</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for c in all_orders %}
-                        <tr>
-                          <th scope="row" class="text-center">{{c.id}}</th>
-                          <th class="text-center">{{c.user.full_name}}</th>
-                          <td class="text-center">
-                            <div class="clock-icon" data-tooltip="{{ c.created|date:'d-m-Y' }} {{ c.created|date:'H:i' }}">
-                              <i class="bi bi-calendar-date"></i>
-                            </div>
-                          </td>
-                          <td class="text-center">
-                            {% if c.user.location.exists %}
-                              {{ c.user.location.first.address }}
-                            {% else %}
-                              <span class="text-muted">No location available</span>
-                            {% endif %}
-                          </td>
-                          <td class="text-center">{{c.total_amount}} ₩</td>
-                          <td class="text-center">
-                            <div class="clock-icon" data-tooltip="{{c.comment}}">
-                              <i class="fa-solid fa-comment"></i>
-                            </div>
-                          </td>
-                          <td class="text-center">
-                            {% if c.status == "in_cart" %}
-                              <span class="badge bg-warning">Savatchada</span>
-                            {% elif c.status == "pending" %}
-                              <span class="badge bg-warning">Kutilmoqda</span>
-                            {% elif c.status == "approved" %}
-                              <span class="badge bg-primary">To'lov tasdiqlandi</span>
-                            {% elif c.status == "sent" %}
-                              <span class="badge bg-success">Yuborildi</span>
-                            {% elif c.status == "cancelled" %}
-                              <span class="badge bg-danger">Bekor qilindi</span>
-                            {% else %}
-                              <span class="badge bg-secondary">{{ c.status }}</span>
-                            {% endif %}
-                          </td>
-                          <td class="text-center">
-                            <a href="{% url 'user-order-detail' c.id %}">
-                              <i class="bi bi-receipt" style="font-size: 2em;"></i>
-                            </a>
-                          </td>
-                        </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
-
-              </div>
-            </div><!-- End Recent Sales -->
-            <style>
-              .clock-icon {
-                position: relative;
-                display: inline-block;
-              }
-            
-              .clock-icon::before {
-                content: attr(data-tooltip);
-                position: absolute;
-                bottom: 100%;
-                left: 50%;
-                transform: translateX(-50%);
-                padding: 0.5rem;
-                background-color: #333;
-                color: #fff;
-                border-radius: 5px;
-                opacity: 0;
-                pointer-events: none;
-                white-space: pre;
-                transition: opacity 0.3s ease-in-out;
-              }
-            
-              .clock-icon:hover::before {
-                opacity: 1;
-              }
-            </style>
-            <!-- Top Selling -->
-            <div class="col-12">
-              <div class="card top-selling overflow-auto">
-                  <div class="card-body pb-0">
-                      <h5 class="card-title">Ombordagi mahsulotlar qoldig'i <span>| mahsulot qoldi < 100 </span></h5>
-                      <table class="table table-borderless datatable">
+                        <table class="table table-borderless datatable">
                           <thead>
-                              <tr>
-                                  <th scope="col">№</th>
-                                  <th scope="col">Maxsulot</th>
-                                  <th scope="col">Miqdori(Kg/L/Dona)</th>
-                              </tr>
+                            <tr>
+                              <th scope="col" class="text-center">#</th>
+                              <th scope="col" class="text-center">Foydalanuvchi</th>
+                              <th scope="col" class="text-center">Sana</th>
+                              <th scope="col" class="text-center">Manzil</th>
+                              <th scope="col" class="text-center">Umumiy narx</th>
+                              <th scope="col" class="text-center">Izoh</th>
+                              <th scope="col" class="text-center">Holati</th>
+                              <th scope="col" class="text-center">Batafsil</th>
+                            </tr>
                           </thead>
                           <tbody>
-                              {% for product_data in products_with_quantity %}
-                                  <tr>
-                                      <th class="text-center">{{product_data.id}}</th>
-                                      <td><a href="#" class="text-primary fw-bold">{{ product_data.name_uz }}</a></td>
-                                      <td class="fw-bold">{{ product_data.product__available_quantity }}</td>
-                                  </tr>
-                              {% endfor %}
-          
+                            {% for c in all_orders %}
+                              <tr>
+                                <th scope="row" class="text-center">{{ c.id }}</th>
+                                <th class="text-center">{{ c.user.full_name }}</th>
+                                <td class="text-center">
+                                  <div class="clock-icon" data-tooltip="{{ c.created|date:'d-m-Y' }} {{ c.created|date:'H:i' }}">
+                                    <i class="bi bi-calendar-date"></i>
+                                  </div>
+                                </td>
+                                <td class="text-center">
+                                  {% if c.user.location.exists %}
+                                    {{ c.user.location.first.address }}
+                                  {% else %}
+                                    <span class="text-muted">No location available</span>
+                                  {% endif %}
+                                </td>
+                                <td class="text-center">{{ c.total_amount }} ₩</td>
+                                <td class="text-center">
+                                  <div class="clock-icon" data-tooltip="{{ c.comment }}">
+                                    <i class="fa-solid fa-comment"></i>
+                                  </div>
+                                </td>
+                                <td class="text-center">
+                                  {% if c.status == 'in_cart' %}
+                                    <span class="badge bg-warning">Savatchada</span>
+                                  {% elif c.status == 'pending' %}
+                                    <span class="badge bg-warning">Kutilmoqda</span>
+                                  {% elif c.status == 'approved' %}
+                                    <span class="badge bg-primary">To'lov tasdiqlandi</span>
+                                  {% elif c.status == 'sent' %}
+                                    <span class="badge bg-success">Yuborildi</span>
+                                  {% elif c.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Bekor qilindi</span>
+                                  {% else %}
+                                    <span class="badge bg-secondary">{{ c.status }}</span>
+                                  {% endif %}
+                                </td>
+                                <td class="text-center">
+                                  <a href="{% url 'user-order-detail' c.id %}"><i class="bi bi-receipt" style="font-size: 2em;"></i></a>
+                                </td>
+                              </tr>
+                            {% endfor %}
                           </tbody>
-                      </table>
+                        </table>
+                      </div>
+                    </div>
                   </div>
-              </div>
-          </div>
-          
-            <!-- End Top Selling -->
-            <div class="card">
-              <div class="card-body">
-                  <h5 class="card-title">So'ngi 1 oy ichida eng ko'p sotilgan mahsulotlar</h5>
-                  <!-- Bar Chart -->
-                  <div style="overflow-x: auto;">
-                      <canvas id="barChart" width="800" height="200"></canvas>
+                  <!-- End Recent Sales -->
+                  <style>
+                    .clock-icon {
+                      position: relative;
+                      display: inline-block;
+                    }
+                    
+                    .clock-icon::before {
+                      content: attr(data-tooltip);
+                      position: absolute;
+                      bottom: 100%;
+                      left: 50%;
+                      transform: translateX(-50%);
+                      padding: 0.5rem;
+                      background-color: #333;
+                      color: #fff;
+                      border-radius: 5px;
+                      opacity: 0;
+                      pointer-events: none;
+                      white-space: pre;
+                      transition: opacity 0.3s ease-in-out;
+                    }
+                    
+                    .clock-icon:hover::before {
+                      opacity: 1;
+                    }
+                  </style>
+                  <!-- Top Selling -->
+                  <div class="col-12">
+                    <div class="card top-selling overflow-auto">
+                      <div class="card-body pb-0">
+                        <h5 class="card-title">Ombordagi mahsulotlar qoldig'i <span>| mahsulot qoldi < 100</span></h5>
+                        <table class="table table-borderless datatable">
+                          <thead>
+                            <tr>
+                              <th scope="col">№</th>
+                              <th scope="col">Maxsulot</th>
+                              <th scope="col">Miqdori(Kg/L/Dona)</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for product_data in products_with_quantity %}
+                              <tr>
+                                <th class="text-center">{{ product_data.id }}</th>
+                                <td>
+                                  <a href="#" class="text-primary fw-bold">{{ product_data.name_uz }}</a>
+                                </td>
+                                <td class="fw-bold">{{ product_data.product__available_quantity }}</td>
+                              </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   </div>
-          
-                  <script>
+
+                  <!-- End Top Selling -->
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">So'ngi 1 oy ichida eng ko'p sotilgan mahsulotlar</h5>
+                      <!-- Bar Chart -->
+                      <div style="overflow-x: auto;">
+                        <canvas id="barChart" width="800" height="200"></canvas>
+                      </div>
+
+                      <script>
                     document.addEventListener("DOMContentLoaded", () => {
                         var productNames = [];
                         var totalQuantities = [];
@@ -561,31 +478,25 @@
                         });
                     });
                 </script>
-                
-                
-                
-                
-          
-                  <!-- End Bar Chart -->
+
+                      <!-- End Bar Chart -->
+                    </div>
+                  </div>
+                </div>
               </div>
-          </div>
-            
-          
-          </div>
-        </div><!-- End Left side columns -->
+              <!-- End Left side columns -->
 
-        <!-- Right side columns -->
-        <div class="col-lg-4">
+              <!-- Right side columns -->
+              <div class="col-lg-4">
+                <!-- Website Traffic -->
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">Top 5 xaridlar</h5>
 
-          <!-- Website Traffic -->
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Top 5 xaridlar</h5>
-  
-                <!-- Pie Chart -->
-                <div id="pieChart" style="min-height: 400px;" class="echart"></div>
-  
-                <script>
+                    <!-- Pie Chart -->
+                    <div id="pieChart" style="min-height: 400px;" class="echart"></div>
+
+                    <script>
                   document.addEventListener("DOMContentLoaded", () => {
                     const data = [
                       {% for order in most_expensive %}
@@ -626,38 +537,37 @@
                     });
                   });
                 </script>
-                
-                
-                <!-- End Pie Chart -->
-  
-              </div>
-            </div>
-          <!-- End Website Traffic -->
 
-          <!-- News & Updates Traffic -->
-          <div class="card">
-            <div class="card-body pb-0">
-              <h5 class="card-title">Komentlar &amp; Izohlar </h5>
-              <div class="news">
-                {% for c in comments %}
-                <div class="post-item clearfix">
-                  <img src="{% static 'assets/img/customer_logo.jpg' %}" alt="">
-                  <h4><a href="{% url 'user-order-detail' c.id %}">{{c.user}}</a></h4>
-                  <p>{{c.comment}}</p>
-                  <p style="text-align: right;"><i class="bi bi-calendar-date"></i> {{ c.created|date:"d-m-Y" }} <i class="bi bi-clock"></i> {{ c.created|date:"H:i" }}</p>
+                    <!-- End Pie Chart -->
+                  </div>
                 </div>
-                {% endfor %}
-              </div><!-- End sidebar recent posts-->
+                <!-- End Website Traffic -->
 
+                <!-- News & Updates Traffic -->
+                <div class="card">
+                  <div class="card-body pb-0">
+                    <h5 class="card-title">Komentlar &amp; Izohlar</h5>
+                    <div class="news">
+                      {% for c in comments %}
+                        <div class="post-item clearfix">
+                          <img src="{% static 'assets/img/customer_logo.jpg' %}" alt="" />
+                          <h4><a href="{% url 'user-order-detail' c.id %}">{{ c.user }}</a></h4>
+                          <p>{{ c.comment }}</p>
+                          <p style="text-align: right;">
+                            <i class="bi bi-calendar-date"></i> {{ c.created|date:'d-m-Y' }} <i class="bi bi-clock"></i> {{ c.created|date:'H:i' }}
+                          </p>
+                        </div>
+                      {% endfor %}
+                    </div>
+                    <!-- End sidebar recent posts -->
+                  </div>
+                </div>
+                <!-- End News & Updates -->
+              </div>
+              <!-- End Right side columns -->
             </div>
-          </div><!-- End News & Updates -->
-
-        </div>
-        <!-- End Right side columns -->
-
-      </div>
-    </section>
-        {% endblock content %}
+          </section>
+        {% endblock %}
       </section>
     </main>
     <!-- End #main -->
@@ -665,29 +575,23 @@
     <!-- ======= Footer ======= -->
     <footer id="footer" class="footer">
       <div class="copyright">
-        &copy; Copyright <strong><span>Million Halal Mart 2024</span></strong
-        >. All Rights Reserved
+        &copy; Copyright <strong><span>Million Halal Mart 2024</span></strong>. All Rights Reserved
       </div>
-      <div class="credits">
-      </div>
+      <div class="credits"></div>
     </footer>
     <!-- End Footer -->
 
-    <a
-      href="#"
-      class="back-to-top d-flex align-items-center justify-content-center"
-      ><i class="bi bi-arrow-up-short"></i
-    ></a>
- 
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
     <!-- Vendor JS Files -->
-    <script src="{% static "assets/vendor/apexcharts/apexcharts.min.js" %}"></script>
-    <script src="{% static "assets/vendor/bootstrap/js/bootstrap.bundle.min.js" %}"></script>
-    <script src="{% static "assets/vendor/chart.js/chart.umd.js" %}"></script>
-    <script src="{% static "assets/vendor/echarts/echarts.min.js" %}"></script>
-    <script src="{% static "assets/vendor/quill/quill.min.js" %}"></script>
-    <script src="{% static "assets/vendor/simple-datatables/simple-datatables.js" %}"></script>
-    <script src="{% static "assets/vendor/tinymce/tinymce.min.js" %}"></script>
-    <script src="{% static "assets/vendor/php-email-form/validate.js" %}"></script>
+    <script src="{% static 'assets/vendor/apexcharts/apexcharts.min.js' %}"></script>
+    <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/vendor/chart.js/chart.umd.js' %}"></script>
+    <script src="{% static 'assets/vendor/echarts/echarts.min.js' %}"></script>
+    <script src="{% static 'assets/vendor/quill/quill.min.js' %}"></script>
+    <script src="{% static 'assets/vendor/simple-datatables/simple-datatables.js' %}"></script>
+    <script src="{% static 'assets/vendor/tinymce/tinymce.min.js' %}"></script>
+    <script src="{% static 'assets/vendor/php-email-form/validate.js' %}"></script>
 
     <!-- Template Main JS File -->
     <script src="{% static 'assets/js/main.js' %}"></script>
