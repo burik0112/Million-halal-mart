@@ -6,9 +6,16 @@ from model_utils.models import TimeStampedModel
 
 
 class Profile(TimeStampedModel, models.Model):
+    LANG=(
+        ('uz', 'UZ'),
+        ('ru', 'RU'),
+        ('en', "EN"),
+        ('kr', 'KR')
+    )
     origin = models.OneToOneField(User, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=17)
+    lang=models.CharField(max_length=2, choices=LANG, default="uz")
     cashback = models.IntegerField(default=0)
     otp = models.CharField(max_length=100, null=True, blank=True)
 

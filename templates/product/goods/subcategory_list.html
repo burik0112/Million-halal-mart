@@ -16,6 +16,7 @@
             <tr>
               <th scope="col" class="text-center">#</th>
               <th scope="col">Nomi</th>
+              <th scope="col" class="text-center">Bosh Kategoriyasi</th>
               <th scope="col" class="text-center">Foto</th>
               <th scope="col" class="text-center">Yaratilgan</th>
               <th scope="col" class="text-center">Aktivligi</th>
@@ -27,6 +28,7 @@
             <tr>
               <th scope="row" class="text-center">{{ c.id }}</th>
               <td >{{ c.name_uz }}</td>
+              <td >{{ c.category }}</td>
               <td class="text-center">
                 <img src="{{ c.image.url }}" alt="{{ c.name }}" width="50" height="50" />
               </td>
@@ -41,7 +43,7 @@
                 <td class="text-center"><img src="{% static 'assets/img/cancel.png' %}" height="20" width="20"
                     alt="Faol emas"></td>
                 {% endif %}
-              </td>
+                </td>
               <td class="text-center">
                 <a href="{% url 'subcategory-edit'  c.id %}" class="btn btn-primary btn-sm">Tahrirlash</a>
               </td>

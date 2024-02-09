@@ -14,7 +14,7 @@ from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
-from .utils import generate_otp
+from .utils import generate_otp, user_lang
 from .models import Favorite, Location, News, Profile, ViewedNews, Banner
 from django.contrib.auth.models import User
 from .serializers import (
@@ -62,6 +62,17 @@ class ProfileCreateAPIView(CreateAPIView):
 class ProfileRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        language = request.data.get('lang', None)
+        user_id = instance.id
+        user_lang(language, user_id)
+
+        return Response(serializer.data)
 
 
 class LocationCreateAPIView(CreateAPIView):

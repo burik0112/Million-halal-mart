@@ -48,8 +48,7 @@ class MultipleFileField(forms.ImageField):
 class PhoneProductItemForm(forms.ModelForm):
     class Meta:
         model = Phone
-        fields = ["model_name", "ram", "storage",
-                  "category", "color", "condition"]
+        fields = ["model_name", "ram", "storage", "category", "color", "condition"]
         widgets = {
             "model_name": forms.TextInput(attrs={"class": "form-control"}),
             "ram": forms.Select(attrs={"class": "form-control"}),
@@ -60,49 +59,54 @@ class PhoneProductItemForm(forms.ModelForm):
             # Add more fields here
         }
         labels = {
-            'model_name': 'Model nomi',
-            'ram': 'Operativ xotirasi (RAM)',
-            'storage': 'Ichki xotirasi',
-            'color': 'Rangi',
-            'condition': 'Holati',
-            'category': 'Kategoriyasi',
+            "model_name": "Model nomi",
+            "ram": "Operativ xotirasi (RAM)",
+            "storage": "Ichki xotirasi",
+            "color": "Rangi",
+            "condition": "Holati",
+            "category": "Kategoriyasi",
         }
+
     # Fields for ProductItem
     category = forms.ModelChoiceField(
         queryset=Category.objects.filter(main_type="p"),
         widget=forms.Select(attrs={"class": "form-control"}),
-        label='Kategoriyasi'
+        label="Kategoriyasi",
     )
     desc_uz = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif UZ'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif UZ",
     )
     desc_ru = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif RU'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif RU",
     )
     desc_en = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif EN'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif EN",
     )
     desc_kr = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif KR'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif KR",
     )
     new_price = forms.DecimalField(
         decimal_places=0,
         max_digits=10,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Chegirmadagi narxi'
+        label="Chegirmadagi narxi",
     )
     weight = forms.DecimalField(
         decimal_places=1,
         max_digits=10,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Maxsulot og`irligi (KG)',
-        initial=1
+        label="Maxsulot og`irligi (KG)",
+        initial=1,
     )
     # Eski narx maydoni (agar kerak bo'lsa)
     old_price = forms.DecimalField(
@@ -110,11 +114,12 @@ class PhoneProductItemForm(forms.ModelForm):
         max_digits=10,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Narxi'
+        label="Narxi",
     )
     available_quantity = forms.IntegerField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Mavjud miqdori'
+        min_value=0,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+        label="Mavjud miqdori",
     )
     active = forms.BooleanField(
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}), initial=True
@@ -125,7 +130,7 @@ class PhoneProductItemForm(forms.ModelForm):
 
     def save(self, commit=True):
         phone = super().save(commit=False)
-        get_weight=self.cleaned_data.get('weight', None)
+        get_weight = self.cleaned_data.get("weight", None)
         product_item = ProductItem(
             weight=get_weight if get_weight else 1,
             desc_uz=self.cleaned_data["desc_uz"],
@@ -196,50 +201,55 @@ class PhoneCategoryCreateForm(forms.ModelForm):
 
 class PhoneEditForm(forms.ModelForm):
     product_desc_uz = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif UZ'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif UZ",
     )
     product_desc_ru = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif RU'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif RU",
     )
     product_desc_en = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif EN'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif EN",
     )
     product_desc_kr = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif KR'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif KR",
     )
     product_old_price = forms.DecimalField(
         decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Maxsulot narxi'
+        label="Maxsulot narxi",
     )
     product_new_price = forms.DecimalField(
         decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Chegirmadagi narxi'
+        label="Chegirmadagi narxi",
     )
     weight = forms.DecimalField(
         decimal_places=1,
         max_digits=10,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Maxsulot og`irligi (KG)',
-        initial=1
+        label="Maxsulot og`irligi (KG)",
+        initial=1,
     )
     product_available_quantity = forms.IntegerField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Mavjud miqdori'
+        min_value=0,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+        label="Mavjud miqdori",
     )
     images = MultipleFileField(required=False)
     category = forms.ModelChoiceField(
         queryset=Category.objects.filter(main_type="p"),
         widget=forms.Select(attrs={"class": "form-select"}),
-        label='Kategoriyasi'
+        label="Kategoriyasi",
     )
     product_active = forms.BooleanField(
         required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
@@ -275,13 +285,13 @@ class PhoneEditForm(forms.ModelForm):
             "images": forms.ClearableFileInput(attrs={"class": "form-control"}),
         }
         labels = {
-            'model_name': 'Model nomi',
-            'ram': 'Operativ xotirasi (RAM)',
-            'storage': 'Ichki xotirasi',
-            'color': 'Rangi',
-            'condition': 'Holati',
-            'category': 'Kategoriyasi',
-            'images': 'Ramslar',
+            "model_name": "Model nomi",
+            "ram": "Operativ xotirasi (RAM)",
+            "storage": "Ichki xotirasi",
+            "color": "Rangi",
+            "condition": "Holati",
+            "category": "Kategoriyasi",
+            "images": "Ramslar",
         }
 
     def __init__(self, *args, **kwargs):
@@ -291,9 +301,9 @@ class PhoneEditForm(forms.ModelForm):
             self.fields["weight"].initial = product.weight
             self.fields["product_old_price"].initial = product.old_price
             self.fields["product_new_price"].initial = product.new_price
-            self.fields[
-                "product_available_quantity"
-            ].initial = product.available_quantity
+            self.fields["product_available_quantity"].initial = (
+                product.available_quantity
+            )
             self.fields["product_desc_uz"].initial = product.desc_uz
             self.fields["product_desc_ru"].initial = product.desc_ru
             self.fields["product_desc_en"].initial = product.desc_en
@@ -304,7 +314,7 @@ class PhoneEditForm(forms.ModelForm):
         phone = super(PhoneEditForm, self).save(commit=False)
         if not phone.product_id:
             phone.product = ProductItem()
-        get_weight=self.cleaned_data.get('weight', None)
+        get_weight = self.cleaned_data.get("weight", None)
         product_item = phone.product
         product_item.old_price = self.cleaned_data["product_old_price"]
         product_item.new_price = self.cleaned_data["product_new_price"]
@@ -341,8 +351,7 @@ class PhoneEditForm(forms.ModelForm):
 class TicketCategoryCreateForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ["name_uz", "name_ru", "name_en",
-                  "name_kr", "image", "desc", "active"]
+        fields = ["name_uz", "name_ru", "name_en", "name_kr", "image", "desc", "active"]
         widgets = {
             "name_uz": forms.TextInput(attrs={"class": "form-control"}),
             "name_ru": forms.TextInput(attrs={"class": "form-control"}),
@@ -378,8 +387,7 @@ class TicketCategoryCreateForm(forms.ModelForm):
 class TicketProductItemForm(forms.ModelForm):
     class Meta:
         model = Ticket
-        fields = ["event_name_uz", "event_name_ru",
-                  "event_name_en", "event_name_kr"]
+        fields = ["event_name_uz", "event_name_ru", "event_name_en", "event_name_kr"]
         widgets = {
             "category": forms.Select(attrs={"class": "form-control"}),
             "event_name_uz": forms.TextInput(attrs={"class": "form-control"}),
@@ -394,47 +402,51 @@ class TicketProductItemForm(forms.ModelForm):
             "event_name_en": "Sarlavha (EN)",
             "event_name_kr": "Sarlavha (KR)",
         }
+
     category = forms.ModelChoiceField(
         queryset=Category.objects.filter(main_type="t"),
         widget=forms.Select(attrs={"class": "form-control"}),
-        label='Kategoriya'
+        label="Kategoriya",
     )
     event_date = forms.DateTimeField(
         input_formats=["%Y-%m-%d"],  # Adjust the format as needed
-        widget=forms.DateTimeInput(
-            attrs={"type": "date", "class": "form-control"}),
-        label='Hodisa sanasi'
+        widget=forms.DateTimeInput(attrs={"type": "date", "class": "form-control"}),
+        label="Hodisa sanasi",
     )
     desc_uz = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif UZ'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif UZ",
     )
     desc_ru = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif RU'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif RU",
     )
     desc_en = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif EN'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif EN",
     )
     desc_kr = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif KR'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif KR",
     )
     new_price = forms.DecimalField(
         decimal_places=0,
         max_digits=10,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Chegirmadagi narxi'
+        label="Chegirmadagi narxi",
     )
     weight = forms.DecimalField(
         decimal_places=1,
         max_digits=10,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Og`irligi',
-        initial=1
+        label="Og`irligi",
+        initial=1,
     )
     # Eski narx maydoni (agar kerak bo'lsa)
     old_price = forms.DecimalField(
@@ -442,12 +454,13 @@ class TicketProductItemForm(forms.ModelForm):
         max_digits=10,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Maxsulot narxi'
+        label="Maxsulot narxi",
     )
 
     available_quantity = forms.IntegerField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Mavjud miqdori'
+        min_value=0,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+        label="Mavjud miqdori",
     )
     active = forms.BooleanField(
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}), initial=True
@@ -458,7 +471,7 @@ class TicketProductItemForm(forms.ModelForm):
 
     def save(self, commit=True):
         ticket = super().save(commit=False)
-        get_weight=self.cleaned_data.get('weight', None)
+        get_weight = self.cleaned_data.get("weight", None)
         product_item = ProductItem(
             desc_uz=self.cleaned_data["desc_uz"],
             desc_ru=self.cleaned_data["desc_ru"],
@@ -490,50 +503,55 @@ class TicketProductItemForm(forms.ModelForm):
 
 class TicketEditForm(forms.ModelForm):
     product_desc_uz = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif UZ'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif UZ",
     )
     product_desc_ru = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif RU'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif RU",
     )
     product_desc_en = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif EN'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif EN",
     )
     product_desc_kr = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif KR'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif KR",
     )
     product_new_price = forms.DecimalField(
         decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Chegirmadagi narxi'
+        label="Chegirmadagi narxi",
     )
     product_old_price = forms.DecimalField(
         decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Maxsulot narxi'
+        label="Maxsulot narxi",
     )
     weight = forms.DecimalField(
         decimal_places=1,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Maxsulot og`irligi (KG)',
+        label="Maxsulot og`irligi (KG)",
         required=False,
-        initial=1
+        initial=1,
     )
     images = MultipleFileField(required=False)
     product_available_quantity = forms.IntegerField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Mavjud miqdori'
+        min_value=0,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+        label="Mavjud miqdori",
     )
     category = forms.ModelChoiceField(
         queryset=Category.objects.filter(main_type="t"),
         widget=forms.Select(attrs={"class": "form-select"}),
-        label='Kategoriyasi'
+        label="Kategoriyasi",
     )
     product_active = forms.BooleanField(
         required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
@@ -578,13 +596,13 @@ class TicketEditForm(forms.ModelForm):
             "event_name_en": "Sarlavha (EN)",
             "event_name_ru": "Sarlavha (RU)",
             "event_name_kr": "Sarlavha (KR)",
-            "event_date": 'Hodisa sanasi',
-            "category": 'Kategoriyasi',
+            "event_date": "Hodisa sanasi",
+            "category": "Kategoriyasi",
             "product_desc_uz": "Ta`rif (UZ)",
             "product_desc_ru": "Ta`rif (RU)",
             "product_desc_en": "Ta`rif (EN)",
             "product_desc_kr": "Ta`rif (KR)",
-            "images": 'Rasmlar',
+            "images": "Rasmlar",
         }
 
     def __init__(self, *args, **kwargs):
@@ -598,9 +616,9 @@ class TicketEditForm(forms.ModelForm):
             self.fields["product_desc_kr"].initial = product.desc_kr
             self.fields["product_old_price"].initial = product.old_price
             self.fields["product_new_price"].initial = product.new_price
-            self.fields[
-                "product_available_quantity"
-            ].initial = product.available_quantity
+            self.fields["product_available_quantity"].initial = (
+                product.available_quantity
+            )
             self.fields["product_active"].initial = product.active
 
     def save(self, commit=True):
@@ -609,7 +627,7 @@ class TicketEditForm(forms.ModelForm):
         if not ticket.product_id:
             ticket.product = ProductItem()
         product_item = ticket.product
-        get_weight=self.cleaned_data.get('weight', None)
+        get_weight = self.cleaned_data.get("weight", None)
         product_item.weight = get_weight if get_weight else 1
         product_item.desc_uz = self.cleaned_data["product_desc_uz"]
         product_item.desc_ru = self.cleaned_data["product_desc_ru"]
@@ -647,8 +665,7 @@ class TicketEditForm(forms.ModelForm):
 class GoodMainCategoryCreateForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ["name_uz", "name_ru", "name_en",
-                  "name_kr", "image", "active"]
+        fields = ["name_uz", "name_ru", "name_en", "name_kr", "image", "active"]
         widgets = {
             "name_uz": forms.TextInput(attrs={"class": "form-control"}),
             "name_ru": forms.TextInput(attrs={"class": "form-control"}),
@@ -683,8 +700,7 @@ class GoodMainCategoryCreateForm(forms.ModelForm):
 
         # Filter the category queryset to main_type='f'
         if "category" in self.fields:
-            self.fields["category"].queryset = Category.objects.filter(
-                main_type="f")
+            self.fields["category"].queryset = Category.objects.filter(main_type="f")
 
     def save(self, commit=True):
         # Save the category with main_type='f'
@@ -699,7 +715,7 @@ class GoodCategoryCreateForm(forms.ModelForm):
     category = forms.ModelChoiceField(
         queryset=Category.objects.filter(main_type="f"),
         widget=forms.Select(attrs={"class": "form-select"}),
-        label='Kategoriyasi'
+        label="Kategoriyasi",
     )
 
     class Meta:
@@ -766,7 +782,6 @@ class GoodProductItemForm(forms.ModelForm):
             "name_ru",
             "expire_date",
             "ingredients",
-
         ]
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
@@ -783,53 +798,57 @@ class GoodProductItemForm(forms.ModelForm):
     category = forms.ModelChoiceField(
         queryset=SubCategory.objects.all(),
         widget=forms.Select(attrs={"class": "form-control"}),
-        label='Kategoriyasi'
+        label="Kategoriyasi",
     )
     name_en = forms.CharField(
         max_length=255,
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control"}),
-        label='Nomi (EN)'
+        label="Nomi (EN)",
     )
     name_kr = forms.CharField(
         max_length=255,
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control"}),
-        label='Nomi (KR)'
+        label="Nomi (KR)",
     )
     name_uz = forms.CharField(
         max_length=255,
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control"}),
-        label='Nomi (UZ)'
+        label="Nomi (UZ)",
     )
     name_ru = forms.CharField(
         max_length=255,
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control"}),
-        label='Nomi (RU)'
+        label="Nomi (RU)",
     )
     desc_uz = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif UZ'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif UZ",
     )
     desc_ru = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif RU'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif RU",
     )
     desc_en = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif EN'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif EN",
     )
     desc_kr = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif KR'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif KR",
     )
     new_price = forms.DecimalField(
         decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Chegirmadagi narxi'
+        label="Chegirmadagi narxi",
     )
 
     # Eski narx maydoni (agar kerak bo'lsa)
@@ -838,23 +857,25 @@ class GoodProductItemForm(forms.ModelForm):
         max_digits=10,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Maxsulot narxi'
+        label="Maxsulot narxi",
     )
     measure = forms.ChoiceField(
-        choices=ProductItem.CHOICES, widget=forms.Select(
-            attrs={"class": "form-select"}),
-        label='O`lchov birligi'
+        choices=ProductItem.CHOICES,
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="O`lchov birligi",
     )
     available_quantity = forms.IntegerField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Mavjud miqdori'
+        min_value=0,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+        label="Mavjud miqdori",
     )
     weight = forms.DecimalField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Maxsulot og`irligi (KG)',
+        min_value=0,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+        label="Maxsulot og`irligi (KG)",
         required=False,
         initial=1,
-        decimal_places=1
+        decimal_places=1,
     )
     # stock = forms.IntegerField(
     #     widget=forms.NumberInput(attrs={"class": "form-control"})
@@ -863,21 +884,21 @@ class GoodProductItemForm(forms.ModelForm):
     #     widget=forms.NumberInput(attrs={"class": "form-control"})
     # )
     active = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}), initial=True,
-        required=False
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        initial=True,
+        required=False,
     )
     images = (
         MultipleFileField()
     )  # New field for multiple images # New field for multiple images
     expire_date = forms.DateTimeField(
         input_formats=["%Y-%m-%d"],  # Adjust the format as needed
-        widget=forms.DateTimeInput(
-            attrs={"type": "date", "class": "form-control"}),
-        label='Yaroqlilik muddati'
+        widget=forms.DateTimeInput(attrs={"type": "date", "class": "form-control"}),
+        label="Yaroqlilik muddati",
     )
 
     def save(self, commit=True):
-        get_weight=self.cleaned_data.get('weight', None)
+        get_weight = self.cleaned_data.get("weight", None)
         good = super().save(commit=False)
         good.name_en = self.cleaned_data.get("name_en")
         good.name_uz = self.cleaned_data.get("name_uz")
@@ -917,47 +938,47 @@ class GoodProductItemForm(forms.ModelForm):
 
 class GoodEditForm(forms.ModelForm):
     # Fields for the Good model
-    name_uz = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}))
-    name_ru = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}))
-    name_en = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}))
-    name_kr = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}))
+    name_uz = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
+    name_ru = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
+    name_en = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
+    name_kr = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
     expire_date = forms.DateField(
-        widget=forms.DateInput(
-            attrs={"class": "form-control", "type": "date"}),
-        label='Yaroqlilik muddati'
+        widget=forms.DateInput(attrs={"class": "form-control", "type": "date"}),
+        label="Yaroqlilik muddati",
     )
     desc_uz = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif UZ'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif UZ",
     )
     desc_ru = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif RU'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif RU",
     )
     desc_en = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif EN'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif EN",
     )
     desc_kr = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"class": "form-control"}),
-        label='Ta`rif KR'
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        label="Ta`rif KR",
     )
     new_price = forms.DecimalField(
         decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Chegirmadagi narxi'
+        label="Chegirmadagi narxi",
     )
     weight = forms.DecimalField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Maxsulot og`irligi (KG)',
+        min_value=0,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+        label="Maxsulot og`irligi (KG)",
         required=False,
         initial=1,
-        decimal_places=1
+        decimal_places=1,
     )
     images = MultipleFileField(required=False)
 
@@ -965,11 +986,12 @@ class GoodEditForm(forms.ModelForm):
         decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Maxsulot narxi'
+        label="Maxsulot narxi",
     )
     available_quantity = forms.IntegerField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Mavjud miqdori'
+        min_value=0,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+        label="Mavjud miqdori",
     )
     active = forms.BooleanField(
         required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
@@ -1050,7 +1072,10 @@ class GoodEditForm(forms.ModelForm):
                     image.save()
         return good
 
+
 from django.core.files.uploadedfile import InMemoryUploadedFile
+
+
 class NewsForm(forms.ModelForm):
     class Meta:
         model = News
@@ -1086,21 +1111,19 @@ class NewsForm(forms.ModelForm):
 
     start_date = forms.DateTimeField(
         input_formats=["%Y-%m-%d"],  # Adjust the format as needed
-        widget=forms.DateTimeInput(
-            attrs={"type": "date", "class": "form-control"}),
-        label='Boshlanish sanasi'
+        widget=forms.DateTimeInput(attrs={"type": "date", "class": "form-control"}),
+        label="Boshlanish sanasi",
     )
     end_date = forms.DateTimeField(
         input_formats=["%Y-%m-%d"],  # Adjust the format as needed
-        widget=forms.DateTimeInput(
-            attrs={"type": "date", "class": "form-control"}),
-        label='Tugash sanasi'
+        widget=forms.DateTimeInput(attrs={"type": "date", "class": "form-control"}),
+        label="Tugash sanasi",
     )
 
     def save(self, commit=True):
         news = super(NewsForm, self).save(commit=False)
 
-        new_image = self.cleaned_data.get('image', None)
+        new_image = self.cleaned_data.get("image", None)
         if new_image:
             # If the new image is an instance of InMemoryUploadedFile, use its content directly
             if isinstance(new_image, InMemoryUploadedFile):
@@ -1114,45 +1137,50 @@ class NewsEditForm(forms.ModelForm):
     start_date = forms.DateTimeField(
         input_formats=["%Y-%m-%d"],  # Adjust the format as needed
         widget=forms.DateTimeInput(
-            attrs={"type": "datetime-local", "class": "form-control"}),
+            attrs={"type": "datetime-local", "class": "form-control"}
+        ),
         initial=timezone.now(),
-        label='Boshlanish sanasi'
+        label="Boshlanish sanasi",
     )
 
     end_date = forms.DateTimeField(
         input_formats=["%Y-%m-%d"],  # Adjust the format as needed
         widget=forms.DateTimeInput(
-            attrs={"type": "datetime-local", "class": "form-control"}),
+            attrs={"type": "datetime-local", "class": "form-control"}
+        ),
         initial=timezone.now(),
-        label='Tugash sanasi'
+        label="Tugash sanasi",
     )
     description_uz = forms.CharField(
         widget=CKEditorWidget(
-            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100}),
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100}
+        ),
         label="Ta`rif UZ",
         required=True,
     )
 
     description_ru = forms.CharField(
         widget=CKEditorWidget(
-            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100}),
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100}
+        ),
         label="Ta`rif RU",
         required=True,
     )
 
     description_en = forms.CharField(
         widget=CKEditorWidget(
-            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100}),
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100}
+        ),
         label="Ta`rif EN",
         required=True,
     )
 
     description_kr = forms.CharField(
         widget=CKEditorWidget(
-            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100}),
+            attrs={"class": "form-control ckeditor", "rows": 10, "cols": 100}
+        ),
         label="Ta`rif KR",
         required=True,
-
     )
 
     class Meta:
@@ -1210,10 +1238,10 @@ class NewsEditForm(forms.ModelForm):
     def save(self, commit=False):
         news = super().save(commit=False)
         if not news.start_date:
-            news.start_date = self.cleaned_data['start_date']
+            news.start_date = self.cleaned_data["start_date"]
         if not news.end_date:
-            news.end_date = self.cleaned_data['end_date']
-        new_image = self.cleaned_data.get('image', None)
+            news.end_date = self.cleaned_data["end_date"]
+        new_image = self.cleaned_data.get("image", None)
         if new_image:
             # If the new image is an instance of InMemoryUploadedFile, use its content directly
             if isinstance(new_image, InMemoryUploadedFile):
@@ -1229,7 +1257,7 @@ class ServiceEditForm(forms.ModelForm):
         decimal_places=0,
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Yetkazib berish xizmati narxi'
+        label="Yetkazib berish xizmati narxi",
     )
 
     class Meta:
@@ -1818,8 +1846,7 @@ class InformationEditForm(forms.ModelForm):
 
         # Set unchanged fields to their initial values
         for field_name in set(self.fields) - set(changed_fields):
-            setattr(information, field_name, getattr(
-                self.instance, field_name))
+            setattr(information, field_name, getattr(self.instance, field_name))
 
         if commit:
             information.save()
@@ -1830,26 +1857,33 @@ class InformationEditForm(forms.ModelForm):
 class BannerForm(forms.ModelForm):
     class Meta:
         model = Banner
-        fields = ['title', 'image', 'active']
+        fields = ["title", "image", "active"]
 
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'image': forms.FileInput(attrs={'class': 'form-control'}),
-            'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            "title": forms.TextInput(attrs={"class": "form-control"}),
+            "image": forms.FileInput(attrs={"class": "form-control"}),
+            "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
         labels = {
-            'title': 'Sarlavhasi',
-            'image': 'Rasmi',
+            "title": "Sarlavhasi",
+            "image": "Rasmi",
         }
 
 
 class CategoryEditForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ['main_type', "name_uz", "name_ru", "name_en", "name_kr",
-                  "image", "active",]
+        fields = [
+            "main_type",
+            "name_uz",
+            "name_ru",
+            "name_en",
+            "name_kr",
+            "image",
+            "active",
+        ]
         widgets = {
-            'main_type': forms.Select(attrs={'class': 'form-control'}),
+            "main_type": forms.Select(attrs={"class": "form-control"}),
             "name_uz": forms.TextInput(attrs={"class": "form-control"}),
             "name_ru": forms.TextInput(attrs={"class": "form-control"}),
             "name_en": forms.TextInput(attrs={"class": "form-control"}),
@@ -1880,13 +1914,21 @@ class CategoryEditForm(forms.ModelForm):
 class SubCategoryEditForm(forms.ModelForm):
     class Meta:
         model = SubCategory
-        fields = ["name_uz", "name_ru", "name_en", "name_kr", "image",
-                  "active"]
+        fields = [
+            "category",
+            "name_uz",
+            "name_ru",
+            "name_en",
+            "name_kr",
+            "image",
+            "active",
+        ]
         widgets = {
             "name_uz": forms.TextInput(attrs={"class": "form-control"}),
             "name_ru": forms.TextInput(attrs={"class": "form-control"}),
             "name_en": forms.TextInput(attrs={"class": "form-control"}),
             "name_kr": forms.TextInput(attrs={"class": "form-control"}),
+            "category": forms.Select(attrs={"class": "form-select"}),
             "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
             "active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
@@ -1895,6 +1937,7 @@ class SubCategoryEditForm(forms.ModelForm):
             "name_ru": "Nomi (RU)",
             "name_en": "Nomi (EN)",
             "name_kr": "Nomi (KR)",
+            "category": "Bosh kategoriyasi",
         }
 
     def __init__(self, *args, **kwargs):
@@ -1904,6 +1947,7 @@ class SubCategoryEditForm(forms.ModelForm):
             self.fields["name_ru"].initial = self.instance.name_ru
             self.fields["name_en"].initial = self.instance.name_en
             self.fields["name_kr"].initial = self.instance.name_kr
+            self.fields["category"].initial = self.instance.category
             self.fields["image"].initial = self.instance.image
             self.fields["active"].initial = self.instance.active
 
@@ -1913,7 +1957,7 @@ class CategoryCreateForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = [
-            'main_type',
+            "main_type",
             "name_uz",
             "name_ru",
             "name_en",
@@ -1922,7 +1966,7 @@ class CategoryCreateForm(forms.ModelForm):
             "active",
         ]
         widgets = {
-            'main_type': forms.Select(attrs={'class': 'form-control'}),
+            "main_type": forms.Select(attrs={"class": "form-control"}),
             "name_uz": forms.TextInput(attrs={"class": "form-control"}),
             "name_ru": forms.TextInput(attrs={"class": "form-control"}),
             "name_en": forms.TextInput(attrs={"class": "form-control"}),
@@ -1965,7 +2009,7 @@ class SubCategoryCreateForm(forms.ModelForm):
     category = forms.ModelChoiceField(
         queryset=Category.objects.filter(main_type="f"),
         widget=forms.Select(attrs={"class": "form-select"}),
-        label='Bosh kategoriyasi'
+        label="Bosh kategoriyasi",
     )
 
     class Meta:
@@ -2026,29 +2070,30 @@ class LoginForm(forms.Form):
 
 
 class BonusEditForm(forms.ModelForm):
-    title = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}), label='Toifasi')
+    title = forms.CharField(
+        widget=forms.TextInput(attrs={"class": "form-control"}), label="Toifasi"
+    )
     amount = forms.DecimalField(
         decimal_places=0,
         max_digits=10,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        label='Buyurtma qiymati'
+        label="Buyurtma qiymati",
     )
     percentage = forms.IntegerField(
         validators=[MinValueValidator(0)],
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
-        label='Chegirma foizi qiymati'
+        widget=forms.NumberInput(attrs={"class": "form-control", "min": 0}),
+        label="Chegirma foizi qiymati",
     )
     active = forms.BooleanField(
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
         required=False,
-        initial=True
+        initial=True,
     )
 
     class Meta:
         model = Bonus
-        fields = ['title', 'amount', 'percentage', 'active']
+        fields = ["title", "amount", "percentage", "active"]
 
     def __init__(self, *args, **kwargs):
         super(BonusEditForm, self).__init__(*args, **kwargs)
@@ -2066,49 +2111,88 @@ class BonusEditForm(forms.ModelForm):
 
 
 class SocialMediaEditForm(forms.ModelForm):
-    telegram = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}), label='Telegram', required=False)
-    instagram = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}), label='Instagram', required=False)
-    whatsapp = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}), label='Whatsapp', required=False)
-    phone_number = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}), label='Telefon nomer', required=False)
-    imo = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}), label='IMO', required=False)
-    kakao = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}), label='Kakao talk', required=False)
-    tiktok = forms.CharField(widget=forms.TextInput(
-        attrs={"class": "form-control"}), label='TikTok', required=False)
+    telegram = forms.CharField(
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        label="Telegram",
+        required=False,
+    )
+    instagram = forms.CharField(
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        label="Instagram",
+        required=False,
+    )
+    whatsapp = forms.CharField(
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        label="Whatsapp",
+        required=False,
+    )
+    phone_number = forms.CharField(
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        label="Telefon nomer",
+        required=False,
+    )
+    imo = forms.CharField(
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        label="IMO",
+        required=False,
+    )
+    kakao = forms.CharField(
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        label="Kakao talk",
+        required=False,
+    )
+    tiktok = forms.CharField(
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        label="TikTok",
+        required=False,
+    )
 
     class Meta:
         model = SocialMedia
-        fields = ['telegram', 'instagram', 'whatsapp',
-                  'phone_number', 'imo', 'kakao', 'tiktok']
+        fields = [
+            "telegram",
+            "instagram",
+            "whatsapp",
+            "phone_number",
+            "imo",
+            "kakao",
+            "tiktok",
+        ]
 
     def clean(self):
         cleaned_data = super().clean()
 
-        for field_name in ['telegram', 'instagram', 'whatsapp', 'tiktok']:
-            if cleaned_data.get(field_name) and cleaned_data[field_name] != getattr(self.instance, field_name):
+        for field_name in ["telegram", "instagram", "whatsapp", "tiktok"]:
+            if cleaned_data.get(field_name) and cleaned_data[field_name] != getattr(
+                self.instance, field_name
+            ):
                 original_value = getattr(self.instance, field_name)
                 cleaned_data[field_name] = self.get_cleaned_url(
-                    field_name, cleaned_data[field_name], original_value)
+                    field_name, cleaned_data[field_name], original_value
+                )
 
         return cleaned_data
 
     def get_cleaned_url(self, field_name, value, original_value):
-        if any(original_value.startswith(prefix) for prefix in [f"https://www.tiktok.com/@{value}", f"https://www.{field_name}.com/", "https://t.me/", "https://wa.me/"]):
+        if any(
+            original_value.startswith(prefix)
+            for prefix in [
+                f"https://www.tiktok.com/@{value}",
+                f"https://www.{field_name}.com/",
+                "https://t.me/",
+                "https://wa.me/",
+            ]
+        ):
             return value  # Don't add the prefix again
         else:
             # Add the prefix based on the social media platform
-            if field_name == 'telegram':
+            if field_name == "telegram":
                 return f"https://t.me/{value}"
-            elif field_name == 'instagram':
+            elif field_name == "instagram":
                 return f"https://www.instagram.com/{value}"
-            elif field_name == 'whatsapp':
+            elif field_name == "whatsapp":
                 return f"https://wa.me/{value}"
-            elif field_name == 'tiktok':
+            elif field_name == "tiktok":
                 return f"https://www.tiktok.com/@{value}"
             else:
                 return value
@@ -2116,9 +2200,16 @@ class SocialMediaEditForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(SocialMediaEditForm, self).__init__(*args, **kwargs)
         if self.instance:
-            for field_name in ['telegram', 'instagram', 'whatsapp', 'phone_number', 'imo', 'kakao', 'tiktok']:
-                self.fields[field_name].initial = getattr(
-                    self.instance, field_name)
+            for field_name in [
+                "telegram",
+                "instagram",
+                "whatsapp",
+                "phone_number",
+                "imo",
+                "kakao",
+                "tiktok",
+            ]:
+                self.fields[field_name].initial = getattr(self.instance, field_name)
 
     def save(self, commit=True):
         media = super(SocialMediaEditForm, self).save(commit=commit)
