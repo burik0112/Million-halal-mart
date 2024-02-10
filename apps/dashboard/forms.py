@@ -996,6 +996,11 @@ class GoodEditForm(forms.ModelForm):
     active = forms.BooleanField(
         required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
     )
+    measure = forms.ChoiceField(
+        choices=ProductItem.CHOICES,
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="O`lchov birligi",
+    )
 
     class Meta:
         model = Good
@@ -1008,6 +1013,7 @@ class GoodEditForm(forms.ModelForm):
             "sub_cat",
             "old_price",
             "new_price",
+            "measure",
             "weight",
             "images",
             "available_quantity",
@@ -1031,6 +1037,7 @@ class GoodEditForm(forms.ModelForm):
             self.fields["weight"].initial = product.weight
             self.fields["available_quantity"].initial = product.available_quantity
             self.fields["desc_uz"].initial = product.desc_uz
+            self.fields["measure"].initial = product.measure
             self.fields["desc_ru"].initial = product.desc_ru
             self.fields["desc_en"].initial = product.desc_kr
             self.fields["desc_kr"].initial = product.desc_en
@@ -1045,6 +1052,7 @@ class GoodEditForm(forms.ModelForm):
         product_item.desc_ru = self.cleaned_data["desc_ru"]
         product_item.desc_kr = self.cleaned_data["desc_kr"]
         product_item.desc_en = self.cleaned_data["desc_en"]
+        product_item.measure = self.cleaned_data["measure"]
         product_item.weight = self.cleaned_data["weight"]
         product_item.new_price = self.cleaned_data["new_price"]
         product_item.old_price = self.cleaned_data["old_price"]
