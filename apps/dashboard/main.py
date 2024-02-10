@@ -50,9 +50,9 @@ def number_cutter(number):
 
 def decimal_cutter(number):
     if number is not None:
-        if number >= Decimal('100000'):
+        if number >= Decimal("100000"):
             return f"{round(number / Decimal('1000000'), 2)}M"
-        elif number >= Decimal('1000'):
+        elif number >= Decimal("1000"):
             return f"{round(number / Decimal('1000'), 2)}K"
         else:
             return number
@@ -63,8 +63,7 @@ def decimal_cutter(number):
 def dashboard(request):
     today = date.today()
     orders = Order.objects.all()
-    order_today = Order.objects.filter(
-        Q(created__date=today) & Q(status='sent'))
+    order_today = Order.objects.filter(Q(created__date=today) & Q(status="sent"))
     orders = number_cutter(orders)
     order_today = number_cutter(order_today)
     customers = Profile.objects.all()
@@ -72,16 +71,18 @@ def dashboard(request):
     customers_today_count = Profile.objects.filter(created__date=today)
     customers_today_count = number_cutter(customers_today_count)
 
-    revenue = Order.objects.filter(status='sent').aggregate(
-        total_amount_sum=Sum('total_amount'))['total_amount_sum']
+    revenue = Order.objects.filter(status="sent").aggregate(
+        total_amount_sum=Sum("total_amount")
+    )["total_amount_sum"]
     revenue = decimal_cutter(revenue)
 
-    revenue_today = Order.objects.filter(Q(created__date=today) & Q(status='sent')).aggregate(
-        total_amount_sum=Sum('total_amount'))['total_amount_sum']
+    revenue_today = Order.objects.filter(
+        Q(created__date=today) & Q(status="sent")
+    ).aggregate(total_amount_sum=Sum("total_amount"))["total_amount_sum"]
     revenue_today = decimal_cutter(revenue_today)
     all_orders = Order.objects.all()
 
-    recent = all_orders.order_by('-created')[:25]
+    recent = all_orders.order_by("-created")[:25]
 
     top_selling_products = SoldProduct.objects.all()
     sold_products_info = defaultdict(int)
@@ -90,36 +91,53 @@ def dashboard(request):
         product_instance = sold_product.product
 
         title = ""
-        if hasattr(product_instance, 'goods'):
-            title = product_instance.goods.name
-        elif hasattr(product_instance, 'tickets'):
-            title = product_instance.tickets.event_name
-        elif hasattr(product_instance, 'phones'):
-            title = product_instance.phones.model_name
+        if hasattr(product_instance, "goods"):
+            title = product_instance.goods.name_uz
+        elif hasattr(product_instance, "tickets"):
+            title = product_instance.tickets.event_name_uz
+        elif hasattr(product_instance, "phones"):
+            title = product_instance.phones.model_name_uz
 
         quantity = sold_product.quantity
         sold_products_info[title] += quantity
 
-    sorted_sold_products = sorted(
-        sold_products_info.items(), key=lambda x: -x[1])
+    sorted_sold_products = sorted(sold_products_info.items(), key=lambda x: -x[1])
 
-    orders_with_comments = Order.objects.exclude(comment='')
+    orders_with_comments = Order.objects.exclude(comment="")
     most_expensive = []
-    for order in all_orders.filter(status='sent').order_by('-total_amount')[:5]:
+    for order in all_orders.filter(status="sent").order_by("-total_amount")[:5]:
         order_info = {
-            'id': order.id,
-            'user': order.user.full_name,
-            'price': round(order.total_amount / 1000, 2),
+            "id": order.id,
+            "user": order.user.full_name,
+            "price": round(order.total_amount / 1000, 2),
         }
         most_expensive.append(order_info)
 
     products_with_quantity = (
         Good.objects.filter(product__available_quantity__lt=100)
-        .values('id', 'name_uz', 'product__available_quantity')
-        .order_by('-product__available_quantity')[:100]
+        .values("id", "name_uz", "product__available_quantity")
+        .order_by("-product__available_quantity")[:100]
     )
 
-    return render(request, "base.html", {'data': sorted_sold_products, 'products_with_quantity': products_with_quantity, 'most_expensive': most_expensive, 'comments': orders_with_comments, 'top_products': top_selling_products, 'customers_today': customers_today_count, 'all_orders': all_orders, 'orders': orders, 'customers': customers, 'revenue': revenue, 'recent': recent, 'order_today': order_today, 'revenue_today': revenue_today})
+    return render(
+        request,
+        "base.html",
+        {
+            "data": sorted_sold_products,
+            "products_with_quantity": products_with_quantity,
+            "most_expensive": most_expensive,
+            "comments": orders_with_comments,
+            "top_products": top_selling_products,
+            "customers_today": customers_today_count,
+            "all_orders": all_orders,
+            "orders": orders,
+            "customers": customers,
+            "revenue": revenue,
+            "recent": recent,
+            "order_today": order_today,
+            "revenue_today": revenue_today,
+        },
+    )
 
 
 def get_first_image_url(product_item):
@@ -145,9 +163,11 @@ class InformationEditView(View):
 
     def get(self, request, pk):
         info = get_object_or_404(Information, pk=pk)
-        key = request.GET.get('key', None)
+        key = request.GET.get("key", None)
         form = InformationEditForm(instance=info)
-        return render(request, self.template_name, {"form": form, "info": info, 'key': key})
+        return render(
+            request, self.template_name, {"form": form, "info": info, "key": key}
+        )
 
     def post(self, request, pk):
         info = get_object_or_404(Information, pk=pk)
@@ -172,10 +192,10 @@ class ServiceView(ListView):
         context = super().get_context_data(**kwargs)
 
         # Fetch Bonus objects separately
-        bonuses = Bonus.objects.all().order_by('pk')
+        bonuses = Bonus.objects.all().order_by("pk")
 
         # Add the Bonus objects to the context
-        context['bonuses'] = bonuses
+        context["bonuses"] = bonuses
 
         return context
 
@@ -187,39 +207,47 @@ class BannerView(ListView):
     form_class = BannerForm
 
     def get_queryset(self):
-        return Banner.objects.all().order_by('-created')
+        return Banner.objects.all().order_by("-created")
 
     def get(self, request, *args, **kwargs):
         form = self.form_class()
-        return render(request, self.template_name, {'banners': self.get_queryset(), 'form': form})
+        return render(
+            request, self.template_name, {"banners": self.get_queryset(), "form": form}
+        )
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('banner-list')
+            return redirect("banner-list")
         else:
-            return render(request, self.template_name, {'banners': self.get_queryset(), 'form': form})
+            return render(
+                request,
+                self.template_name,
+                {"banners": self.get_queryset(), "form": form},
+            )
 
 
 class BannerActionView(View):
     def post(self, request, *args, **kwargs):
-        if 'action' not in request.POST:
-            return render(request, 'error.html', {'error_message': 'Action not specified'})
+        if "action" not in request.POST:
+            return render(
+                request, "error.html", {"error_message": "Action not specified"}
+            )
 
-        action = request.POST.get('action')
+        action = request.POST.get("action")
 
-        if action == 'toggle':
+        if action == "toggle":
             # Toggle the active status
-            banner = get_object_or_404(Banner, pk=kwargs['pk'])
+            banner = get_object_or_404(Banner, pk=kwargs["pk"])
             banner.active = not banner.active
             banner.save()
-        elif action == 'delete':
+        elif action == "delete":
             # Delete the banner
-            banner = get_object_or_404(Banner, pk=kwargs['pk'])
+            banner = get_object_or_404(Banner, pk=kwargs["pk"])
             banner.delete()
 
-        return redirect('banner-list')
+        return redirect("banner-list")
 
 
 class ServiceEditView(View):
@@ -246,7 +274,7 @@ class NewsListView(ListView):
     context_object_name = "news"
 
     def get_queryset(self):
-        return News.objects.all().order_by('-pk')
+        return News.objects.all().order_by("-pk")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -302,7 +330,7 @@ class OrdersView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(OrdersView, self).get_context_data(**kwargs)
-        user = get_object_or_404(Profile, id=self.kwargs['pk'])
+        user = get_object_or_404(Profile, id=self.kwargs["pk"])
         orders = Order.objects.filter(user=user)
 
         if orders:
@@ -314,25 +342,26 @@ class OrdersView(DetailView):
         return context
 
     def post(self, request, *args, **kwargs):
-        order_id = self.kwargs['pk']
+        order_id = self.kwargs["pk"]
         order = get_object_or_404(Order, id=order_id)
-        new_status = request.POST.get('status')
+        new_status = request.POST.get("status")
 
         if new_status in dict(order.STATUS_CHOICES):
             order.status = new_status
             order.save()
 
-        return HttpResponseRedirect(reverse('orders-list', kwargs={'pk': order.user.id}))
+        return HttpResponseRedirect(
+            reverse("orders-list", kwargs={"pk": order.user.id})
+        )
 
 
 def bot(order):
     text4channel = f"""🔰 <b>Buyurtma holati:</b> #<i>YANGI</i>\n\n 🔢 <b>Buyurtma raqami:</b> <i>{order.id}</i>\n👤 <b>Mijoz ismi:</b> <i>{order.user.full_name}</i>\n📞 <b>Tel raqami:</b> <i>{order.user.phone_number}</i>\n🏠 <b>Manzili:</b> """
     for location in order.user.location.all():
         text4channel += f"{location.address}\n"
-    text4channel += '🛒 <b>Mahsulotlar:</b> \n'
+    text4channel += "🛒 <b>Mahsulotlar:</b> \n"
     for order_item in order.get_order_items():
-        product_details = order.get_product_details(
-            order_item.product, order_item)
+        product_details = order.get_product_details(order_item.product, order_item)
         text4channel += f" 🟢 <i>{product_details}</i>\n"
     text4channel += f"📝 <b>Izoh:</b> <i>{order.comment}</i>\n📅 <b>Sana:</b> <i>{order.created.strftime('%Y-%m-%d %H:%M')}</i>\n💸 <b>Jami:</b> <i>{order.total_amount} ₩</i>\n\n⁉️ <u>To`lov amalga oshirilganligini tasdiqlaysizmi?</u>"
     inline_keyboard = [
@@ -357,6 +386,8 @@ def bot(order):
         return response.text
     except Exception as e:
         return f"Error: {e}"
+
+
 class BonusEditView(View):
     template_name = "dashboard/service/edit_bonus.html"
 
