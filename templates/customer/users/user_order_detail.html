@@ -80,8 +80,8 @@
                   <tr>
                     <td class="text-center">{{ item_data.order_item.id }}</td>
                     {% if item_data.order_item.product.phones %}
-                    <td>{{item_data.order_item.product.phones.category}}</td>
-                    <td>{{ item_data.order_item.product.phones.model_name }}/{{item_data.order_item.product.phones.get_ram_display }}/{{item_data.order_item.product.phones.get_storage_display }}/{{item_data.order_item.product.phones.get_color_display }}</td>
+                    <td>{{item_data.order_item.product.phones.category.name_uz}}</td>
+                    <td>{{ item_data.order_item.product.phones.model_name_uz }}/{{item_data.order_item.product.phones.get_ram_display }}/{{item_data.order_item.product.phones.get_storage_display }}/{{item_data.order_item.product.phones.get_color_display }}</td>
                     {% if item_data.first_image_url %}
                     <td class="text-center"><img src="{{ item_data.first_image_url }}" height="75" width="75"
                         alt="Product Image"></td>
@@ -91,8 +91,8 @@
                     <td class="text-center">{{item_data.total_price}} ₩</td>
 
                     {% elif item_data.order_item.product.tickets %}
-                    <td>{{item_data.order_item.product.tickets.category}}</td>
-                    <td>{{ item_data.order_item.product.tickets.event_name }}</td>
+                    <td>{{item_data.order_item.product.tickets.category.name_uz}}</td>
+                    <td>{{ item_data.order_item.product.tickets.event_name_uz }}</td>
                     {% if item_data.first_image_url %}
                     <td class="text-center"><img src="{{ item_data.first_image_url }}" height="75" width="75"
                         alt="Product Image"></td>
@@ -101,8 +101,8 @@
                     <td class="text-center">{{ item_data.order_item.quantity }} {{item_data.order_item.product.get_measure_display }}</td>
                     <td class="text-center">{{item_data.total_price}} ₩</td>
                     {% elif item_data.order_item.product.goods %}
-                    <td>{{item_data.order_item.product.goods.sub_cat}}</td>
-                    <td>{{ item_data.order_item.product.goods.name }}</td>
+                    <td>{{item_data.order_item.product.goods.sub_cat.name_uz}}</td>
+                    <td>{{ item_data.order_item.product.goods.name_uz }}</td>
                     {% if item_data.first_image_url %}
                     <td class="text-center"><img src="{{ item_data.first_image_url }}" height="75" width="75"
                         alt="Product Image"></td>
