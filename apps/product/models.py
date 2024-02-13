@@ -52,7 +52,19 @@ class ProductItem(TimeStampedModel, models.Model):
     bonus = models.IntegerField(default=0)
     is_favorite = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
+    def save(self, *args, **kwargs):
+        # Implement the logic to adjust prices based on your conditions
+        if self.new_price and self.old_price and self.new_price < self.old_price:
+            # Condition 1: new < old, do nothing special as sale is calculated dynamically
+            pass
+        elif self.new_price and self.old_price and self.new_price > self.old_price:
+            # Condition 2: new > old, reset old_price to None
+            self.old_price = None
+        elif self.new_price == self.old_price:
+            # Condition 3: new == old, set new_price to None
+            self.new_price = None
 
+        super().save(*args, **kwargs)
     @property
     def sale(self):
         """Agar yangi narx eski narxdan past bo'lsa, foizni qaytaradi."""
