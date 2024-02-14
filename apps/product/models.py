@@ -107,21 +107,22 @@ class Ticket(models.Model):
 
 class Phone(models.Model):
     STORAGE = (
-        (0, "32 GB"),
-        (1, "64 GB"),
-        (2, "128 GB"),
-        (3, "256 GB"),
-        (4, "512 GB"),
-        (5, "1 TB"),
-        (6, "2 TB"),
+        ("32 GB", "32 GB"),
+        ("64 GB", "64 GB"),
+        ("128 GB", "128 GB"),
+        ("256 GB", "256 GB"),
+        ("512 GB", "512 GB"),
+        ("1 TB", "1 TB"),
+        ("2 TB", "2 TB"),
     )
     RAM = (
-        (0, "4 GB"),
-        (1, "6 GB"),
-        (2, "8 GB"),
-        (3, "12 GB"),
-        (4, "16 GB"),
-        (5, "32 GB"),
+        ("4 GB", "4 GB"),
+        ("6 GB", "6 GB"),
+        ("8 GB", "8 GB"),
+        ("12 GB", "12 GB"),
+        ("16 GB", "16 GB"),
+        ("32 GB", "32 GB"),
+        ("64 GB", "64 GB"),
     )
     COLOR_CHOICES = (
         ("red", "Red"),
@@ -153,8 +154,8 @@ class Phone(models.Model):
         ProductItem, on_delete=models.CASCADE, related_name="phones"
     )
     model_name = models.CharField(max_length=255)
-    ram = models.IntegerField(choices=RAM, default=0)
-    storage = models.IntegerField(choices=STORAGE, default=0)
+    ram = models.CharField(choices=RAM, default=0)
+    storage = models.CharField(choices=STORAGE, default=0)
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True, related_name="phones"
     )
