@@ -3,7 +3,16 @@ from decouple import config
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView
 from django.views import View
-from .forms import ReminderForm, AgrementForm, ShipmentForm, PrivacyForm, AboutUsForm, SupportForm, PaymentForm, SocialMediaEditForm
+from .forms import (
+    ReminderForm,
+    AgrementForm,
+    ShipmentForm,
+    PrivacyForm,
+    AboutUsForm,
+    SupportForm,
+    PaymentForm,
+    SocialMediaEditForm,
+)
 
 
 def edit_reminder(request, pk):
@@ -44,6 +53,7 @@ def edit_shipment(request, pk):
 
     return render(request, "information/edit_shipment.html", {"form": form})
 
+
 def edit_privacy(request, pk):
     info = get_object_or_404(Information, pk=pk)
     if request.method == "POST":
@@ -55,6 +65,7 @@ def edit_privacy(request, pk):
         form = PrivacyForm(instance=info)
 
     return render(request, "information/edit_privacy.html", {"form": form})
+
 
 def edit_aboutus(request, pk):
     info = get_object_or_404(Information, pk=pk)
@@ -68,6 +79,7 @@ def edit_aboutus(request, pk):
 
     return render(request, "information/edit_aboutus.html", {"form": form})
 
+
 def edit_support(request, pk):
     info = get_object_or_404(Information, pk=pk)
     if request.method == "POST":
@@ -79,6 +91,7 @@ def edit_support(request, pk):
         form = SupportForm(instance=info)
 
     return render(request, "information/edit_support.html", {"form": form})
+
 
 def edit_payment(request, pk):
     info = get_object_or_404(Information, pk=pk)
@@ -92,6 +105,7 @@ def edit_payment(request, pk):
 
     return render(request, "information/edit_payment.html", {"form": form})
 
+
 class SocialMediaListView(ListView):
     model = SocialMedia
     template_name = "information/socialmedia.html"
@@ -103,7 +117,8 @@ class SocialMediaListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
-    
+
+
 class SocialMediaEditView(View):
     template_name = "information/socialmedia_edit.html"
 
@@ -115,9 +130,14 @@ class SocialMediaEditView(View):
     def post(self, request, pk):
         media = get_object_or_404(SocialMedia, pk=pk)
         form = SocialMediaEditForm(request.POST, instance=media)
-        
+
         if form.is_valid():
             form.save()
             return redirect("socialmedia")
 
         return render(request, self.template_name, {"form": form, "media": media})
+
+
+def base_info(request):
+    info=Information.objects.all().first()
+    return render(request, "base_info.html", {'info':info})
