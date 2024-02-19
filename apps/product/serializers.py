@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 
+from apps.customer.models import Favorite
+
 from .models import Category, Good, Image, Phone, ProductItem, SubCategory, Ticket
 from .utils import ProductItemCreatorMixin
 
@@ -44,11 +46,15 @@ class ProductItemSerializer(serializers.ModelSerializer):
 
 class TicketSerializer(ProductItemCreatorMixin):
     product = ProductItemSerializer()
-
+    is_favorite = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Ticket
         fields = "__all__"
-
+    def get_is_favorite(self, obj):
+        favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
+        if favorite:
+            return True
+        return False
     def create(self, validate_data):
         product = self.create_pruduct(validate_data)
         return Ticket.objects.create(**validate_data, product=product)
