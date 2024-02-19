@@ -50,7 +50,6 @@ class ProductItem(TimeStampedModel, models.Model):
     measure = models.IntegerField(choices=CHOICES, default=0)
     available_quantity = models.PositiveIntegerField(default=0)
     bonus = models.IntegerField(default=0)
-    is_favorite = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
 
     @property
