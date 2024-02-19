@@ -122,7 +122,7 @@ class FavoriteCreateAPIView(CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user.profile,product__is_favorite=True)
+        serializer.save(user=self.request.user.profile)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
