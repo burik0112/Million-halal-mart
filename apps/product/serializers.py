@@ -51,6 +51,8 @@ class TicketSerializer(ProductItemCreatorMixin):
         model = Ticket
         fields = "__all__"
     def get_is_favorite(self, obj):
+        if self.context["request"].user.is_anonymous:
+            return False
         favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
         if favorite:
             return True
@@ -64,6 +66,8 @@ class PhoneSerializer(ProductItemCreatorMixin):
     product = ProductItemSerializer()
     is_favorite = serializers.SerializerMethodField(read_only=True)
     def get_is_favorite(self, obj):
+        if self.context["request"].user.is_anonymous:
+            return False
         favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
         if favorite:
             return True
@@ -81,6 +85,8 @@ class GoodSerializer(ProductItemCreatorMixin):
     product = ProductItemSerializer()
     is_favorite = serializers.SerializerMethodField(read_only=True)
     def get_is_favorite(self, obj):
+        if self.context["request"].user.is_anonymous:
+            return False
         favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
         if favorite:
             return True
@@ -100,6 +106,8 @@ class TicketPopularSerializer(serializers.ModelSerializer):
     sold_count = serializers.IntegerField(read_only=True)
     is_favorite = serializers.SerializerMethodField(read_only=True)
     def get_is_favorite(self, obj):
+        if self.context["request"].user.is_anonymous:
+            return False
         favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
         if favorite:
             return True
@@ -114,6 +122,8 @@ class PhonePopularSerializer(serializers.ModelSerializer):
     sold_count = serializers.IntegerField(read_only=True)
     is_favorite = serializers.SerializerMethodField(read_only=True)
     def get_is_favorite(self, obj):
+        if self.context["request"].user.is_anonymous:
+            return False
         favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
         if favorite:
             return True
@@ -128,6 +138,8 @@ class GoodPopularSerializer(serializers.ModelSerializer):
     sold_count = serializers.IntegerField(read_only=True)
     is_favorite = serializers.SerializerMethodField(read_only=True)
     def get_is_favorite(self, obj):
+        if self.context["request"].user.is_anonymous:
+            return False
         favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
         if favorite:
             return True
