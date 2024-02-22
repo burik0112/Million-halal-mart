@@ -26,8 +26,8 @@ def send_fcm_notification(title, body, topic):
 @receiver(post_save, sender=News)
 def news_created(sender, instance, created, **kwargs):
     if created:
-        send_fcm_notification("Yangi yangilik", instance.title, "newsTopic")
-
+        firebase = send_fcm_notification("Yangi yangilik", instance.title, "newsTopic")
+        print(firebase,"message id keldi")
 @receiver(post_save, sender=ProductItem)
 def product_created(sender, instance, created, **kwargs):
     if created:

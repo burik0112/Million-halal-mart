@@ -62,7 +62,12 @@ class TicketSerializer(ProductItemCreatorMixin):
 
 class PhoneSerializer(ProductItemCreatorMixin):
     product = ProductItemSerializer()
-
+    is_favorite = serializers.SerializerMethodField(read_only=True)
+    def get_is_favorite(self, obj):
+        favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
+        if favorite:
+            return True
+        return False
     class Meta:
         model = Phone
         fields = "__all__"
@@ -74,7 +79,12 @@ class PhoneSerializer(ProductItemCreatorMixin):
 
 class GoodSerializer(ProductItemCreatorMixin):
     product = ProductItemSerializer()
-
+    is_favorite = serializers.SerializerMethodField(read_only=True)
+    def get_is_favorite(self, obj):
+        favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
+        if favorite:
+            return True
+        return False
     class Meta:
         model = Good
         fields = "__all__"
@@ -88,16 +98,26 @@ class GoodSerializer(ProductItemCreatorMixin):
 class TicketPopularSerializer(serializers.ModelSerializer):
     product = ProductItemSerializer()
     sold_count = serializers.IntegerField(read_only=True)
-
+    is_favorite = serializers.SerializerMethodField(read_only=True)
+    def get_is_favorite(self, obj):
+        favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
+        if favorite:
+            return True
+        return False
     class Meta:
         model = Ticket
-        fields = ["event_name", "event_date", "sold_count", "product"]
+        fields = ["event_name", "event_date", "sold_count", "product","is_favorite"]
 
 
 class PhonePopularSerializer(serializers.ModelSerializer):
     product = ProductItemSerializer()
     sold_count = serializers.IntegerField(read_only=True)
-
+    is_favorite = serializers.SerializerMethodField(read_only=True)
+    def get_is_favorite(self, obj):
+        favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
+        if favorite:
+            return True
+        return False
     class Meta:
         model = Phone
         fields = "__all__"
@@ -106,7 +126,12 @@ class PhonePopularSerializer(serializers.ModelSerializer):
 class GoodPopularSerializer(serializers.ModelSerializer):
     product = ProductItemSerializer()
     sold_count = serializers.IntegerField(read_only=True)
-
+    is_favorite = serializers.SerializerMethodField(read_only=True)
+    def get_is_favorite(self, obj):
+        favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
+        if favorite:
+            return True
+        return False
     class Meta:
         model = Good
         fields = "__all__"

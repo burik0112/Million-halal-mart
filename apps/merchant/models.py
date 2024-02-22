@@ -24,7 +24,9 @@ class Order(TimeStampedModel, models.Model):
     )
     comment = models.TextField(blank=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="in_cart")
-
+    location = models.ForeignKey(
+        "customer.Location", on_delete=models.SET_NULL, null=True
+    )
     total_amount = models.DecimalField(decimal_places=0, max_digits=20, default=0.00)
 
     @property
