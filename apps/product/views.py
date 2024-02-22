@@ -19,6 +19,10 @@ from .serializers import (
     TicketPopularSerializer,
     PhonePopularSerializer,
     GoodPopularSerializer,
+    TicketForSearchSerializer,
+    GoodForSearchSerializer,
+    PhoneForSearchSerializer
+    
 )
 
 # Create your views here.
@@ -185,15 +189,15 @@ class MultiProductSearchView(views.APIView):
             return query
 
         results = {
-            "tickets": TicketSerializer(
+            "tickets": TicketForSearchSerializer(
                 Ticket.objects.filter(build_query_for_model(Ticket, "event_name")),
                 many=True,
             ).data,
-            "phones": PhoneSerializer(
+            "phones": PhoneForSearchSerializer(
                 Phone.objects.filter(build_query_for_model(Phone, "model_name")),
                 many=True,
             ).data,
-            "goods": GoodSerializer(
+            "goods": GoodForSearchSerializer(
                 Good.objects.filter(build_query_for_model(Good, "name")), many=True
             ).data,
         }

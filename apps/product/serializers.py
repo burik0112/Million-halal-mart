@@ -61,7 +61,18 @@ class TicketSerializer(ProductItemCreatorMixin):
         product = self.create_pruduct(validate_data)
         return Ticket.objects.create(**validate_data, product=product)
 
+class TicketForSearchSerializer(ProductItemCreatorMixin):
+    product = ProductItemSerializer()
+    class Meta:
+        model = Ticket
+        fields = "__all__"
 
+class PhoneForSearchSerializer(ProductItemCreatorMixin):
+    product = ProductItemSerializer()
+
+    class Meta:
+        model = Phone
+        fields = "__all__"
 class PhoneSerializer(ProductItemCreatorMixin):
     product = ProductItemSerializer()
     is_favorite = serializers.SerializerMethodField(read_only=True)
@@ -80,6 +91,13 @@ class PhoneSerializer(ProductItemCreatorMixin):
         product = self.create_pruduct()
         return Phone.objects.create(**validate_data, product=product)
 
+class GoodForSearchSerializer(ProductItemCreatorMixin):
+    product = ProductItemSerializer()
+
+    class Meta:
+        model = Good
+        fields = "__all__"
+        read_only_fields = ("images",)
 
 class GoodSerializer(ProductItemCreatorMixin):
     product = ProductItemSerializer()
