@@ -49,7 +49,8 @@ class Order(TimeStampedModel, models.Model):
         return total_delivery_fee
 
     def get_product_details(self, product_item, order_item):
-        total_amount = product_item.new_price * order_item.quantity
+        price = product_item.product.new_price if product_item.product.new_price > 0 else product_item.product.old_price
+        total_amount = price * order_item.quantity
         # print(total_amount)
 
         if hasattr(product_item, "goods"):
@@ -108,7 +109,8 @@ class Order(TimeStampedModel, models.Model):
     def bonus_amount(self):
         total = 0
         for item in self.orderitem.all():
-            total += item.product.new_price * item.quantity
+            price = item.product.new_price if item.product.new_price > 0 else item.product.old_price
+            total += price * item.quantity
 
         # Bonuslarni tekshirish
         applicable_bonus = (
@@ -125,7 +127,8 @@ class Order(TimeStampedModel, models.Model):
     def update_total_amount(self):
         total = 0
         for item in self.orderitem.all():
-            total += item.product.new_price * item.quantity
+            price = item.product.new_price if item.product.new_price > 0 else item.product.old_price
+            total += price * item.quantity
 
         # Bonuslarni tekshirish
         applicable_bonus = (
