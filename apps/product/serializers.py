@@ -54,7 +54,7 @@ class TicketSerializer(ProductItemCreatorMixin):
         if self.context["request"].user.is_anonymous:
             return False
         favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
-        if favorite:
+        if favorite is not None:
             return True
         return False
     def create(self, validate_data):
@@ -80,7 +80,7 @@ class PhoneSerializer(ProductItemCreatorMixin):
         if self.context["request"].user.is_anonymous:
             return False
         favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
-        if favorite:
+        if favorite is not None:
             return True
         return False
     class Meta:
@@ -106,7 +106,7 @@ class GoodSerializer(ProductItemCreatorMixin):
         if self.context["request"].user.is_anonymous:
             return False
         favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
-        if favorite:
+        if favorite is not None:
             return True
         return False
     class Meta:
@@ -127,7 +127,7 @@ class TicketPopularSerializer(serializers.ModelSerializer):
         if self.context["request"].user.is_anonymous:
             return False
         favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
-        if favorite:
+        if favorite is not None:
             return True
         return False
     class Meta:
@@ -143,7 +143,7 @@ class PhonePopularSerializer(serializers.ModelSerializer):
         if self.context["request"].user.is_anonymous:
             return False
         favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
-        if favorite:
+        if favorite is not None:
             return True
         return False
     class Meta:
@@ -159,7 +159,7 @@ class GoodPopularSerializer(serializers.ModelSerializer):
         if self.context["request"].user.is_anonymous:
             return False
         favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
-        if favorite:
+        if favorite is not None:
             return True
         return False
     class Meta:
