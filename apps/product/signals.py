@@ -15,7 +15,7 @@ def send_fcm_notification(title, body, topic):
         "Authorization": f"key={FCM_SERVER_KEY}",
     }
     data = {
-        "to": f"/topics/{topic}",
+        "to": f"/topics/all",
         "priority": "high",
         "notification": {"title": title, "body": body},
     }
