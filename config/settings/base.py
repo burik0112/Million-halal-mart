@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "ckeditor",
     "ckeditor_uploader",
+    "debug_toolbar",
 ] + LOCAL_APPS
 
 MIDDLEWARE = [
@@ -79,6 +80,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
@@ -122,7 +124,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    "0.0.0.0",
+    # ...
+]
+DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: True}
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
