@@ -20,3 +20,4 @@ django-ckeditor
 
 telebot
 sentry-sdk
+django-debug-toolbar==4.3.0
