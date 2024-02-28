@@ -62,6 +62,7 @@ class ProfileCreateAPIView(CreateAPIView):
 class ProfileRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
@@ -73,6 +74,11 @@ class ProfileRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
         user_lang(language, user_id)
 
         return Response(serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=204)
 
 
 class LocationCreateAPIView(CreateAPIView):
