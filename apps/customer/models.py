@@ -6,16 +6,11 @@ from model_utils.models import TimeStampedModel
 
 
 class Profile(TimeStampedModel, models.Model):
-    LANG=(
-        ('uz', 'UZ'),
-        ('ru', 'RU'),
-        ('en', "EN"),
-        ('kr', 'KR')
-    )
+    LANG = (("uz", "UZ"), ("ru", "RU"), ("en", "EN"), ("kr", "KR"))
     origin = models.OneToOneField(User, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=17)
-    lang=models.CharField(max_length=2, choices=LANG, default="uz")
+    lang = models.CharField(max_length=2, choices=LANG, default="uz")
     cashback = models.IntegerField(default=0)
     otp = models.CharField(max_length=100, null=True, blank=True)
 
@@ -44,6 +39,18 @@ class News(TimeStampedModel, models.Model):
     description = models.TextField(blank=True)
     image = models.ImageField(upload_to="media/news")
     active = models.BooleanField(default=True)
+
+    @classmethod
+    def get_latest_unviewed_news(cls, user):
+        # Foydalanuvchining ko'rmagan yangiliklarini topish
+        viewed_news_ids = user.viewednews.values_list("news", flat=True)
+        latest_news = (
+            cls.objects.exclude(id__in=viewed_news_ids)
+            .filter(active=True)
+            .order_by("-start_date")
+            .first()
+        )
+        return latest_news
 
 
 class ViewedNews(TimeStampedModel, models.Model):

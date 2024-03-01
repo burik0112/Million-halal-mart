@@ -62,13 +62,14 @@ class ProfileCreateAPIView(CreateAPIView):
 class ProfileRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
-        language = request.data.get('lang', None)
+        language = request.data.get("lang", None)
         user_id = instance.id
         user_lang(language, user_id)
 
@@ -127,11 +128,11 @@ class FavoriteCreateAPIView(CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
+
         try:
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
-            
+
             return Response(
                 serializer.data, status=status.HTTP_201_CREATED, headers=headers
             )
@@ -195,11 +196,9 @@ class RegisterView(APIView):
             send_otp_sms(phone_number, otp)
         except Exception as e:
             return Response(
-            {
-                "message": "OTP yuborishda xatolik yuz berdi."
-            },
-            status=status.HTTP_408_REQUEST_TIMEOUT,
-        )
+                {"message": "OTP yuborishda xatolik yuz berdi."},
+                status=status.HTTP_408_REQUEST_TIMEOUT,
+            )
         user, _ = User.objects.get_or_create(username=phone_number)
         profile, _ = Profile.objects.update_or_create(
             origin=user,
@@ -292,3 +291,29 @@ class ProfileEditAPIView(generics.UpdateAPIView):
         # Foydalanuvchining profili olindi, agar yo'q bo'lsa, 404 xato qaytariladi
         profile = Profile.objects.get(origin=self.request.user)
         return profile
+
+
+class LatestUnviewedNewsView(APIView):
+    def get(self, request, *args, **kwargs):
+        latest_news = News.get_latest_unviewed_news(request.user)
+        if latest_news:
+            serializer = NewsSerializer(latest_news)
+            return Response(serializer.data)
+        return Response(
+            {"message": "Barcha yangiliklar ko'rilgan"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+
+class MarkNewsAsViewed(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = ViewedNewsSerializer(
+            data=request.data, context={"request": request}
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"message": "Yangilik o'qildi sifatida belgilandi"},
+                status=status.HTTP_201_CREATED,
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

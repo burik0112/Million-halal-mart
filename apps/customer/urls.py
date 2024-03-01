@@ -25,4 +25,6 @@ urlpatterns = [
     path("set-password/", views.SetPasswordView.as_view()),
     path("profile/edit/", views.ProfileEditAPIView.as_view()),
     path("banners/", views.BannerListAPIView.as_view(), name="banner"),
+        path('latest-unviewed-news/', views.LatestUnviewedNewsView.as_view(), name='latest-unviewed-news'),
+    path('mark-news-as-viewed/', views.MarkNewsAsViewed.as_view(), name='mark-news-as-viewed'),
 ]

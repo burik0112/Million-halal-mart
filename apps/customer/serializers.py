@@ -157,6 +157,12 @@ class ViewedNewsSerializer(serializers.ModelSerializer):
         model = ViewedNews
         fields = "__all__"
 
+    def create(self, validated_data):
+        user = self.context["request"].user
+        news = validated_data["news"]
+        viewed_news, created = ViewedNews.objects.get_or_create(user=user, news=news)
+        return viewed_news
+
 
 class FavoriteSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -213,3 +219,14 @@ class BannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Banner
         fields = "__all__"
+
+
+# class NewsSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = News
+#         fields = '__all__'
+
+# class ViewedNewsSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = ViewedNews
+#         fields = '__all__'
