@@ -49,16 +49,19 @@ class Order(TimeStampedModel, models.Model):
         return total_delivery_fee
 
     def get_product_details(self, product_item, order_item):
-        price = product_item.product.new_price if product_item.product.new_price > 0 else product_item.product.old_price
-        total_amount = price * order_item.quantity
-        # print(total_amount)
+        if hasattr(product_item, 'product') and hasattr(product_item.product, 'new_price') and hasattr(product_item.product, 'old_price'):
+            price = product_item.product.new_price if product_item.product.new_price > 0 else product_item.product.old_price
+            total_amount = price * order_item.quantity
 
-        if hasattr(product_item, "goods"):
-            return f"{product_item.goods.name} x {order_item.quantity} {product_item.get_measure_display()} = {total_amount} ₩"
-        elif hasattr(product_item, "tickets"):
-            return f"{product_item.tickets.event_name} x {order_item.quantity} {product_item.get_measure_display()} = {total_amount} ₩"
-        elif hasattr(product_item, "phones"):
-            return f"{product_item.phones.model_name}/{product_item.phones.get_ram_display()}/{product_item.phones.get_storage_display()} x {order_item.quantity} {product_item.get_measure_display()} = {total_amount} ₩"
+            product_instance = product_item.product
+
+            if hasattr(product_instance, "goods"):
+                return f"{product_instance.goods.name} x {order_item.quantity} {product_instance.get_measure_display()} = {total_amount} ₩"
+            elif hasattr(product_instance, "tickets"):
+                return f"{product_instance.tickets.event_name} x {order_item.quantity} {product_instance.get_measure_display()} = {total_amount} ₩"
+            elif hasattr(product_instance, "phones"):
+                return f"{product_instance.phones.model_name}/{product_instance.phones.get_ram_display()}/{product_instance.phones.get_storage_display()} x {order_item.quantity} {product_instance.get_measure_display()} = {total_amount} ₩"
+
         return "Mahsulot tafsiloti mavjud emas"
 
     def save(self, *args, **kwargs):

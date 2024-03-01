@@ -75,6 +75,11 @@ class ProfileRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
 
         return Response(serializer.data)
 
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=204)
+
 
 class LocationCreateAPIView(CreateAPIView):
     queryset = Location.objects.all()
