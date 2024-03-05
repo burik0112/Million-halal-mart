@@ -775,7 +775,6 @@ class GoodProductItemForm(forms.ModelForm):
     class Meta:
         model = Good
         fields = [
-            "category",
             "name_kr",
             "name_uz",
             "name_en",
@@ -786,7 +785,7 @@ class GoodProductItemForm(forms.ModelForm):
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
             "ingredients": forms.TextInput(attrs={"class": "form-control"}),
-            "category": forms.Select(attrs={"class": "form-control"}),
+            # "category": forms.Select(attrs={"class": "form-control"}),
             "expire_date": forms.DateTimeField(
                 input_formats=["%Y-%m-%d"],  # Adjust the format as needed
                 widget=forms.DateTimeInput(
@@ -877,12 +876,6 @@ class GoodProductItemForm(forms.ModelForm):
         initial=1,
         decimal_places=1,
     )
-    # stock = forms.IntegerField(
-    #     widget=forms.NumberInput(attrs={"class": "form-control"})
-    # )
-    # bonus = forms.IntegerField(
-    #     widget=forms.NumberInput(attrs={"class": "form-control"})
-    # )
     active = forms.BooleanField(
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
         initial=True,
@@ -900,6 +893,7 @@ class GoodProductItemForm(forms.ModelForm):
     def save(self, commit=True):
         get_weight = self.cleaned_data.get("weight", None)
         good = super().save(commit=False)
+        good.sub_cat = self.cleaned_data.get("category")
         good.name_en = self.cleaned_data.get("name_en")
         good.name_uz = self.cleaned_data.get("name_uz")
         good.name_ru = self.cleaned_data.get("name_ru")
@@ -913,6 +907,7 @@ class GoodProductItemForm(forms.ModelForm):
             desc_ru=self.cleaned_data["desc_ru"],
             desc_en=self.cleaned_data["desc_en"],
             desc_kr=self.cleaned_data["desc_kr"],
+            measure=self.cleaned_data["measure"],
             new_price=self.cleaned_data["new_price"],
             old_price=self.cleaned_data.get("old_price"),
             available_quantity=self.cleaned_data["available_quantity"],
@@ -923,7 +918,9 @@ class GoodProductItemForm(forms.ModelForm):
         if commit:
             product_item.save()
             good.product = product_item
+            print("Category: before", good.sub_cat)
             good.save()
+            print("Category: after", good.sub_cat)
 
             # Save multiple images
             for img in self.files.getlist("images"):
