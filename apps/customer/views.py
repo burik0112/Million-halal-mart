@@ -300,7 +300,7 @@ class ProfileEditAPIView(generics.UpdateAPIView):
 
 class LatestUnviewedNewsView(APIView):
     def get(self, request, *args, **kwargs):
-        latest_news = News.get_latest_unviewed_news(request.user)
+        latest_news = News.get_latest_unviewed_news(request.user.profile)
         if latest_news:
             serializer = NewsSerializer(latest_news)
             return Response(serializer.data)
