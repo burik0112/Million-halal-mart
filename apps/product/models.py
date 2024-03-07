@@ -104,6 +104,7 @@ class Phone(models.Model):
         ("512 GB", "512 GB"),
         ("1 TB", "1 TB"),
         ("2 TB", "2 TB"),
+        ("other", "Boshqa"),
     )
     RAM = (
         ("2 GB", "2 GB"),
@@ -114,6 +115,7 @@ class Phone(models.Model):
         ("16 GB", "16 GB"),
         ("32 GB", "32 GB"),
         ("64 GB", "64 GB"),
+        ("other", "Boshqa"),
     )
     COLOR_CHOICES = (
         ("red", "Red"),
