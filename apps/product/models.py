@@ -118,6 +118,7 @@ class Phone(models.Model):
     COLOR_CHOICES = (
         ("red", "Red"),
         ("blue", "Blue"),
+        ("pink", "Pink"),
         ("green", "Green"),
         ("black", "Black"),
         ("white", "White"),
