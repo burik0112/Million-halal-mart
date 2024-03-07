@@ -96,6 +96,7 @@ class Ticket(models.Model):
 
 class Phone(models.Model):
     STORAGE = (
+        ("16 GB", "16 GB"),
         ("32 GB", "32 GB"),
         ("64 GB", "64 GB"),
         ("128 GB", "128 GB"),
@@ -105,6 +106,7 @@ class Phone(models.Model):
         ("2 TB", "2 TB"),
     )
     RAM = (
+        ("2 GB", "2 GB"),
         ("4 GB", "4 GB"),
         ("6 GB", "6 GB"),
         ("8 GB", "8 GB"),
