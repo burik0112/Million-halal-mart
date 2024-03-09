@@ -73,7 +73,9 @@ def handle_callback_query(call):
         text4channel,
         reply_markup=markup,
     )
-
+    return bot.send_message(
+        CHANNEL,
+        text4channel)
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("no|"))
 def handle_callback_query(call):
