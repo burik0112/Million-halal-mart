@@ -61,8 +61,9 @@ def handle_callback_query(call):
         product_details = order.get_product_details(
             order_item.product, order_item)
         text4channel += f" 🟢 <i>{product_details}</i>\n"
+    txtchannel=text4channel+f"📝 <b>Izoh:</b> <i>{order.comment}</i>\n📅 <b>Sana:</b> <i>{order.created.strftime('%Y-%m-%d %H:%M')}</i>\n💸 <b>Jami:</b> <i>{order.total_amount} ₩"
     text4channel += f"📝 <b>Izoh:</b> <i>{order.comment}</i>\n📅 <b>Sana:</b> <i>{order.created.strftime('%Y-%m-%d %H:%M')}</i>\n💸 <b>Jami:</b> <i>{order.total_amount} ₩</i>\n\n⁉️ <u>Buyurtma yuborildimi?</u>"
-
+    
     markup = types.InlineKeyboardMarkup(row_width=2)
     b1 = types.InlineKeyboardButton(
         text="🚚 Yuborildi", callback_data=f"sent|{order.id}")
@@ -75,7 +76,7 @@ def handle_callback_query(call):
     )
     return bot.send_message(
         CHANNEL,
-        text4channel)
+        txtchannel)
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("no|"))
 def handle_callback_query(call):
