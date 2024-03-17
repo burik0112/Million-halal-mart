@@ -4,7 +4,8 @@ from . import views
 
 urlpatterns = [
     path("profile/create/", views.ProfileCreateAPIView.as_view()),
-    path("profile/<int:pk>/retriev/", views.ProfileRetrieveUpdateDelete.as_view()),
+    path("profile/delete/", views.ProfileDelete.as_view(), name="profile-delete"),
+    path("profile/update/", views.ProfileUpdate.as_view(), name="profile-update"),
     path("location/create/", views.LocationCreateAPIView.as_view()),
     path("location/list/", views.LocationListAPIView.as_view()),
     path("location/<int:pk>/retriev/", views.LocationRetrieveUpdateDelete.as_view()),
