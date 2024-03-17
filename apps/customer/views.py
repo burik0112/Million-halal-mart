@@ -91,7 +91,7 @@ class ProfileDelete(APIView):
         user.delete()
         return Response(
             {"message": "User has been successfully deleted"},
-            status=status.HTTP_404_NOT_FOUND,
+            status=status.HTTP_200_OK,
         )
 
 
