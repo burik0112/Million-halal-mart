@@ -4,6 +4,7 @@ from rest_framework.generics import (
     CreateAPIView,
     ListAPIView,
     RetrieveUpdateDestroyAPIView,
+    RetrieveUpdateAPIView,
 )
 from django.utils.translation import gettext_lazy as _
 from rest_framework.permissions import IsAuthenticated
@@ -14,7 +15,7 @@ from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
-from .utils import generate_otp, user_lang
+from .utils import generate_otp
 from .models import Favorite, Location, News, Profile, ViewedNews, Banner
 from django.contrib.auth.models import User
 from .serializers import (
@@ -59,26 +60,39 @@ class ProfileCreateAPIView(CreateAPIView):
     serializer_class = ProfileSerializer
 
 
-class ProfileRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
+class ProfileUpdate(APIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
 
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop("partial", False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+    def patch(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", True)
+        user = self.request.user
+        try:
+            profile = user.profile
+
+        except:
+            profile=None
+            return Response({"error": "Profile not found"}, status=status.HTTP_400_B)
+        serializer = self.serializer_class(
+            profile, data=request.data, partial=partial
+        )
         serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        language = request.data.get("lang", None)
-        user_id = instance.id
-        user_lang(language, user_id)
-
+        serializer.save()
         return Response(serializer.data)
 
-    def delete(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(status=204)
+
+
+class ProfileDelete(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        user.delete()
+        return Response(
+            {"message": "User has been successfully deleted"},
+            status=status.HTTP_204_NO_CONTENT,
+        )
 
 
 class LocationCreateAPIView(CreateAPIView):
