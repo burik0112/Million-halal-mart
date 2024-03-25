@@ -361,7 +361,7 @@ def bot(order):
         text4channel += f"{location.address}\n"
     text4channel += "🛒 <b>Mahsulotlar:</b> \n"
     for order_item in order.get_order_items():
-        product_details = order.get_product_details(order_item.product, order_item)
+        product_details = order.get_product_details(order_item, order_item)
         text4channel += f" 🟢 <i>{product_details}</i>\n"
     text4channel += f"📝 <b>Izoh:</b> <i>{order.comment}</i>\n📅 <b>Sana:</b> <i>{order.created.strftime('%Y-%m-%d %H:%M')}</i>\n💸 <b>Jami:</b> <i>{order.total_amount} ₩</i>\n\n⁉️ <u>To`lov amalga oshirilganligini tasdiqlaysizmi?</u>"
     inline_keyboard = [

@@ -59,7 +59,7 @@ def handle_callback_query(call):
     text4channel += '🛒 <b>Mahsulotlar:</b> \n'
     for order_item in order.get_order_items():
         product_details = order.get_product_details(
-            order_item.product, order_item)
+            order_item, order_item)
         text4channel += f" 🟢 <i>{product_details}</i>\n"
     txtchannel=text4channel+f"📝 <b>Izoh:</b> <i>{order.comment}</i>\n📅 <b>Sana:</b> <i>{order.created.strftime('%Y-%m-%d %H:%M')}</i>\n💸 <b>Jami:</b> <i>{order.total_amount} ₩"
     text4channel += f"📝 <b>Izoh:</b> <i>{order.comment}</i>\n📅 <b>Sana:</b> <i>{order.created.strftime('%Y-%m-%d %H:%M')}</i>\n💸 <b>Jami:</b> <i>{order.total_amount} ₩</i>\n\n⁉️ <u>Buyurtma yuborildimi?</u>"
@@ -89,7 +89,7 @@ def handle_callback_query(call):
     text4channel += '🛒 <b>Mahsulotlar:</b> \n'
     for order_item in order.get_order_items():
         product_details = order.get_product_details(
-            order_item.product, order_item)
+            order_item, order_item)
         text4channel += f" 🟢 <i>{product_details}</i>\n"
     text4channel += f"📝 <b>Izoh:</b> <i>{order.comment}</i>\n📅 <b>Sana:</b> <i>{order.created.strftime('%Y-%m-%d %H:%M')}</i>\n💸 <b>Jami:</b> <i>{order.total_amount} ₩</i>\n\n"
     bot.delete_message(call.from_user.id, call.message.message_id)
@@ -131,7 +131,7 @@ def handle_callback_query(call):
         text4channel += '🛒 <b>Mahsulotlar:</b> \n'
         for order_item in order.get_order_items():
             product_details = order.get_product_details(
-                order_item.product, order_item)
+                order_item, order_item)
             text4channel += f" 🟢 <i>{product_details}</i>\n"
         text4channel += f"📝 <b>Izoh:</b> <i>{order.comment}</i>\n📅 <b>Sana:</b> <i>{order.created.strftime('%Y-%m-%d %H:%M')}</i>\n💸 <b>Jami:</b> <i>{order.total_amount} ₩</i>"
         bot.delete_message(call.from_user.id, call.message.message_id)
