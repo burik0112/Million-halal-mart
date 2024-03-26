@@ -69,7 +69,9 @@ class OrderListAPIView(ListAPIView):
         Bu metod faqat autentifikatsiya qilingan foydalanuvchiga tegishli orderlarni qaytaradi.
         """
         user = self.request.user
-        return Order.objects.filter(user=user.profile).order_by("-pk")
+        return Order.objects.filter(user=user.profile).order_by("-pk").select_related(
+            "user", "product"
+        ).prefetch_related("orderitem")
 
 
 class OrderRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
