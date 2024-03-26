@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework.pagination import PageNumberPagination
 from apps.product.models import ProductItem, Good, Phone, Ticket, Image
@@ -127,7 +128,7 @@ class SetPasswordSerializer(serializers.Serializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Profile
         fields = "__all__"
@@ -151,9 +152,15 @@ class NewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = "__all__"
+
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        rep["image"] = instance.image.url
+        if "image" in rep:
+            if instance.image and hasattr(instance.image, "url"):
+                full_path = settings.DOMAIN_NAME + instance.image.url
+                rep["image"] = full_path
+            else:
+                rep["image"] = None
         return rep
 
 
