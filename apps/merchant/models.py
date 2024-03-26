@@ -157,7 +157,7 @@ class Order(TimeStampedModel, models.Model):
         """
         Order bilan bog'liq barcha OrderItem'larni qaytaradi.
         """
-        return self.orderitem.all().select_related("product").order_by("-pk")
+        return self.orderitem.all().select_related("product","goods","tickets","phones").order_by("-pk")
 
 
 class OrderItem(TimeStampedModel, models.Model):
