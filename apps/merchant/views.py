@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, permissions
 from django.db import transaction
+from django.db.models import Prefetch
 from rest_framework.response import Response
 from .models import Order, OrderItem, Information, Service, SocialMedia, Bonus
 from .serializers import (
@@ -69,11 +70,8 @@ class OrderListAPIView(ListAPIView):
         Bu metod faqat autentifikatsiya qilingan foydalanuvchiga tegishli orderlarni qaytaradi.
         """
         user = self.request.user
-        return (
-            Order.objects.filter(user=user.profile)
-            .order_by("-pk")
-            .select_related("user","location")
-            .prefetch_related("orderitem","products","orderitem__product","orderitem__product__goods")
+        return Order.objects.filter(user=user.profile).order_by("-pk").prefetch_related(
+            Prefetch("orderitem", queryset=OrderItem.objects.select_related("product").prefetch_related("product__phones", "product__tickets", "product__goods"))
         )
 
 
