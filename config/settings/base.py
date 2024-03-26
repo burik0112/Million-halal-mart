@@ -130,7 +130,7 @@ INTERNAL_IPS = [
     "0.0.0.0",
     # ...
 ]
-DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: False}
+DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: True}
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
