@@ -71,7 +71,7 @@ class OrderListAPIView(ListAPIView):
         """
         user = self.request.user
         return Order.objects.filter(user=user.profile).order_by("-pk").prefetch_related(
-            Prefetch("orderitem", queryset=OrderItem.objects.select_related("product").prefetch_related("product__phones", "product__tickets", "product__goods"))
+            Prefetch("orderitem", queryset=OrderItem.objects.select_related("product").prefetch_related("product__phones", "product__tickets", "product__goods","product__images")),
         )
 
 
