@@ -151,6 +151,10 @@ class NewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = "__all__"
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep["image"] = instance.image.url
+        return rep
 
 
 class ViewedNewsSerializer(serializers.ModelSerializer):
