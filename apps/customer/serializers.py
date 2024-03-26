@@ -171,7 +171,7 @@ class ViewedNewsSerializer(serializers.ModelSerializer):
         read_only_fields = ["user"]
 
     def create(self, validated_data):
-        user = self.context["request"].user
+        user = self.context["request"].user.profile
         news = validated_data["news"]
         viewed_news, created = ViewedNews.objects.get_or_create(user=user, news=news)
         return viewed_news
