@@ -73,7 +73,7 @@ class OrderListAPIView(ListAPIView):
             Order.objects.filter(user=user.profile)
             .order_by("-pk")
             .select_related("user","location")
-            .prefetch_related("orderitem","products")
+            .prefetch_related("orderitem","products","orderitem__product","orderitem__product__goods")
         )
 
 
