@@ -69,9 +69,12 @@ class OrderListAPIView(ListAPIView):
         Bu metod faqat autentifikatsiya qilingan foydalanuvchiga tegishli orderlarni qaytaradi.
         """
         user = self.request.user
-        return Order.objects.filter(user=user.profile).order_by("-pk").select_related(
-            "user", "product"
-        ).prefetch_related("orderitem")
+        return (
+            Order.objects.filter(user=user.profile)
+            .order_by("-pk")
+            .select_related("user", "products","location")
+            .prefetch_related("orderitem")
+        )
 
 
 class OrderRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
@@ -171,8 +174,7 @@ class CheckoutView(APIView):
                 update_data = request.data.copy()
                 update_data["status"] = "pending"
 
-                serializer = OrderStatusUpdateSerializer(
-                    order, data=update_data)
+                serializer = OrderStatusUpdateSerializer(order, data=update_data)
                 if serializer.is_valid():
                     serializer.save()
                     # Logic for sending message to a bot
