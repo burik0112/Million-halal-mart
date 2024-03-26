@@ -168,6 +168,7 @@ class ViewedNewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ViewedNews
         fields = "__all__"
+        read_only_fields = ["user"]
 
     def create(self, validated_data):
         user = self.context["request"].user
