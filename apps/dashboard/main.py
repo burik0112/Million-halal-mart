@@ -60,81 +60,86 @@ def decimal_cutter(number):
         return 0
 
 
+from django.db.models import Count, Sum, F
+
+
 def dashboard(request):
     today = date.today()
-    orders = Order.objects.all()
-    order_today = Order.objects.filter(Q(created__date=today) & Q(status="sent"))
-    orders = number_cutter(orders)
-    order_today = number_cutter(order_today)
-    customers = Profile.objects.all()
-    customers = number_cutter(customers)
-    customers_today_count = Profile.objects.filter(created__date=today)
-    customers_today_count = number_cutter(customers_today_count)
 
-    revenue = Order.objects.filter(status="sent").aggregate(
-        total_amount_sum=Sum("total_amount")
-    )["total_amount_sum"]
-    revenue = decimal_cutter(revenue)
+    # Prefetch related data for orders and annotate necessary aggregates
+    orders = Order.objects.prefetch_related("user").annotate(
+        total_amount_sum=Sum("total_amount"),
+        customers_count=Count("user", distinct=True),
+    )
 
-    revenue_today = Order.objects.filter(
-        Q(created__date=today) & Q(status="sent")
-    ).aggregate(total_amount_sum=Sum("total_amount"))["total_amount_sum"]
+    # Filter orders for today and count them
+    order_today = orders.filter(created__date=today, status="sent")
+    order_today_count = order_today.count()
+
+    # Count total customers and customers created today
+    customers_count = Profile.objects.count()
+    customers_today_count = Profile.objects.filter(created__date=today).count()
+
+    # Aggregate revenue for today's orders
+    revenue_today = order_today.aggregate(total_amount_sum=Sum("total_amount"))[
+        "total_amount_sum"
+    ]
     revenue_today = decimal_cutter(revenue_today)
-    all_orders = Order.objects.all()
 
-    recent = all_orders.order_by("-created")[:25]
+    # Get recent orders
+    recent = orders.order_by("-created")[:25]
 
-    top_selling_products = SoldProduct.objects.all()
-    sold_products_info = defaultdict(int)
+    # Get top selling products with total quantity
+    top_selling_products = (
+        SoldProduct.objects.select_related("product")
+        .values(
+            "product__goods__name_uz",
+            "product__tickets__event_name_uz",
+            "product__phones__model_name_uz",
+        )
+        .annotate(total_quantity=Sum("quantity"))
+        .order_by("-total_quantity")[:10]
+    )
 
-    for sold_product in top_selling_products:
-        product_instance = sold_product.product
+    data = []
+    for product_data in top_selling_products:
+        # Determine title based on available fields
+        title = (
+            product_data.get("product__goods__name_uz", "")
+            or product_data.get("product__tickets__event_name_uz", "")
+            or product_data.get("product__phones__model_name_uz", "")
+        )
 
-        title = ""
-        if hasattr(product_instance, "goods"):
-            title = product_instance.goods.name_uz
-        elif hasattr(product_instance, "tickets"):
-            title = product_instance.tickets.event_name_uz
-        elif hasattr(product_instance, "phones"):
-            title = product_instance.phones.model_name_uz
+        data.append({"title": title, "total_quantity": product_data["total_quantity"]})
+    # Get most expensive orders
+    most_expensive = orders.filter(status="sent").order_by("-total_amount")[:5]
 
-        quantity = sold_product.quantity
-        sold_products_info[title] += quantity
-
-    sorted_sold_products = sorted(sold_products_info.items(), key=lambda x: -x[1])
-
-    orders_with_comments = Order.objects.exclude(comment="")
-    most_expensive = []
-    for order in all_orders.filter(status="sent").order_by("-total_amount")[:5]:
-        order_info = {
-            "id": order.id,
-            "user": order.user.full_name,
-            "price": round(order.total_amount / 1000, 2),
-        }
-        most_expensive.append(order_info)
-
+    # Get products with low quantity
     products_with_quantity = (
         Good.objects.filter(product__available_quantity__lt=100)
-        .values("id", "name_uz", "product__available_quantity")
-        .order_by("-product__available_quantity")[:100]
+        .annotate(available_quantity=F("product__available_quantity"))
+        .order_by("-available_quantity")[:100]
     )
+
+    # Get orders with comments
+    orders_with_comments = orders.exclude(comment="")
 
     return render(
         request,
         "base.html",
         {
-            "data": sorted_sold_products,
+            "data": data,
             "products_with_quantity": products_with_quantity,
             "most_expensive": most_expensive,
             "comments": orders_with_comments,
             "top_products": top_selling_products,
             "customers_today": customers_today_count,
-            "all_orders": all_orders,
+            "all_orders": orders,
             "orders": orders,
-            "customers": customers,
-            "revenue": revenue,
+            "customers": customers_count,
+            "revenue_today": revenue_today,
             "recent": recent,
-            "order_today": order_today,
+            "order_today": order_today_count,
             "revenue_today": revenue_today,
         },
     )

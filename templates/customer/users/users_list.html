@@ -1,65 +1,54 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block content %}
-{% load static %}
-<div class="row">
-  <div class="col-lg-12">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center">
-          <h5 class="card-title">Foydalanuvchilar ro'yhati</h5>
+  {% load static %}
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title">Foydalanuvchilar ro'yhati</h5>
+          </div>
+          <table class="table table-borderless datatable">
+            <thead>
+              <tr>
+                <th scope="col" class="text-center">#</th>
+                <th scope="col" class="text-center">To'liq ismi</th>
+                <th scope="col" class="text-center">Telefon raqami</th>
+                <th scope="col" class="text-center">Buyurtmarlar soni</th>
+                <th scope="col" class="text-center">Manzili</th>
+                <th scope="col" class="text-center">Qo'shilgan sana</th>
+                <th scope="col" class="text-center">Buyurtmalari</th>
+                <th scope="col" class="text-center">Qo'shimcha</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in users %}
+                <tr>
+                  <th scope="row" class="text-center">{{ user.id }}</th>
+                  <td class="text-center">{{ user.full_name }}</td>
+                  <td class="text-center">{{ user.phone_number }}</td>
+                  <td class="text-center">{{ user.order.count }}</td>
+                  <td class="text-center">
+                    {% if user.active_location %}
+                      {{ user.active_location.address }}
+                    {% else %}
+                      Manzil topilmadi
+                    {% endif %}
+                  </td>
+                  <td class="text-center">
+                    <i class="bi bi-calendar-date"></i> {{ user.created|date:'d-m-Y' }} <br />
+                    <i class="bi bi-clock"></i> {{ user.created|date:'H:i' }}
+                  </td>
+                  <td class="text-center">
+                    <a href="{% url 'user-orders-list' user.origin.id %}"><i class="bi bi-journal-text" style="font-size: 2em;"></i></a>
+                  </td>
+                </tr>
+              {% endfor %}
+              <!-- End loop -->
+            </tbody>
+          </table>
         </div>
-        <table class="table table-borderless datatable">
-          <thead>
-            <tr>
-              <th scope="col" class="text-center">#</th>
-              <th scope="col" class="text-center">To'liq ismi</th>
-              <th scope="col" class="text-center">Telefon raqami</th>
-              <th scope="col" class="text-center">Buyurtmarlar soni</th>
-              <th scope="col" class="text-center">Manzili</th>
-              <th scope="col" class="text-center">Qo'shilgan sana</th>
-              <th scope="col" class="text-center">Buyurtmalari</th>
-              <th scope="col" class="text-center">Qo'shimcha</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for user in users %}
-            <tr>
-              <th scope="row" class="text-center">{{ user.id }}</th>
-              <td class="text-center">{{ user.full_name }}</td>
-              <td class="text-center">{{ user.phone_number }}</td>
-              <td class="text-center">{{ user.order.count }}</td>
-              <td class="text-center">
-                {% if user.active_location %}
-                    {{ user.active_location }}
-                {% else %}
-                    Manzil topilmadi
-                {% endif %}
-              </td>
-              <td class="text-center">
-                  <i class="bi bi-calendar-date"></i> {{ user.created|date:"d-m-Y" }} <br>
-                  <i class="bi bi-clock"></i> {{ user.created|date:"H:i" }}
-              </td>
-              <td class="text-center">
-                  <a href="{% url 'user-orders-list' user.origin.id %}">
-                      <i class="bi bi-journal-text" style="font-size: 2em;"></i>
-                  </a>
-              </td>
-              <td class="text-center">
-            {% if user.origin.is_active %}
-                <a href="{% url 'block_activate_user' pk=user.id %}" class="btn btn-danger btn-sm">Bloklash</a>
-            {% else %}
-                <a href="{% url 'block_activate_user' pk=user.id %}" class="btn btn-success btn-sm">Faollashtirish</a>
-            {% endif %}
-        </td>
-
-              </td>
-            </tr>
-            {% endfor %}
-            <!-- End loop -->
-          </tbody>
-        </table>
       </div>
     </div>
   </div>
-</div>
 {% endblock %}

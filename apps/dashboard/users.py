@@ -8,6 +8,7 @@ from django.views.generic import ListView
 from django.db.models import Subquery, OuterRef
 from django.urls import reverse
 from django.http import HttpResponseRedirect
+from django.db.models import Prefetch, Q, Count
 
 
 class UserListView(ListView):
@@ -16,22 +17,22 @@ class UserListView(ListView):
     context_object_name = "users"
 
     def get_queryset(self):
-        return Profile.objects.all().order_by("pk")
+        # Fetch the profiles along with their active locations
+        active_locations = Location.objects.filter(active=True)
+        profiles_with_active_location = (
+            Profile.objects.prefetch_related(
+                Prefetch(
+                    "location", queryset=active_locations, to_attr="active_location"
+                )
+            )
+            .select_related("origin")
+            .order_by("pk")
+        )
+        return profiles_with_active_location
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # Retrieve the active location for each user using Subquery
-        active_locations = Location.objects.filter(
-            user=OuterRef("pk"), active=True
-        ).values("address")[:1]
-
-        # Annotate the queryset with the active location
-        users_with_active_location = Profile.objects.annotate(
-            active_location=Subquery(active_locations)
-        )
-
-        context["users"] = users_with_active_location
+        context["users"] = self.get_queryset()
         return context
 
 
@@ -122,12 +123,16 @@ class UserOrderDetailView(DetailView):
             x = "Ticket", {
                 "event_name": product_item.tickets.event_name,
                 "event_date": product_item.tickets.event_date,
-                "category": product_item.tickets.category.name
-                if product_item.tickets.category
-                else "Bilet",
-                "price": product_item.new_price
-                if product_item.new_price
-                else product_item.old_price,
+                "category": (
+                    product_item.tickets.category.name
+                    if product_item.tickets.category
+                    else "Bilet"
+                ),
+                "price": (
+                    product_item.new_price
+                    if product_item.new_price
+                    else product_item.old_price
+                ),
             }
             return x
         elif hasattr(product_item, "goods"):
@@ -135,9 +140,11 @@ class UserOrderDetailView(DetailView):
                 "name": product_item.goods.name,
                 "ingredients": product_item.goods.ingredients,
                 "expire_date": product_item.goods.expire_date,
-                "sub_cat": product_item.goods.sub_cat.name
-                if product_item.goods.sub_cat
-                else None,
+                "sub_cat": (
+                    product_item.goods.sub_cat.name
+                    if product_item.goods.sub_cat
+                    else None
+                ),
             }
         return None, None
 
@@ -147,7 +154,7 @@ class OrdersListView(ListView):
     context_object_name = "orders"
 
     def get_queryset(self):
-        return Order.objects.all().order_by("-created")
+        return Order.objects.select_related("user").order_by("-created")
 
 
 def update_order_status(request, pk):
