@@ -109,12 +109,7 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link {% if not 'dashboard/product' in request.path %}
-
-            {% endif %}"
-            data-bs-target="#mahsulotlar-nav"
-            data-bs-toggle="collapse"
-            href="#">
+          <a class="nav-link {% if not 'dashboard/product' in request.path %}{% endif %}" data-bs-target="#mahsulotlar-nav" data-bs-toggle="collapse" href="#">
             <i class="bi bi-journal-text"></i><span style="color: #4154f1;">Mahsulotlar</span>
             <i class="bi bi-chevron-down ms-auto"></i>
           </a>
@@ -159,12 +154,7 @@
         <!-- End Profile Page Nav -->
 
         <li class="nav-item">
-          <a class="nav-link {% if not 'dashboard/news' in request.path %}
-
-            {% endif %}"
-            data-bs-target="#qoshimchalar-nav"
-            data-bs-toggle="collapse"
-            href="#">
+          <a class="nav-link {% if not 'dashboard/news' in request.path %}{% endif %}" data-bs-target="#qoshimchalar-nav" data-bs-toggle="collapse" href="#">
             <i class="bi bi-question-circle"></i><span style="color: #4154f1;">Qo'shimchalar</span>
             <i class="bi bi-chevron-down ms-auto"></i>
           </a>
@@ -192,7 +182,7 @@
             </li>
           </ul>
         </li>
-        <!--  <li class="nav-item">
+        <!--   <li class="nav-item">
           <a class="nav-link collapsed" href="pages-error-404.html">
             <i class="bi bi-dash-circle"></i>
             <span>Error 404</span>
@@ -204,7 +194,7 @@
             <i class="bi bi-file-earmark"></i>
             <span>Blank</span>
           </a>
-        </li>  -->
+        </li>   -->
       </ul>
     </aside>
     <!-- End Sidebar -->
@@ -239,7 +229,7 @@
                             <i class="bi bi-cart"></i>
                           </div>
                           <div class="ps-3 text-center">
-                            <h6>{{ orders }}</h6>
+                            <h6>{{ orders.count }}</h6>
                             <span class="text-success small pt-1 fw-bold">{{ order_today }}</span> <span class="text-muted small pt-2 ps-1">Bugun</span>
                           </div>
                         </div>
@@ -402,7 +392,7 @@
                                 <td>
                                   <a href="#" class="text-primary fw-bold">{{ product_data.name_uz }}</a>
                                 </td>
-                                <td class="fw-bold">{{ product_data.product__available_quantity }}</td>
+                                <td class="fw-bold">{{ product_data.available_quantity }}</td>
                               </tr>
                             {% endfor %}
                           </tbody>
@@ -421,63 +411,64 @@
                       </div>
 
                       <script>
-                    document.addEventListener("DOMContentLoaded", () => {
-                        var productNames = [];
-                        var totalQuantities = [];
-                        var randomColors = [];
-                
-                        {% for title, quantity in data %}
-                            productNames.push("{{ title|default:'' }}");
-                            totalQuantities.push({{ quantity|default:0 }});
-                            randomColors.push(getRandomColor());
-                        {% endfor %}
-                
-                        console.log('Product Names:', productNames);
-                        console.log('Total Quantities:', totalQuantities);
-                        console.log('Random Colors:', randomColors);
-                
-                        function getRandomColor() {
-                            var letters = '0123456789ABCDEF';
-                            var color = '#';
-                            for (var i = 0; i < 6; i++) {
-                                color += letters[Math.floor(Math.random() * 16)];
+                        document.addEventListener("DOMContentLoaded", () => {
+                            var productNames = [];
+                            var totalQuantities = [];
+                            var randomColors = [];
+                    
+                            {% for item in data %}
+                                productNames.push("{{ item.title|escapejs|default:'' }}");
+                                totalQuantities.push({{ item.total_quantity|default:0 }});
+                                randomColors.push(getRandomColor());
+                            {% endfor %}
+                    
+                            console.log('Product Names:', productNames);
+                            console.log('Total Quantities:', totalQuantities);
+                            console.log('Random Colors:', randomColors);
+                    
+                            function getRandomColor() {
+                                var letters = '0123456789ABCDEF';
+                                var color = '#';
+                                for (var i = 0; i < 6; i++) {
+                                    color += letters[Math.floor(Math.random() * 16)];
+                                }
+                                return color;
                             }
-                            return color;
-                        }
-                
-                        new Chart(document.querySelector('#barChart'), {
-                            type: 'bar',
-                            data: {
-                                labels: productNames,
-                                datasets: [{
-                                    label: 'Qoldiq',
-                                    data: totalQuantities,
-                                    backgroundColor: randomColors,
-                                    borderColor: 'rgb(75, 192, 192)',
-                                    borderWidth: 1
-                                }]
-                            },
-                            options: {
-                                scales: {
-                                    x: {
-                                        beginAtZero: true
+                    
+                            new Chart(document.querySelector('#barChart'), {
+                                type: 'bar',
+                                data: {
+                                    labels: productNames,
+                                    datasets: [{
+                                        label: 'Qoldiq',
+                                        data: totalQuantities,
+                                        backgroundColor: randomColors,
+                                        borderColor: 'rgb(75, 192, 192)',
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    scales: {
+                                        x: {
+                                            beginAtZero: true
+                                        },
+                                        y: {
+                                            beginAtZero: true
+                                        }
                                     },
-                                    y: {
-                                        beginAtZero: true
-                                    }
-                                },
-                                plugins: {
-                                    legend: {
-                                        display: false
-                                    }
-                                },
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                scrollX: true  // Enable horizontal scrolling
-                            }
+                                    plugins: {
+                                        legend: {
+                                            display: false
+                                        }
+                                    },
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    scrollX: true  // Enable horizontal scrolling
+                                }
+                            });
                         });
-                    });
-                </script>
+                    </script>
+                    
 
                       <!-- End Bar Chart -->
                     </div>
@@ -497,46 +488,51 @@
                     <div id="pieChart" style="min-height: 400px;" class="echart"></div>
 
                     <script>
-                  document.addEventListener("DOMContentLoaded", () => {
-                    const data = [
-                      {% for order in most_expensive %}
-                        { value: {{ order.price }}, name: "{{ order.user }}" },
-                      {% endfor %}
-                    ];
-                
-                    echarts.init(document.querySelector("#pieChart")).setOption({
-                      title: {
-                        left: 'center'
-                      },
-                      tooltip: {
-                        trigger: 'item'
-                      },
-                      legend: {
-                        orient: 'vertical',
-                        left: 'left'
-                      },
-                      series: [{
-                        name: 'Access From',
-                        type: 'pie',
-                        radius: '50%',
-                        data: data,
-                        emphasis: {
-                          itemStyle: {
-                            shadowBlur: 10,
-                            shadowOffsetX: 0,
-                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                      document.addEventListener("DOMContentLoaded", () => {
+                          const data = [
+                              {% for order in most_expensive %}
+                                  { value: {{ order.total_amount }}, name: "{{ order.user__full_name }}" },
+                              {% endfor %}
+                          ];
+                  
+                          if (data.length > 0) {
+                              echarts.init(document.querySelector("#pieChart")).setOption({
+                                  title: {
+                                      left: 'center'
+                                  },
+                                  tooltip: {
+                                      trigger: 'item'
+                                  },
+                                  legend: {
+                                      orient: 'vertical',
+                                      left: 'left'
+                                  },
+                                  series: [{
+                                      name: 'Access From',
+                                      type: 'pie',
+                                      radius: '50%',
+                                      data: data,
+                                      emphasis: {
+                                          itemStyle: {
+                                              shadowBlur: 10,
+                                              shadowOffsetX: 0,
+                                              shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                          }
+                                      },
+                                      label: {
+                                          show: true,
+                                          formatter: function (params) {
+                                              return '₩' + ' ' + (params.value / 1000).toFixed(2) + 'K';
+                                          },
+                                      },
+                                  }]
+                              });
+                          } else {
+                              console.log("No data available for the pie chart.");
                           }
-                        },
-                        label: {
-                          show: true,
-                          formatter: function (params) {
-                            return '₩' +' ' + params.value + 'K';
-                          },
-                        },
-                      }]
-                    });
-                  });
-                </script>
+                      });
+                  </script>
+                  
 
                     <!-- End Pie Chart -->
                   </div>

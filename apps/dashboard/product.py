@@ -19,7 +19,6 @@ from .forms import (
     SubCategoryEditForm,
     CategoryCreateForm,
     SubCategoryCreateForm,
-
 )
 
 
@@ -117,18 +116,14 @@ class TicketCategoryCreateView(CreateView):
         form.instance.main_type = "t"
         return super().form_valid(form)
 
-
 class GoodListView(ListView):
     model = Good
     template_name = "product/goods/good_list.html"
     context_object_name = "goods"
 
     def get_queryset(self):
-        return Good.objects.all().order_by("pk")
+        return Good.objects.select_related("product").prefetch_related("sub_cat").order_by("pk")
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
 
 
 class GoodCategoryCreateView(CreateView):
@@ -271,6 +266,7 @@ class GoodDeleteView(View):
         product_item.delete()  # Delete the associated ProductItem
         return redirect("good-list")  # Redirect to phone list
 
+
 class CategoryCreateView(CreateView):
     model = Category
     form_class = CategoryCreateForm
@@ -284,7 +280,8 @@ class CategoryCreateView(CreateView):
 
     def form_valid(self, form):
         return super().form_valid(form)
-    
+
+
 class CategoryListView(ListView):
     model = Category
     template_name = "product/category_list.html"  # your template name
@@ -296,7 +293,8 @@ class CategoryListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
-    
+
+
 class CategoryEditView(View):
     template_name = "product/category_edit.html"
 
@@ -316,11 +314,15 @@ class CategoryEditView(View):
             form.save()
             return redirect("category-list")
         return render(request, self.template_name, {"form": form, "category": category})
+
+
 class CategoryDeleteView(View):
     def post(self, request, pk):
         category = get_object_or_404(Category, pk=pk)
         category.delete()  # Delete the Phone instance
         return redirect("category-list")  # Redirect to phone list
+
+
 class SubCategoryCreateView(CreateView):
     model = SubCategory
     form_class = SubCategoryCreateForm
@@ -334,6 +336,8 @@ class SubCategoryCreateView(CreateView):
 
     def form_valid(self, form):
         return super().form_valid(form)
+
+
 class SubCategoryListView(ListView):
     model = SubCategory
     template_name = "product/goods/subcategory_list.html"  # your template name
@@ -345,7 +349,8 @@ class SubCategoryListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
-    
+
+
 class SubCategoryEditView(View):
     template_name = "product/goods/subcategory_edit.html"
 
@@ -364,7 +369,11 @@ class SubCategoryEditView(View):
         if form.is_valid():
             form.save()
             return redirect("subcategory-list")
-        return render(request, self.template_name, {"form": form, "subcategory": subcategory})
+        return render(
+            request, self.template_name, {"form": form, "subcategory": subcategory}
+        )
+
+
 class SubCategoryDeleteView(View):
     def post(self, request, pk):
         subcategory = get_object_or_404(SubCategory, pk=pk)
