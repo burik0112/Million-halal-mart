@@ -18,17 +18,17 @@ class UserListView(ListView):
 
     def get_queryset(self):
         # Fetch the profiles along with their active locations
+        profiles = Profile.objects.select_related("origin").order_by("pk")
         active_locations = Location.objects.filter(active=True)
-        profiles_with_active_location = (
-            Profile.objects.prefetch_related(
-                Prefetch(
-                    "location", queryset=active_locations, to_attr="active_location"
-                )
-            )
-            .select_related("origin")
-            .order_by("pk")
-        )
-        return profiles_with_active_location
+
+        # Create a dictionary to hold locations for each profile
+        profiles_with_locations = {}
+
+        for profile in profiles:
+            profile_locations = active_locations.filter(user=profile)
+            profiles_with_locations[profile] = profile_locations
+
+        return profiles_with_locations
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
