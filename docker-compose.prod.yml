@@ -39,8 +39,8 @@ services:
     environment:
       - DATABASES_HOST=db
       - DB_PORT=5432
-      - DB_USER=username
-      - DB_PASSWORD=strongpassword
+      - DB_USER=${BOUNCER_USER}
+      - DB_PASSWORD=${BOUNCER_PASSWORD}
       # - ADMIN_USERS=postgres,admin
       # - DATABASE_URL=postgres://${DB_USERNAME}:${DB_PASSWORD}@db/${DB_NAME}
     ports:

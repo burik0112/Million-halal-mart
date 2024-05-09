@@ -1,3 +1,3 @@
-"username" "strongpassword"
-"postgres"
+"pg_user" "p12345!"
+"market"
 
