@@ -19,6 +19,7 @@ from django.db.models import Q
 from collections import defaultdict
 from django.db.models import Sum
 from decimal import Decimal
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def get_env_value(env_variable):
@@ -87,7 +88,7 @@ def dashboard(request):
     revenue_today = decimal_cutter(revenue_today)
 
     # Get recent orders
-    recent = orders.order_by("-created")[:25]
+    recent = orders.order_by("-created")[:20]
 
     # Get top selling products with total quantity
     top_selling_products = (
@@ -118,7 +119,7 @@ def dashboard(request):
     products_with_quantity = (
         Good.objects.filter(product__available_quantity__lt=100)
         .annotate(available_quantity=F("product__available_quantity"))
-        .order_by("-available_quantity")[:100]
+        .order_by("available_quantity")[:50]
     )
 
     # Get orders with comments

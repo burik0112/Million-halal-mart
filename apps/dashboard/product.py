@@ -20,12 +20,14 @@ from .forms import (
     CategoryCreateForm,
     SubCategoryCreateForm,
 )
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 class PhoneListView(ListView):
     model = Phone
     template_name = "product/electronics/phone_list.html"  # your template name
     context_object_name = "phones"
+    paginate_by = 10
 
     def get_queryset(self):
         return Phone.objects.all().order_by("pk")
@@ -75,7 +77,7 @@ class TicketListView(ListView):
     model = Ticket
     template_name = "product/tickets/ticket_list.html"  # your template name
     context_object_name = "tickets"
-
+    paginate_by = 10
     def get_queryset(self):
         return Ticket.objects.all().order_by("pk")
 
@@ -116,14 +118,21 @@ class TicketCategoryCreateView(CreateView):
         form.instance.main_type = "t"
         return super().form_valid(form)
 
+
 class GoodListView(ListView):
     model = Good
     template_name = "product/goods/good_list.html"
     context_object_name = "goods"
+    paginate_by = 10  # Number of items per page
 
     def get_queryset(self):
-        return Good.objects.select_related("product").prefetch_related("sub_cat").order_by("pk")
-
+        # Retrieve all goods with related product and sub_category
+        goods = (
+            Good.objects.select_related("product")
+            .prefetch_related("sub_cat")
+            .order_by("pk")
+        )
+        return goods
 
 
 class GoodCategoryCreateView(CreateView):
@@ -342,7 +351,7 @@ class SubCategoryListView(ListView):
     model = SubCategory
     template_name = "product/goods/subcategory_list.html"  # your template name
     context_object_name = "subcategories"
-
+    paginate_by=10
     def get_queryset(self):
         return SubCategory.objects.all().order_by("pk")
 
