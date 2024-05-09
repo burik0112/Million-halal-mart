@@ -15,24 +15,24 @@ class UserListView(ListView):
     model = Profile
     template_name = "customer/users/users_list.html"
     context_object_name = "users"
+    paginate_by = 10
 
     def get_queryset(self):
         # Fetch the profiles along with their active locations
         profiles = Profile.objects.select_related("origin").order_by("pk")
-        active_locations = Location.objects.filter(active=True)
-
-        # Create a dictionary to hold locations for each profile
-        profiles_with_locations = {}
-
-        for profile in profiles:
-            profile_locations = active_locations.filter(user=profile)
-            profiles_with_locations[profile] = profile_locations
-
-        return profiles_with_locations
+        return profiles
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["users"] = self.get_queryset()
+
+        # Fetch active locations for each profile
+        profiles = self.get_queryset()
+        active_locations = {}
+        for profile in profiles:
+            profile_locations = Location.objects.filter(user=profile, active=True)
+            active_locations[profile] = profile_locations
+
+        context["active_locations"] = active_locations
         return context
 
 
@@ -152,6 +152,7 @@ class UserOrderDetailView(DetailView):
 class OrdersListView(ListView):
     template_name = "customer/orders/orders_list.html"
     context_object_name = "orders"
+    paginate_by = 10
 
     def get_queryset(self):
         return Order.objects.select_related("user").order_by("-created")
