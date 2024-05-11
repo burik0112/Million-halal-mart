@@ -364,8 +364,8 @@ class OrdersView(DetailView):
 def bot(order):
     text4channel = f"""🔰 <b>Buyurtma holati:</b> #<i>YANGI</i>\n\n 🔢 <b>Buyurtma raqami:</b> <i>{order.id}</i>\n👤 <b>Mijoz ismi:</b> <i>{order.user.full_name}</i>\n📞 <b>Tel raqami:</b> <i>{order.user.phone_number}</i>\n🏠 <b>Manzili:</b> """
     for location in order.user.location.all():
-        text4channel += f"{location.address}\n"
-    text4channel += "🛒 <b>Mahsulotlar:</b> \n"
+        text4channel += f"{location.address}"
+    text4channel += "\n🛒 <b>Mahsulotlar:</b> \n"
     for order_item in order.get_order_items():
         product_details = order.get_product_details(order_item, order_item)
         text4channel += f" 🟢 <i>{product_details}</i>\n"

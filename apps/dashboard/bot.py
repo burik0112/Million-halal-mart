@@ -49,10 +49,9 @@ def start(message: types.Message):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("yes|"))
 def handle_callback_query(call):
-    order = Order.objects.get(id=int(call.data[-1]))
+    order = Order.objects.get(id=int(call.data.split('|')[-1]))
     order.status = "approved"
     order.save()
-
     text4channel = f"""✅ <b>Buyurtma holati:</b> #<i>{order.get_status_display_value()[-11::].upper()}</i>\n\n 🔢 <b>Buyurtma raqami:</b> <i>{order.id}</i>\n👤 <b>Mijoz ismi:</b> <i>{order.user.full_name}</i>\n📞 <b>Tel raqami:</b> <i>{order.user.phone_number}</i>\n🏠 <b>Manzili:</b> """
     for location in order.user.location.all():
         text4channel += f"{location.address}\n"
@@ -80,7 +79,7 @@ def handle_callback_query(call):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("no|"))
 def handle_callback_query(call):
-    order = Order.objects.get(id=int(call.data[-1]))
+    order = Order.objects.get(id=int(call.data.split('|')[-1]))
     order.status = "cancelled"
     order.save()
     text4channel = f"""❌ <b>Buyurtma holati:</b> #<i>{order.get_status_display_value()[:5].upper()}</i>\n\n 🔢 <b>Buyurtma raqami:</b> <i>{order.id}</i>\n👤 <b>Mijoz ismi:</b> <i>{order.user.full_name}</i>\n📞 <b>Tel raqami:</b> <i>{order.user.phone_number}</i>\n🏠 <b>Manzili:</b> """
@@ -101,10 +100,11 @@ def handle_callback_query(call):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("sent|"))
 def handle_callback_query(call):
-    order_id = int(call.data[-1])
+    order_id = int(call.data.split('|')[-1])
     try:
         order = Order.objects.get(id=order_id)
-
+        order.status='sent'
+        order.save()
         for order_item in order.orderitem.all():
             try:
                 sold_product = SoldProduct.objects.get(
