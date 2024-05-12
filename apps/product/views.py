@@ -3,10 +3,10 @@ from rest_framework.filters import SearchFilter
 from django.conf import settings
 from rest_framework.generics import ListAPIView
 from rest_framework import views, status
-from django.db.models import Sum, Count
 from rest_framework.response import Response
-from django.db.models import F
-from django.db.models import Q
+from django.db.models import Q, Exists, OuterRef, F, Sum, Value, BooleanField
+
+from apps.customer.models import Favorite
 from .models import Category, Good, Image, Phone, SubCategory, Ticket
 from .serializers import (
     CategorySerializer,
@@ -52,16 +52,48 @@ class TicketListAPIView(ListAPIView):
 
 
 class PhoneListAPIView(ListAPIView):
-    queryset = Phone.objects.all().order_by("-pk")
+    queryset = (
+        Phone.objects.all()
+        .order_by("-pk")
+        .select_related("product")
+        .prefetch_related("product__images")
+    )
     serializer_class = PhoneSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ["category", "product"]
 
     pagination_class = CustomPageNumberPagination
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_anonymous:
+            return (
+                Phone.objects.all()
+                .order_by("-pk")
+                .select_related("product")
+                .prefetch_related("product__images")
+                .annotate(is_favorite=Value(False, output_field=BooleanField()))
+            )
+        else:
+            favorites_subquery = Favorite.objects.filter(
+                user=user.profile, product_id=OuterRef("product_id")
+            )
+            return (
+                Phone.objects.all()
+                .order_by("-pk")
+                .select_related("product")
+                .prefetch_related("product__images")
+                .annotate(is_favorite=Exists(favorites_subquery))
+            )
+
 
 class GoodListAPIView(ListAPIView):
-    queryset = Good.objects.all().order_by("-pk")
+    queryset = (
+        Good.objects.select_related("product")
+        .prefetch_related("product__images")
+        .all()
+        .order_by("-pk")
+    )
     serializer_class = GoodSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = [
@@ -69,6 +101,28 @@ class GoodListAPIView(ListAPIView):
         "product",
     ]
     pagination_class = CustomPageNumberPagination
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_anonymous:
+            return (
+                Good.objects.all()
+                .order_by("-pk")
+                .select_related("product")
+                .prefetch_related("product__images")
+                .annotate(is_favorite=Value(False, output_field=BooleanField()))
+            )
+        else:
+            favorites_subquery = Favorite.objects.filter(
+                user=user.profile, product_id=OuterRef("product_id")
+            )
+            return (
+                Good.objects.all()
+                .order_by("-pk")
+                .select_related("product")
+                .prefetch_related("product__images")
+                .annotate(is_favorite=Exists(favorites_subquery))
+            )
 
 
 class ImageListAPIView(ListAPIView):
@@ -95,9 +149,12 @@ class PopularTicketsAPIView(ListAPIView):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-        return Ticket.objects.annotate(
-            sold_count=Sum("product__sold_products__quantity")
-        ).order_by("-sold_count")
+        return (
+            Ticket.objects.select_related("product")
+            .prefetch_related("product__images")
+            .annotate(sold_count=Sum("product__sold_products__quantity"))
+            .order_by("-sold_count")
+        )
 
 
 class PopularPhonesAPIView(ListAPIView):
@@ -106,9 +163,12 @@ class PopularPhonesAPIView(ListAPIView):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-        return Phone.objects.annotate(
-            sold_count=Sum("product__sold_products__quantity")
-        ).order_by("-sold_count")
+        return (
+            Phone.objects.select_related("product")
+            .prefetch_related("product__images")
+            .annotate(sold_count=Sum("product__sold_products__quantity"))
+            .order_by("-sold_count")
+        )
 
 
 class PopularGoodAPIView(ListAPIView):
@@ -117,9 +177,29 @@ class PopularGoodAPIView(ListAPIView):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-        return Good.objects.annotate(
-            sold_count=Sum("product__sold_products__quantity")
-        ).order_by("-sold_count")
+
+        user = self.request.user
+        sold_count_subquery = Sum("product__sold_products__quantity")
+        if user.is_anonymous:
+            return (
+                Good.objects.select_related("product")
+                .prefetch_related("product__images")
+                .annotate(sold_count=sold_count_subquery)
+                .annotate(is_favorite=Value(False, output_field=BooleanField()))
+                .order_by("-sold_count")
+            )
+
+        else:
+            favorites_subquery = Favorite.objects.filter(
+                user=user.profile, product_id=OuterRef("product_id")
+            )
+            return (
+                Good.objects.all()
+                .order_by("-pk")
+                .select_related("product")
+                .prefetch_related("product__images")
+                .annotate(is_favorite=Exists(favorites_subquery))
+            )
 
 
 class NewTicketsListView(ListAPIView):
@@ -135,7 +215,12 @@ class NewPhonesListView(ListAPIView):
 
 
 class NewGoodsListView(ListAPIView):
-    queryset = Good.objects.all().order_by("product__created")
+    queryset = (
+        Good.objects.all()
+        .select_related("product")
+        .prefetch_related("product__images")
+        .order_by("product__created")
+    )
     serializer_class = GoodSerializer
     pagination_class = CustomPageNumberPagination
 

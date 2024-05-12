@@ -29,28 +29,17 @@ class Order(TimeStampedModel, models.Model):
     )
     total_amount = models.DecimalField(decimal_places=0, max_digits=20, default=0.00)
 
-    @property
-    def delivery_fee(self):
-        total_weight = 0
-        for item in self.orderitem.all():
-            total_weight += item.product.weight * item.quantity
-
-        # Pochta xarajatlarini hisoblash
-        service = Service.objects.first()  # Pochta xizmati olish
-        if service:
-            delivery_fee = service.delivery_fee
-            weight_factor = Decimal(
-                total_weight // 20
-            )  # Har 20 kg uchun qo'shimcha pochta xarajati
-            total_delivery_fee = delivery_fee * (weight_factor + Decimal(1))
-        else:
-            total_delivery_fee = Decimal(0)
-
-        return total_delivery_fee
-
     def get_product_details(self, product_item, order_item):
-        if hasattr(product_item, 'product') and hasattr(product_item.product, 'new_price') and hasattr(product_item.product, 'old_price'):
-            price = product_item.product.new_price if product_item.product.new_price > 0 else product_item.product.old_price
+        if (
+            hasattr(product_item, "product")
+            and hasattr(product_item.product, "new_price")
+            and hasattr(product_item.product, "old_price")
+        ):
+            price = (
+                product_item.product.new_price
+                if product_item.product.new_price > 0
+                else product_item.product.old_price
+            )
             total_amount = price * order_item.quantity
 
             product_instance = product_item.product
@@ -108,6 +97,75 @@ class Order(TimeStampedModel, models.Model):
                 "new_available_quantity"
             ]
             product_item.save()
+
+    _service_cache = None
+    _bonus_cache = None
+
+    @classmethod
+    def update_service_cache(cls):
+        cls._service_cache = Service.objects.first()
+
+    @classmethod
+    def update_bonus_cache(cls, total):
+        cls._bonus_cache = (
+            Bonus.objects.filter(amount__lte=total, active=True)
+            .order_by("-amount")
+            .first()
+        )
+
+    @property
+    def delivery_fee(self):
+        if not self.__class__._service_cache:
+            self.__class__.update_service_cache()
+
+        total_weight = sum(
+            item.product.weight * item.quantity for item in self.orderitem.all()
+        )
+        if self.__class__._service_cache:
+            delivery_fee = self.__class__._service_cache.delivery_fee
+            weight_factor = Decimal(total_weight // 20)
+            return delivery_fee * (weight_factor + Decimal(1))
+        return Decimal(0)
+
+    # @property
+    # def bonus_amount(self):
+    #     total = sum(
+    #         (
+    #             item.product.new_price
+    #             if item.product.new_price > 0
+    #             else item.product.old_price
+    #         )
+    #         * item.quantity
+    #         for item in self.orderitem.all()
+    #     )
+
+    #     if not self.__class__._bonus_cache:
+    #         self.__class__.update_bonus_cache(total)
+
+    #     if self.__class__._bonus_cache:
+    #         return {
+    #             "amount": self.__class__._bonus_cache.amount,
+    #             "percentage": self.__class__._bonus_cache.percentage,
+    #         }
+    #     return None
+    # @property
+    # def delivery_fee(self):
+    #     total_weight = 0
+    #     for item in self.orderitem.all():
+    #         total_weight += item.product.weight * item.quantity
+
+    #     # Pochta xarajatlarini hisoblash
+    #     service = Service.objects.first()  # Pochta xizmati olish
+    #     if service:
+    #         delivery_fee = service.delivery_fee
+    #         weight_factor = Decimal(
+    #             total_weight // 20
+    #         )  # Har 20 kg uchun qo'shimcha pochta xarajati
+    #         total_delivery_fee = delivery_fee * (weight_factor + Decimal(1))
+    #     else:
+    #         total_delivery_fee = Decimal(0)
+
+    #     return total_delivery_fee
     @property
     def bonus_amount(self):
         total = 0
@@ -130,7 +188,11 @@ class Order(TimeStampedModel, models.Model):
     def update_total_amount(self):
         total = 0
         for item in self.orderitem.all():
-            price = item.product.new_price if item.product.new_price > 0 else item.product.old_price
+            price = (
+                item.product.new_price
+                if item.product.new_price > 0
+                else item.product.old_price
+            )
             total += price * item.quantity
 
         # Bonuslarni tekshirish
@@ -157,7 +219,7 @@ class Order(TimeStampedModel, models.Model):
         """
         Order bilan bog'liq barcha OrderItem'larni qaytaradi.
         """
-        return self.orderitem.all().select_related("product").prefetch_related("product__phones", "product__tickets", "product__goods","product__images").order_by("-pk")
+        return self.orderitem.all().order_by("-pk")
 
 
 class OrderItem(TimeStampedModel, models.Model):

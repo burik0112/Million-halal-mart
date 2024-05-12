@@ -12,6 +12,8 @@ from rest_framework import status, permissions
 from django.db import transaction
 from django.db.models import Prefetch
 from rest_framework.response import Response
+
+from apps.product.models import Image, ProductItem
 from .models import Order, OrderItem, Information, Service, SocialMedia, Bonus
 from .serializers import (
     CustomPageNumberPagination,
@@ -58,6 +60,7 @@ class OrderCreateAPIView(CreateAPIView):
 
 
 class OrderListAPIView(ListAPIView):
+    queryset = Order.objects.all()
     serializer_class = OrderListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ["user__full_name"]
@@ -70,32 +73,62 @@ class OrderListAPIView(ListAPIView):
         Bu metod faqat autentifikatsiya qilingan foydalanuvchiga tegishli orderlarni qaytaradi.
         """
         user = self.request.user
-        return (
-            Order.objects.filter(user=user.profile)
-            .order_by("-pk")
+        if user.is_anonymous:
+            return Order.objects.none()
+
+        
+        # Efficiently prefetching related data
+        # product_prefetch = Prefetch(
+        #     'products',
+        #     queryset=ProductItem.objects.all()
+        #     .select_related('phones', 'tickets', 'goods')  # Optimize OneToOne relations
+        #     .prefetch_related(
+        #         Prefetch('images', queryset=Image.objects.all(), to_attr='prefetched_images')
+        #     )
+        # )
+
+        # return (
+        #     Order.objects.filter(user=user.profile)
+        #     .prefetch_related(
+        #         product_prefetch,  # Products with optimized related objects
+        #         'orderitem', # Order items linked to the order
+        #         'orderitem__product'
+        #     )
+        #     .order_by("-created")  # Most recent orders first
+        # )
+
+        product_prefetch = Prefetch(
+            'product',
+            queryset=ProductItem.objects.all()
+            .select_related('phones', 'tickets', 'goods') 
             .prefetch_related(
-                Prefetch(
-                    "orderitem",
-                    queryset=OrderItem.objects.select_related(
-                        "product"
-                    ).prefetch_related(
-                        "product__phones",
-                        "product__tickets",
-                        "product__goods",
-                        "product__images",
-                    ),
-                ),
-            )
+                    'images'  # Prefetch all related images without using a custom attribute
+                )# Optimize OneToOne relations
+            # .prefetch_related(
+            #     Prefetch('images', queryset=Image.objects.all(), to_attr='prefetched_images')
+            # )
         )
 
+        # Ensure that 'orderitem' prefetches not only 'product' but also detailed relationships
+        order_items_prefetch = Prefetch(
+            'orderitem',
+            queryset=OrderItem.objects.all().prefetch_related(product_prefetch)
+        )
+
+        return (
+            Order.objects.filter(user=user.profile)
+            .prefetch_related(order_items_prefetch, 'orderitem__product')
+            .prefetch_related('products')
+            .order_by("-created")  # Most recent orders first
+        )
 
 class OrderRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
-    queryset = Order.objects.all()
+    queryset = Order.objects.all().order_by("-pk")
     serializer_class = OrderSerializer
 
 
 class OrderItemCreateAPIView(CreateAPIView):
-    queryset = OrderItem.objects.all()
+    queryset = OrderItem.objects.all().order_by("-pk")
     serializer_class = OrderItemSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -135,7 +168,7 @@ class OrderItemListAPIView(ListAPIView):
 
 
 class OrderItemRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
-    queryset = OrderItem.objects.all()
+    queryset = OrderItem.objects.all().order_by("-pk")
     serializer_class = OrderItemSerializer
 
     def delete(self, request, *args, **kwargs):

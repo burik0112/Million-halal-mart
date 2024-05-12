@@ -72,15 +72,12 @@ class ProfileUpdate(APIView):
             profile = user.profile
 
         except:
-            profile=None
+            profile = None
             return Response({"error": "Profile not found"}, status=status.HTTP_400_B)
-        serializer = self.serializer_class(
-            profile, data=request.data, partial=partial
-        )
+        serializer = self.serializer_class(profile, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
-
 
 
 class ProfileDelete(APIView):
@@ -184,19 +181,25 @@ class FavoriteListAPIView(ListAPIView):
     queryset = Favorite.objects.all().order_by("-pk")
     serializer_class = FavoriteListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ["user", "product"]
+    # filterset_fields = ["user", "product"]
     search_fields = ["product__name", "user__full_name"]
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
         if not self.request.user.is_authenticated:
             return Favorite.objects.none()
-
-        return (
-            Favorite.objects.filter(user=self.request.user.profile)
-            .select_related("product", "user")
+        # qs = (
+        #     Favorite.objects.filter(user=self.request.user.profile)
+        #     .select_related("product", "user")
+        #     .order_by("-pk")
+        # )
+        qs = (
+            Favorite.objects.all()
             .order_by("-pk")
+            .select_related("product__tickets", "product__goods", "product__phones")
+            .prefetch_related("product__images")
         )
+        return qs
 
 
 class FavoriteRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
