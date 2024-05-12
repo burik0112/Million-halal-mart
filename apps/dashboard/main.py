@@ -82,6 +82,10 @@ def dashboard(request):
     customers_today_count = Profile.objects.filter(created__date=today).count()
 
     # Aggregate revenue for today's orders
+    total_revenue=orders.filter(status="sent").aggregate(total_amount_sum=Sum("total_amount"))[
+        "total_amount_sum"
+    ]
+    total_revenue=decimal_cutter(total_revenue)
     revenue_today = order_today.aggregate(total_amount_sum=Sum("total_amount"))[
         "total_amount_sum"
     ]
@@ -138,7 +142,7 @@ def dashboard(request):
             "all_orders": orders,
             "orders": orders,
             "customers": customers_count,
-            "revenue_today": revenue_today,
+            "total_revenue": total_revenue,
             "recent": recent,
             "order_today": order_today_count,
             "revenue_today": revenue_today,
