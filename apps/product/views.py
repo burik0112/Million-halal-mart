@@ -224,6 +224,27 @@ class NewGoodsListView(ListAPIView):
     serializer_class = GoodSerializer
     pagination_class = CustomPageNumberPagination
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_anonymous:
+            return (
+                Good.objects.all()
+                .select_related("product")
+                .prefetch_related("product__images")
+                .order_by("product__created")
+            )
+        else:
+            favorites_subquery = Favorite.objects.filter(
+                user=user.profile, product_id=OuterRef("product_id")
+            )
+            return (
+                Good.objects.all()
+                .select_related("product")
+                .prefetch_related("product__images")
+                .order_by("product__created")
+                .annotate(is_favorite=Exists(favorites_subquery))
+            )
+
 
 class TicketsOnSaleListView(ListAPIView):
     serializer_class = TicketSerializer
