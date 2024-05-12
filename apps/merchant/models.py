@@ -12,7 +12,7 @@ class Order(TimeStampedModel, models.Model):
     STATUS_CHOICES = (
         ("in_cart", "Savatchada"),
         ("pending", "Kutilmoqda"),
-        ("approved", "To'lov tasdiqlandi"),
+        ("approved", "Tasdiqlandi"),
         ("sent", "Yuborildi"),
         ("cancelled", "Bekor qilindi"),
     )
@@ -45,11 +45,11 @@ class Order(TimeStampedModel, models.Model):
             product_instance = product_item.product
 
             if hasattr(product_instance, "goods"):
-                return f"{product_instance.goods.name} x {order_item.quantity} {product_instance.get_measure_display()} = {total_amount} ₩"
+                return f"{product_instance.goods.name_uz} x {order_item.quantity} {product_instance.get_measure_display()} = {total_amount} ₩"
             elif hasattr(product_instance, "tickets"):
-                return f"{product_instance.tickets.event_name} x {order_item.quantity} {product_instance.get_measure_display()} = {total_amount} ₩"
+                return f"{product_instance.tickets.event_name_uz} x {order_item.quantity} {product_instance.get_measure_display()} = {total_amount} ₩"
             elif hasattr(product_instance, "phones"):
-                return f"{product_instance.phones.model_name}/{product_instance.phones.get_ram_display()}/{product_instance.phones.get_storage_display()} x {order_item.quantity} {product_instance.get_measure_display()} = {total_amount} ₩"
+                return f"{product_instance.phones.model_name_uz}/{product_instance.phones.get_ram_display()}/{product_instance.phones.get_storage_display()} x {order_item.quantity} {product_instance.get_measure_display()} = {total_amount} ₩"
 
         return "Mahsulot tafsiloti mavjud emas"
 
