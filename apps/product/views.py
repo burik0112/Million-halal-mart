@@ -1,3 +1,4 @@
+import re
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from django.conf import settings
@@ -270,7 +271,23 @@ class GoodsOnSaleListView(ListAPIView):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-        queryset = Good.objects.filter(product__new_price__lt=F("product__old_price"))
+        user = self.request.user
+        if self.request.user.is_anonymous:
+            return (
+                Good.objects.filter(product__new_price__lt=F("product__old_price"))
+                .select_related("product")
+                .prefetch_related("product__images")
+                .annotate(is_favorite=Value(False, output_field=BooleanField()))
+            )
+        favorites_subquery = Favorite.objects.filter(
+            user=user.profile, product_id=OuterRef("product_id")
+        )
+        queryset = (
+            Good.objects.filter(product__new_price__lt=F("product__old_price"))
+            .select_related("product")
+            .prefetch_related("product__images")
+            .annotate(is_favorite=Exists(favorites_subquery))
+        )
         return queryset
 
 
