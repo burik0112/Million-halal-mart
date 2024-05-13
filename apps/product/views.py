@@ -233,6 +233,7 @@ class NewGoodsListView(ListAPIView):
                 .select_related("product")
                 .prefetch_related("product__images")
                 .order_by("product__created")
+                .annotate(is_favorite=Value(False, output_field=BooleanField()))
             )
         else:
             favorites_subquery = Favorite.objects.filter(
