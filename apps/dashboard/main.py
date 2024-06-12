@@ -127,7 +127,7 @@ def dashboard(request):
     )
 
     # Get orders with comments
-    orders_with_comments = orders.exclude(comment="")
+    orders_with_comments = orders.exclude(comment="")[:10]
 
     return render(
         request,

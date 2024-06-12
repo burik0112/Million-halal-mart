@@ -489,7 +489,7 @@
                       document.addEventListener("DOMContentLoaded", () => {
                           const data = [
                               {% for order in most_expensive %}
-                                  { value: {{ order.total_amount }}, name: "{{ order.user__full_name }}" },
+                                  { value: {{ order.total_amount }}, name: "{{ order.user.full_name }}" },
                               {% endfor %}
                           ];
                   
@@ -506,7 +506,7 @@
                                       left: 'left'
                                   },
                                   series: [{
-                                      name: 'Access From',
+                                      name: "{{ order.user.full_name }}",
                                       type: 'pie',
                                       radius: '50%',
                                       data: data,
