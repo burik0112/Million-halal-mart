@@ -19,7 +19,7 @@ class UserListView(ListView):
 
     def get_queryset(self):
         # Fetch the profiles along with their active locations
-        profiles = Profile.objects.select_related("origin").order_by("pk")
+        profiles = Profile.objects.select_related("origin").order_by("-pk")
         return profiles
 
     def get_context_data(self, **kwargs):
