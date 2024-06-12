@@ -15,7 +15,7 @@
                 <th scope="col" class="text-center">To'liq ismi</th>
                 <th scope="col" class="text-center">Telefon raqami</th>
                 <th scope="col" class="text-center">Buyurtmarlar soni</th>
-                <th scope="col" class="text-center">Manzili</th>
+                {% comment %} <th scope="col" class="text-center">Manzili</th> {% endcomment %}
                 <th scope="col" class="text-center">Qo'shilgan sana</th>
                 <th scope="col" class="text-center">Buyurtmalari</th>
                 {% comment %} <th scope="col" class="text-center">Qo'shimcha</th> {% endcomment %}
@@ -28,15 +28,15 @@
                   <td class="text-center">{{ profile.full_name }}</td>
                   <td class="text-center">{{ profile.phone_number }}</td>
                   <td class="text-center">{{ profile.order.count }}</td>
-                  <td class="text-center">
-                    {% if profile.location_set.all %}
-                      {% for location in profile.location_set.all %}
-                        {{ location.address }}<br>
-                      {% endfor %}
-                    {% else %}
-                      Manzil topilmadi
-                    {% endif %}
-                  </td>
+                  {% comment %} <td class="text-center">
+                      {% if active_locations.profile.id %}
+                          {% for location in active_locations.profile.id %}
+                              {{ location.address }}<br>
+                          {% endfor %}
+                      {% else %}
+                          Manzil topilmadi
+                      {% endif %}
+                  </td> {% endcomment %}
                   <td class="text-center">
                     <i class="bi bi-calendar-date"></i> {{ profile.created|date:'d-m-Y' }} <br />
                     <i class="bi bi-clock"></i> {{ profile.created|date:'H:i' }}
