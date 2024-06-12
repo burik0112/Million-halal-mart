@@ -22,7 +22,6 @@ def get_env_value(env_variable):
 
 CHANNEL = int(get_env_value("CHANNEL"))
 BOT_TOKEN = get_env_value("BOT_TOKEN")
-CHANNEL_USERNAME = "@openai_chat_gpt_robot"
 
 bot = telebot.telebot.TeleBot(BOT_TOKEN, parse_mode="HTML")
 
