@@ -6,7 +6,7 @@ from .models import *
 
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ["main_type", "name", "desc", 'created']
+    list_display = ["main_type", "name", "desc", "created"]
 
 
 admin.site.register(Category, CategoryAdmin)
@@ -20,7 +20,16 @@ admin.site.register(SubCategory, SubCategoryAdmin)
 
 
 class ProductItemAdmin(admin.ModelAdmin):
-    list_display = ["created", "desc_uz", "old_price", "new_price", "available_quantity", "measure"]
+    list_display = [
+        "created",
+        "desc_uz",
+        "product_type",
+        "old_price",
+        "new_price",
+        "available_quantity",
+        "measure",
+    ]
+    list_editable = ["product_type"]
 
 
 admin.site.register(ProductItem, ProductItemAdmin)
@@ -48,7 +57,7 @@ admin.site.register(Good, GoodAdmin)
 
 
 class ImageAdmin(admin.ModelAdmin):
-    list_display = ["id","image", "name", "product"]
+    list_display = ["id", "image", "name", "product"]
 
 
 admin.site.register(Image, ImageAdmin)

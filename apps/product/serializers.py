@@ -47,25 +47,33 @@ class ProductItemSerializer(serializers.ModelSerializer):
 class TicketSerializer(ProductItemCreatorMixin):
     product = ProductItemSerializer()
     is_favorite = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Ticket
         fields = "__all__"
+
     def get_is_favorite(self, obj):
         if self.context["request"].user.is_anonymous:
             return False
-        favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
+        favorite = Favorite.objects.filter(
+            user=self.context["request"].user.profile, product=obj.product
+        ).first()
         if favorite is not None:
             return True
         return False
+
     def create(self, validate_data):
         product = self.create_pruduct(validate_data)
         return Ticket.objects.create(**validate_data, product=product)
 
+
 class TicketForSearchSerializer(ProductItemCreatorMixin):
     product = ProductItemSerializer()
+
     class Meta:
         model = Ticket
         fields = "__all__"
+
 
 class PhoneForSearchSerializer(ProductItemCreatorMixin):
     product = ProductItemSerializer()
@@ -73,6 +81,8 @@ class PhoneForSearchSerializer(ProductItemCreatorMixin):
     class Meta:
         model = Phone
         fields = "__all__"
+
+
 class PhoneSerializer(ProductItemCreatorMixin):
     product = ProductItemSerializer()
     is_favorite = serializers.BooleanField(read_only=True)
@@ -80,10 +90,13 @@ class PhoneSerializer(ProductItemCreatorMixin):
     def get_is_favorite(self, obj):
         if self.context["request"].user.is_anonymous:
             return False
-        favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
+        favorite = Favorite.objects.filter(
+            user=self.context["request"].user.profile, product=obj.product
+        ).first()
         if favorite is not None:
             return True
         return False
+
     class Meta:
         model = Phone
         fields = "__all__"
@@ -91,6 +104,7 @@ class PhoneSerializer(ProductItemCreatorMixin):
     def create(self, validate_data):
         product = self.create_pruduct()
         return Phone.objects.create(**validate_data, product=product)
+
 
 class GoodForSearchSerializer(ProductItemCreatorMixin):
     product = ProductItemSerializer()
@@ -100,10 +114,11 @@ class GoodForSearchSerializer(ProductItemCreatorMixin):
         fields = "__all__"
         read_only_fields = ("images",)
 
+
 class GoodSerializer(ProductItemCreatorMixin):
     product = ProductItemSerializer()
     is_favorite = serializers.BooleanField(read_only=True)
-    
+
     class Meta:
         model = Good
         fields = "__all__"
@@ -118,29 +133,37 @@ class TicketPopularSerializer(serializers.ModelSerializer):
     product = ProductItemSerializer()
     sold_count = serializers.IntegerField(read_only=True)
     is_favorite = serializers.SerializerMethodField(read_only=True)
+
     def get_is_favorite(self, obj):
         if self.context["request"].user.is_anonymous:
             return False
-        favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
+        favorite = Favorite.objects.filter(
+            user=self.context["request"].user.profile, product=obj.product
+        ).first()
         if favorite is not None:
             return True
         return False
+
     class Meta:
         model = Ticket
-        fields = ["event_name", "event_date", "sold_count", "product","is_favorite"]
+        fields = ["event_name", "event_date", "sold_count", "product", "is_favorite"]
 
 
 class PhonePopularSerializer(serializers.ModelSerializer):
     product = ProductItemSerializer()
     sold_count = serializers.IntegerField(read_only=True)
     is_favorite = serializers.SerializerMethodField(read_only=True)
+
     def get_is_favorite(self, obj):
         if self.context["request"].user.is_anonymous:
             return False
-        favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
+        favorite = Favorite.objects.filter(
+            user=self.context["request"].user.profile, product=obj.product
+        ).first()
         if favorite is not None:
             return True
         return False
+
     class Meta:
         model = Phone
         fields = "__all__"
@@ -150,13 +173,41 @@ class GoodPopularSerializer(serializers.ModelSerializer):
     product = ProductItemSerializer()
     sold_count = serializers.IntegerField(read_only=True)
     is_favorite = serializers.BooleanField(read_only=True)
+
     def get_is_favorite(self, obj):
         if self.context["request"].user.is_anonymous:
             return False
-        favorite = Favorite.objects.filter(user=self.context["request"].user.profile, product=obj.product).first()
+        favorite = Favorite.objects.filter(
+            user=self.context["request"].user.profile, product=obj.product
+        ).first()
         if favorite is not None:
             return True
         return False
+
     class Meta:
         model = Good
+        fields = "__all__"
+
+
+class GoodVariantSerializer(serializers.ModelSerializer):
+    product = ProductItemSerializer()
+
+    class Meta:
+        model = Good
+        fields = "__all__"
+
+
+class PhoneVariantSerializer(serializers.ModelSerializer):
+    product = ProductItemSerializer()
+
+    class Meta:
+        model = Phone
+        fields = "__all__"
+
+
+class TicketVariantSerializer(serializers.ModelSerializer):
+    product = ProductItemSerializer()
+
+    class Meta:
+        model = Ticket
         fields = "__all__"
