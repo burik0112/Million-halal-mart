@@ -7,19 +7,23 @@ from rest_framework import views, status
 from rest_framework.response import Response
 from django.db.models import Q, Exists, OuterRef, F, Sum, Value, BooleanField
 
+from django.db.models import Prefetch
 from apps.customer.models import Favorite
-from .models import Category, Good, Image, Phone, SubCategory, Ticket
+from .models import Category, Good, Image, Phone, SubCategory, Ticket, ProductItem
 from .serializers import (
     CategorySerializer,
     CustomPageNumberPagination,
     GoodSerializer,
+    GoodVariantSerializer,
     ImageSerializer,
     PhoneSerializer,
+    PhoneVariantSerializer,
     SubCategorySerializer,
     TicketSerializer,
     TicketPopularSerializer,
     PhonePopularSerializer,
     GoodPopularSerializer,
+    TicketVariantSerializer,
 )
 
 # Create your views here.
@@ -48,6 +52,7 @@ class TicketListAPIView(ListAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = [
         "product",
+        "product__product_type",
     ]
     pagination_class = CustomPageNumberPagination
 
@@ -61,7 +66,7 @@ class PhoneListAPIView(ListAPIView):
     )
     serializer_class = PhoneSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ["category", "product"]
+    filterset_fields = ["category", "product", "product__product_type"]
 
     pagination_class = CustomPageNumberPagination
 
@@ -100,6 +105,7 @@ class GoodListAPIView(ListAPIView):
     filterset_fields = [
         "sub_cat",
         "product",
+        "product__product_type",
     ]
     pagination_class = CustomPageNumberPagination
 
@@ -125,6 +131,69 @@ class GoodListAPIView(ListAPIView):
                 .annotate(is_favorite=Exists(favorites_subquery))
             )
 
+
+class GoodVariantsAPIView(views.APIView):
+    def get(self, request, product_type):
+        # Good obyektlarini olish
+        goods = (
+            Good.objects.filter(product__product_type=product_type)
+            .select_related("product")
+            .prefetch_related("product__images")
+        )
+
+        # Agar mahsulotlar topilmasa, 404 xatosini qaytarish
+        if not goods.exists():
+            return Response(
+                {"detail": "No goods found with this product_type."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Serializer yordamida ma'lumotlarni formatlash
+        serializer = GoodVariantSerializer(
+            goods, many=True, context={"request": request}
+        )
+
+        return Response(serializer.data)
+
+class TicketVariantsAPIView(views.APIView):
+    def get(self, request, product_type):
+        tickets = (
+            Ticket.objects.filter(product__product_type=product_type)
+            .select_related("product")
+            .prefetch_related("product__images")
+        )
+
+        if not tickets.exists():
+            return Response(
+                {"detail": "No tickets found with this product_type."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = TicketVariantSerializer(
+            tickets, many=True, context={"request": request}
+        )
+
+        return Response(serializer.data)
+
+class PhoneVariantsAPIView(views.APIView):
+    def get(self, request, product_type):
+        phones = (
+            Phone.objects.filter(product__product_type=product_type)
+            .select_related("product")
+            .prefetch_related("product__images")
+        )
+
+        if not phones.exists():
+            return Response(
+                {"detail": "No phones found with this product_type."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = PhoneVariantSerializer(
+            phones, many=True, context={"request": request}
+        )
+
+        return Response(serializer.data)
 
 class ImageListAPIView(ListAPIView):
     queryset = Image.objects.all().order_by("-pk")

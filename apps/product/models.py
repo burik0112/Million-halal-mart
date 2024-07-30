@@ -43,7 +43,7 @@ class ProductItem(TimeStampedModel, models.Model):
     old_price = models.DecimalField(
         decimal_places=0, max_digits=10, null=True, blank=True, default=0
     )
-    product_type = models.UUIDField(default=uuid.uuid4, editable=False)
+    product_type = models.UUIDField(default=uuid.uuid4, editable=True)
     new_price = models.DecimalField(
         decimal_places=0, max_digits=10, null=True, blank=True, default=0
     )
