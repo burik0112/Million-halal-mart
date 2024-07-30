@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from model_utils.models import TimeStampedModel
 
@@ -38,11 +39,11 @@ class ProductItem(TimeStampedModel, models.Model):
         (2, "L"),
         (3, "PAKET"),
     )
-
     desc = models.TextField()
     old_price = models.DecimalField(
         decimal_places=0, max_digits=10, null=True, blank=True, default=0
     )
+    product_type = models.UUIDField(default=uuid.uuid4, editable=False)
     new_price = models.DecimalField(
         decimal_places=0, max_digits=10, null=True, blank=True, default=0
     )
@@ -51,6 +52,16 @@ class ProductItem(TimeStampedModel, models.Model):
     available_quantity = models.PositiveIntegerField(default=0)
     bonus = models.IntegerField(default=0)
     active = models.BooleanField(default=True)
+    class Meta:
+        indexes = [
+            models.Index(fields=['product_type']),
+        ]
+    
+    @property
+    def variants(self):
+        return ProductItem.objects.filter(product_type=self.product_type).exclude(
+            id=self.id
+        )
 
     @property
     def sale(self):
