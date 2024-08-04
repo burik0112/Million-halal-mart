@@ -95,7 +95,7 @@ class PhoneListAPIView(ListAPIView):
 
 class GoodListAPIView(ListAPIView):
     queryset = (
-        Good.objects.select_related("product")
+        Good.objects.filter(product__main=True).select_related("product")
         .prefetch_related("product__images")
         .all()
         .order_by("-pk")
@@ -113,7 +113,7 @@ class GoodListAPIView(ListAPIView):
         user = self.request.user
         if user.is_anonymous:
             return (
-                Good.objects.all()
+                Good.objects.filter(product__main=True)
                 .order_by("-pk")
                 .select_related("product")
                 .prefetch_related("product__images")
@@ -124,7 +124,7 @@ class GoodListAPIView(ListAPIView):
                 user=user.profile, product_id=OuterRef("product_id")
             )
             return (
-                Good.objects.all()
+                Good.objects.filter(product__main=True)
                 .order_by("-pk")
                 .select_related("product")
                 .prefetch_related("product__images")
