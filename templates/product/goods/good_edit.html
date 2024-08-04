@@ -4,7 +4,12 @@
 <!-- Existing form and content -->
 <form method="post" enctype="multipart/form-data">
   <h1>Mahsulotni tahrirlash oynasi</h1>
-  {% csrf_token %} {{ form.as_p }}
+  {% csrf_token %} 
+  <div class="d-flex align-items-center justify-content-between">
+    <a href="{% url 'add_product_child' good.pk%}?product_type={{ good.product.product_type }}" class="btn btn-success btn-sm">Kichik mahsulot qo'shish</a>
+    <div class="mb-3">{{ form.main }} Asosiy</div>
+</div>
+  {{ form.as_p }}
   <button type="submit" class="btn btn-primary" name="edit">Saqlash</button>
   <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteConfirmModal" id="yourDeleteButtonId">
     O'chirish

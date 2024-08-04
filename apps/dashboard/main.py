@@ -323,8 +323,6 @@ class NewsEditView(View):
             if form.is_valid():
                 form.save()
                 return redirect("news-list")
-            else:
-                print(form.errors)  # Print errors to console for debugging
         if "delete" in request.POST:
             news = get_object_or_404(News, pk=pk)
             news.delete()

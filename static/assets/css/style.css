@@ -9,6 +9,32 @@
 /*--------------------------------------------------------------
 # General
 --------------------------------------------------------------*/
+.child-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.child-details .info {
+  display: flex;
+  flex-direction: column;
+}
+
+.child-details .card-title {
+  margin: 0;
+  padding: 0;
+}
+
+.child-details .info .card-title + .card-title {
+  margin-top: 5px; /* Adjust the top margin to control the space between the elements */
+}
+
+.disabled-checkbox {
+  margin-left: 20px; /* Adjust the left margin as needed to position the checkbox */
+  pointer-events: none; /* Prevent the checkbox from being clickable */
+}
+
+
 :root {
   scroll-behavior: smooth;
 }

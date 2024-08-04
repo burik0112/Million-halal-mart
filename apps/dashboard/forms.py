@@ -881,6 +881,11 @@ class GoodProductItemForm(forms.ModelForm):
         initial=True,
         required=False,
     )
+    main = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        initial=True,
+        required=False,
+    )
     images = (
         MultipleFileField()
     )  # New field for multiple images # New field for multiple images
@@ -911,16 +916,13 @@ class GoodProductItemForm(forms.ModelForm):
             new_price=self.cleaned_data["new_price"],
             old_price=self.cleaned_data.get("old_price"),
             available_quantity=self.cleaned_data["available_quantity"],
-            # stock=self.cleaned_data["stock"],
-            # bonus=self.cleaned_data["bonus"],
             active=self.cleaned_data["active"],
+            main=self.cleaned_data["main"],
         )
         if commit:
             product_item.save()
             good.product = product_item
-            print("Category: before", good.sub_cat)
             good.save()
-            print("Category: after", good.sub_cat)
 
             # Save multiple images
             for img in self.files.getlist("images"):
@@ -931,6 +933,93 @@ class GoodProductItemForm(forms.ModelForm):
                 )
                 image.save()
         return good
+    
+class GoodChildProductItemForm(forms.ModelForm):
+    def __init__(self, *args, product_type=None, **kwargs):
+        self.product_type = product_type
+        super().__init__(*args, **kwargs) 
+    class Meta:
+        model = Good
+        fields = [
+            "name_kr",
+            "name_uz",
+            "name_en",
+            "name_ru",
+        ]
+    name_en = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        label="Nomi (EN)",
+    )
+    name_kr = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        label="Nomi (KR)",
+    )
+    name_uz = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        label="Nomi (UZ)",
+    )
+    name_ru = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        label="Nomi (RU)",
+    )
+   
+    available_quantity = forms.IntegerField(
+        min_value=0,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+        label="Mavjud miqdori",
+    )
+    active = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        initial=True,
+        required=False,
+    )
+   
+    images = (
+        MultipleFileField()
+    )  # New field for multiple images # New field for multiple images
+
+
+    def save(self, commit=True):
+        good = super().save(commit=False)
+        good.name_en = self.cleaned_data.get("name_en")
+        good.name_uz = self.cleaned_data.get("name_uz")
+        good.name_ru = self.cleaned_data.get("name_ru")
+        good.name_kr = self.cleaned_data.get("name_kr")
+        
+        if self.product_type is None:
+            raise ValueError("product_type must be provided")
+        
+        product_item = ProductItem(
+            available_quantity=self.cleaned_data["available_quantity"],
+            active=self.cleaned_data["active"],
+            product_type=self.product_type,
+            main=False
+              # Ensure this is set
+        )
+        
+        if commit:
+            product_item.save()
+            good.product = product_item
+            good.save()
+
+            # Save multiple images
+            for img in self.files.getlist("images"):
+                image = Image(
+                    image=img,
+                    name=f"{self.cleaned_data['name_uz']}_{img.name}",
+                    product=product_item,
+                )
+                image.save()
+        return good
+
 
 
 class GoodEditForm(forms.ModelForm):
@@ -993,6 +1082,10 @@ class GoodEditForm(forms.ModelForm):
     active = forms.BooleanField(
         required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
     )
+    main = forms.BooleanField(
+        required=False, 
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+    )
     measure = forms.ChoiceField(
         choices=ProductItem.CHOICES,
         widget=forms.Select(attrs={"class": "form-select"}),
@@ -1019,6 +1112,7 @@ class GoodEditForm(forms.ModelForm):
             "desc_en",
             "desc_kr",
             "active",
+            "main",
         ]
         widgets = {
             "sub_cat": forms.Select(attrs={"class": "form-select"}),
@@ -1039,6 +1133,7 @@ class GoodEditForm(forms.ModelForm):
             self.fields["desc_en"].initial = product.desc_kr
             self.fields["desc_kr"].initial = product.desc_en
             self.fields["active"].initial = product.active
+            self.fields["main"].initial = product.main
 
     def save(self, commit=True):
         good = super(GoodEditForm, self).save(commit=False)
@@ -1055,6 +1150,7 @@ class GoodEditForm(forms.ModelForm):
         product_item.old_price = self.cleaned_data["old_price"]
         product_item.available_quantity = self.cleaned_data["available_quantity"]
         product_item.active = self.cleaned_data["active"]
+        product_item.main = self.cleaned_data["main"]
         if commit:
             product_item.save()
             good.save()

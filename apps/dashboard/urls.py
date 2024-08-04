@@ -24,6 +24,8 @@ from .product import (
     SubCategoryListView,
     SubCategoryEditView,
     SubCategoryDeleteView,
+    ChildrenView,
+    ChildActionView,
 )
 
 from .users import (
@@ -170,6 +172,16 @@ urlpatterns = [
         "product/good-subcategory/",
         login_required(GoodCategoryCreateView.as_view()),
         name="good_subcategory",
+    ),
+    path(
+        "product/good-child/<int:pk>/",
+        login_required(ChildrenView.as_view()),
+        name="add_product_child",
+    ),
+    path(
+        "product/good-child/action/<int:parent_pk>/<int:pk>/",
+        login_required(ChildActionView.as_view()),
+        name="product-child-action",
     ),
     path("product/goods/", login_required(GoodListView.as_view()), name="good-list"),
     path(

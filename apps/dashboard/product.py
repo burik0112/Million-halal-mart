@@ -19,6 +19,7 @@ from .forms import (
     SubCategoryEditForm,
     CategoryCreateForm,
     SubCategoryCreateForm,
+    GoodChildProductItemForm,
 )
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -78,6 +79,7 @@ class TicketListView(ListView):
     template_name = "product/tickets/ticket_list.html"  # your template name
     context_object_name = "tickets"
     paginate_by = 10
+
     def get_queryset(self):
         return Ticket.objects.all().order_by("pk")
 
@@ -128,7 +130,7 @@ class GoodListView(ListView):
     def get_queryset(self):
         # Retrieve all goods with related product and sub_category
         goods = (
-            Good.objects.select_related("product")
+            Good.objects.filter(product__main=True).select_related("product")
             .prefetch_related("sub_cat")
             .order_by("pk")
         )
@@ -202,6 +204,60 @@ class GoodEditDeleteView(View):
         else:
             form = GoodEditForm(instance=good)
         return render(request, self.template_name, {"form": form, "good": good})
+
+
+class ChildrenView(ListView):
+    model = Good
+    template_name = "product/goods/product_children.html"
+    context_object_name = "children"
+    form_class = GoodChildProductItemForm
+
+    def get_queryset(self, request, pk):
+        good = get_object_or_404(Good, pk=pk)
+        product_type = good.product.product_type
+        children = Good.objects.filter(
+            product__product_type=product_type, product__main=False
+        )
+        return {"children": children, "good": good, 'type': product_type}
+
+    def get(self, request, *args, **kwargs):
+        obj = self.get_queryset(request, pk=kwargs["pk"])
+        form = self.form_class(product_type=obj['type'])
+        return render(
+            request,
+            self.template_name,
+            {"children": obj["children"], "form": form, "good": obj["good"]},
+        )
+
+    def post(self, request, *args, **kwargs):
+        obj = self.get_queryset(request, pk=kwargs["pk"])
+        form = self.form_class(request.POST, request.FILES, product_type=obj['type'])
+        if form.is_valid():
+            form.save()
+            return redirect("add_product_child", pk=kwargs['pk'])
+        else:
+            return render(
+                request,
+                self.template_name,
+                {"children": obj["children"], "form": form, "good": obj["good"]},
+            )
+
+
+class ChildActionView(View):
+    def post(self, request, *args, **kwargs):
+        action = request.POST.get("action")
+        parent_pk = kwargs.get("parent_pk")
+        child_pk = kwargs.get("pk")
+
+        if action == "toggle":
+            child = get_object_or_404(Good, pk=child_pk)
+            child.product.active = not child.product.active
+            child.product.save()
+        elif action == "delete":
+            child = get_object_or_404(Good, pk=child_pk)
+            child.delete()
+
+        return redirect("add_product_child", pk=parent_pk)
 
 
 class PhoneEditDeleteView(View):
@@ -351,7 +407,8 @@ class SubCategoryListView(ListView):
     model = SubCategory
     template_name = "product/goods/subcategory_list.html"  # your template name
     context_object_name = "subcategories"
-    paginate_by=10
+    paginate_by = 10
+
     def get_queryset(self):
         return SubCategory.objects.all().order_by("pk")
 
