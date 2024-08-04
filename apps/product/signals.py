@@ -34,6 +34,7 @@ def news_created(sender, instance, created, **kwargs):
 def product_created(sender, instance, created, **kwargs):
     if created:
         send_fcm_notification("Yangi mahsulot!", instance.desc, "productTopic")
+        # pass
 
 
 @receiver(post_save, sender=ProductItem)

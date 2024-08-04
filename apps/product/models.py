@@ -51,6 +51,7 @@ class ProductItem(TimeStampedModel, models.Model):
     measure = models.IntegerField(choices=CHOICES, default=0)
     available_quantity = models.PositiveIntegerField(default=0)
     bonus = models.IntegerField(default=0)
+    main=models.BooleanField(default=True)
     active = models.BooleanField(default=True)
     class Meta:
         indexes = [

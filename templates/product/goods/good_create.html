@@ -11,6 +11,7 @@
   <form method="post" enctype="multipart/form-data">
     <!-- Add enctype attribute -->
     {% csrf_token %}
+    
     <div class="row">
 
       <!-- First Column -->
@@ -38,6 +39,7 @@
         </div>
           <div class="mb-3">{{ form.desc_uz.label_tag }} {{ form.desc_uz }}</div>
           <div class="mb-3">{{ form.desc_ru.label_tag }} {{ form.desc_ru }}</div>
+          
       </div>
 
       <!-- Second Column -->
@@ -61,6 +63,7 @@
         <div class="mb-3">
           {{ form.weight.label_tag }} {{ form.weight }}
         </div>
+
           <div class="mb-3">{{ form.desc_en.label_tag }} {{ form.desc_en }}</div>
           <div class="mb-3">{{ form.desc_kr.label_tag }} {{ form.desc_kr }}</div>
       </div>
@@ -68,8 +71,14 @@
 
       
 
-      <div class="col-md-12">
-        <div class="mb-3">{{ form.active }} Active </div>
+      <div class="row">
+        <div class="col-md-6">
+            <div class="d-flex justify-content-between mb-6">
+                <div>{{ form.active }} Active</div>
+                <div>{{ form.main }} Asosiy</div>
+            </div>
+        </div>
+    </div>
       </div>
     </div>
     <!-- {{ form.as_p }} -->
