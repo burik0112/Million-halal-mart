@@ -993,21 +993,33 @@ class GoodChildProductItemForm(forms.ModelForm):
         good.name_uz = self.cleaned_data.get("name_uz")
         good.name_ru = self.cleaned_data.get("name_ru")
         good.name_kr = self.cleaned_data.get("name_kr")
-        
+
         if self.product_type is None:
             raise ValueError("product_type must be provided")
-        
+        parent = Good.objects.get(product__product_type=self.product_type, product__main=True)
         product_item = ProductItem(
             available_quantity=self.cleaned_data["available_quantity"],
             active=self.cleaned_data["active"],
             product_type=self.product_type,
-            main=False
+            main=False,
+            new_price=parent.product.new_price,
+            old_price=parent.product.old_price,
+            desc_uz=parent.product.desc_uz,
+            desc_ru=parent.product.desc_ru,
+            desc_en=parent.product.desc_en,
+            desc_kr=parent.product.desc_kr,
+            measure=parent.product.measure,
+            weight=parent.product.weight,
+            
+
               # Ensure this is set
         )
         
         if commit:
+            
             product_item.save()
             good.product = product_item
+            good.sub_cat = parent.sub_cat
             good.save()
 
             # Save multiple images

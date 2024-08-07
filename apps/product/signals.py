@@ -19,15 +19,14 @@ def send_fcm_notification(title, body, topic):
         "priority": "high",
         "notification": {"title": title, "body": body},
     }
-    response = requests.post(FCM_URL, json=data, headers=headers)
-    return response.json()
+    requests.post(FCM_URL, json=data, headers=headers)
+    # return response.json()
 
 
 @receiver(post_save, sender=News)
 def news_created(sender, instance, created, **kwargs):
     if created:
-        firebase = send_fcm_notification("Yangilik!", instance.title, "newsTopic")
-        print(firebase, "message id keldi")
+        send_fcm_notification("Yangilik!", instance.title, "newsTopic")
 
 
 @receiver(post_save, sender=ProductItem)
