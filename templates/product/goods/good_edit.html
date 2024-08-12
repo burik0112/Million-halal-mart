@@ -7,7 +7,6 @@
   {% csrf_token %} 
   <div class="d-flex align-items-center justify-content-between">
     <a href="{% url 'add_product_child' good.pk%}?product_type={{ good.product.product_type }}" class="btn btn-success btn-sm">Kichik mahsulot qo'shish</a>
-    <div class="mb-3">{{ form.main }} Asosiy</div>
 </div>
   {{ form.as_p }}
   <button type="submit" class="btn btn-primary" name="edit">Saqlash</button>

@@ -9,6 +9,9 @@
 /*--------------------------------------------------------------
 # General
 --------------------------------------------------------------*/
+.small-input {
+  max-width: 500px; /* Adjust the max-width to the desired size */
+}
 .child-details {
   display: flex;
   align-items: center;
