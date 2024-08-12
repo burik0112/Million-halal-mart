@@ -1097,6 +1097,7 @@ class GoodEditForm(forms.ModelForm):
     main = forms.BooleanField(
         required=False, 
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        label="Asosiy"
     )
     measure = forms.ChoiceField(
         choices=ProductItem.CHOICES,

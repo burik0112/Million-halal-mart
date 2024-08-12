@@ -22,7 +22,7 @@ from .forms import (
     GoodChildProductItemForm,
 )
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from django.db.models import Q
 
 class PhoneListView(ListView):
     model = Phone
@@ -128,12 +128,16 @@ class GoodListView(ListView):
     paginate_by = 10  # Number of items per page
 
     def get_queryset(self):
-        # Retrieve all goods with related product and sub_category
+        query = self.request.GET.get('q', '')
+        # Retrieve goods with related product and sub_category, and filter by name if a search query is provided
         goods = (
-            Good.objects.filter(product__main=True).select_related("product")
+            Good.objects.filter(product__main=True)
+            .select_related("product")
             .prefetch_related("sub_cat")
             .order_by("pk")
         )
+        if query:
+            goods = goods.filter(name_uz__icontains=query)
         return goods
 
 
