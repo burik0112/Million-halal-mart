@@ -153,9 +153,15 @@ class OrdersListView(ListView):
     template_name = "customer/orders/orders_list.html"
     context_object_name = "orders"
     paginate_by = 10
-
     def get_queryset(self):
-        return Order.objects.select_related("user").order_by("-created")
+        query = self.request.GET.get('q', '')
+        # Retrieve goods with related product and sub_category, and filter by name if a search query is provided
+        order = (
+            Order.objects.select_related("user").order_by("-created")
+        )
+        if query:
+            order = order.filter(Q(user__full_name__icontains=query) | Q(id__icontains=query))
+        return order
 
 
 def update_order_status(request, pk):

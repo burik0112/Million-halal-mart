@@ -197,6 +197,7 @@ class CheckoutView(APIView):
     def post(self, request, order_id, *args, **kwargs):
         with transaction.atomic():
             try:
+
                 # Check the original Order
                 original_order = Order.objects.get(
                     id=order_id, user=request.user.profile
@@ -218,7 +219,6 @@ class CheckoutView(APIView):
 
                 update_data = request.data.copy()
                 update_data["status"] = "pending"
-
                 serializer = OrderStatusUpdateSerializer(order, data=update_data)
                 if serializer.is_valid():
                     serializer.save()
