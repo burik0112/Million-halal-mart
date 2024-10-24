@@ -31,7 +31,6 @@ extra_datas = {}
 
 @csrf_exempt
 def index(request):
-    print(123123213123)
     if request.method == "GET":
         return HttpResponse("<a href='http://t.me/dkarimoff96'>Created by</>")
     if request.method == "POST":
