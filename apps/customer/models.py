@@ -1,8 +1,16 @@
+import random, string
+
+
 from django.contrib.auth.models import User
 from django.db import models
 from model_utils.models import TimeStampedModel
 
 # Create your models here.
+
+def generate_referral_code(length=8):
+    """Генерирует уникальный код из букв и цифр"""
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+
 
 
 class Profile(TimeStampedModel, models.Model):
@@ -13,8 +21,23 @@ class Profile(TimeStampedModel, models.Model):
     lang = models.CharField(max_length=2, choices=LANG, default="uz")
     cashback = models.IntegerField(default=0)
     otp = models.CharField(max_length=100, null=True, blank=True)
+    referral_code = models.CharField(
+        max_length=20,
+        unique=True
+    )
 
-    def __str__(self) -> str:
+    def save(self, *args, **kwargs):
+        if not self.referral_code:
+            # Генерируем уникальный код
+            while True:
+                code = generate_referral_code()
+                if not Profile.objects.filter(referral_code=code).exists():
+                    self.referral_code = code
+                    break
+        super().save(*args, **kwargs)
+
+
+def __str__(self) -> str:
         return self.origin.username
 
 

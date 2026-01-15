@@ -44,3 +44,61 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ("status",)
 
 admin.site.register(Order, OrderAdmin)
+
+
+@admin.register(LoyaltyCard)
+class LoyaltyCardModelAdmin(admin.ModelAdmin):
+    list_display = ['profile','current_balance','cycle_start','cycle_end','cycle_days','cycle_number','created_at','updated_at']
+
+
+
+@admin.register(LoyaltyPendingBonus)
+class LoyaltyPendingBonusAdmin(admin.ModelAdmin):
+    list_display = [
+        "order_name",
+        "profile",
+        "order_amount",
+        "percent",
+        "bonus_amount",
+        "status",
+        "created_at",
+    ]
+
+    list_editable = ["percent", "status"]
+
+    readonly_fields = [
+        "order",
+        "order_name",
+        "order_amount",
+        "bonus_amount",
+        "profile",
+    ]
+
+
+@admin.register(Referral)
+class ReferralModelAdmin(admin.ModelAdmin):
+    list_display = [
+        'referrer',
+        'referee',
+        'status',
+        'created_at'
+    ]
+    list_filter = ['status', 'created_at']
+    search_fields = [
+        'referrer__username',
+        'referee__username'
+    ]
+
+
+
+@admin.register(WalletTransaction)
+class WalletTransactionModelAdmin(admin.ModelAdmin):
+    list_display = [
+        'profile',
+        'amount',
+        'type',
+        'reference_id',
+        'created_at'
+    ]
+    list_filter = ['type', 'created_at']
+    search_fields = ['user__username', 'reference_id']

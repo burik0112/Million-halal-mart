@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from .views import LoyaltyCardByProfileAPIView, LoyaltyCardDetailAPIView
 
 urlpatterns = [
     path("order/create/", views.OrderCreateAPIView.as_view()),
@@ -14,4 +15,6 @@ urlpatterns = [
     path("service/", views.ServiceListAPIView.as_view(), name="service"),
     path("social-media-urls/", views.SocialMeadiaAPIView.as_view()),
     path("bonus-list/", views.BonusPIView.as_view()),
+    path('loyalty-cards/', LoyaltyCardByProfileAPIView.as_view(), name='loyalty-cards-by-profile'),
+    path('loyalty-cards/<int:pk>/', LoyaltyCardDetailAPIView.as_view(), name='loyalty-card-detail'),
 ]

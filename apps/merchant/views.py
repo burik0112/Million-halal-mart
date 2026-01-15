@@ -14,7 +14,7 @@ from django.db.models import Prefetch
 from rest_framework.response import Response
 
 from apps.product.models import Image, ProductItem
-from .models import Order, OrderItem, Information, Service, SocialMedia, Bonus
+from .models import Order, OrderItem, Information, Service, SocialMedia, Bonus, LoyaltyCard
 from .serializers import (
     CustomPageNumberPagination,
     OrderItemSerializer,
@@ -25,7 +25,7 @@ from .serializers import (
     OrderListSerializer,
     OrderCreateSerializer,
     SocialMediaSerializer,
-    BonusSerializer,
+    BonusSerializer, LoyaltyCardSerializer,
 )
 from apps.dashboard.main import bot
 
@@ -261,3 +261,47 @@ class SocialMeadiaAPIView(ListAPIView):
 class BonusPIView(ListAPIView):
     queryset = Bonus.objects.all().order_by("pk")
     serializer_class = BonusSerializer
+
+
+
+class LoyaltyCardByProfileAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        full_name = request.query_params.get('full_name')
+        profile_id = request.query_params.get('profile_id')
+
+        # Начинаем с всех карт
+        queryset = LoyaltyCard.objects.select_related('profile').all()
+
+        # Фильтруем по full_name, если передан
+        if full_name:
+            queryset = queryset.filter(profile__full_name__icontains=full_name)
+
+        # Фильтруем по profile_id, если передан
+        if profile_id:
+            queryset = queryset.filter(profile__id=profile_id)
+
+        # Если ничего не найдено
+        if not queryset.exists():
+            return Response({"detail": "Loyalty cards not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Сериализуем данные
+        serializer = LoyaltyCardSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class LoyaltyCardDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk, *args, **kwargs):
+        """
+        Возвращает loyalty card пользователя по profile pk
+        """
+        try:
+            card = LoyaltyCard.objects.select_related('profile').get(profile__id=pk)
+        except LoyaltyCard.DoesNotExist:
+            return Response({"detail": "Loyalty card not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = LoyaltyCardSerializer(card)
+        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -3,7 +3,7 @@ from rest_framework.pagination import PageNumberPagination
 from apps.product.serializers import (
     ProductItemSerializer,
 )
-from .models import Bonus
+from .models import Bonus, LoyaltyCard
 from apps.product.models import Phone, Ticket, Good
 from .models import Order, OrderItem, Information, Service, SocialMedia
 
@@ -179,3 +179,23 @@ class BonusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bonus
         fields = "__all__"
+
+
+class LoyaltyCardSerializer(serializers.ModelSerializer):
+    full_name = serializers.CharField(source='profile.full_name', read_only=True)
+
+    class Meta:
+        model = LoyaltyCard
+        fields = [
+            'id',
+            'profile',  # id профиля
+            'full_name',  # имя пользователя
+            'current_balance',
+            'cycle_start',
+            'cycle_end',
+            'cycle_days',
+            'cycle_number',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = ['id', 'full_name', 'created_at', 'updated_at']

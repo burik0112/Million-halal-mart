@@ -1,4 +1,8 @@
+from datetime import timedelta
+
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 from model_utils.models import TimeStampedModel
 from django.db.models import F
 from ckeditor.fields import RichTextField
@@ -6,6 +10,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from decimal import Decimal
 from django.db.models import F, fields, ExpressionWrapper
+
+from apps.customer.models import Profile, Location
+from apps.product.models import ProductItem
 
 
 class Order(TimeStampedModel, models.Model):
@@ -16,178 +23,30 @@ class Order(TimeStampedModel, models.Model):
         ("sent", "Yuborildi"),
         ("cancelled", "Bekor qilindi"),
     )
+
     user = models.ForeignKey(
-        "customer.Profile", on_delete=models.CASCADE, related_name="order"
+        Profile, on_delete=models.CASCADE, related_name="order"
     )
     products = models.ManyToManyField(
-        "product.ProductItem", through="OrderItem", related_name="order"
+        ProductItem, through="OrderItem", related_name="order"
     )
     comment = models.TextField(blank=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="in_cart")
-    location = models.ForeignKey(
-        "customer.Location", on_delete=models.SET_NULL, null=True
-    )
-    total_amount = models.DecimalField(decimal_places=0, max_digits=20, default=0.00)
+    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
+    total_amount = models.DecimalField(decimal_places=0, max_digits=20, default=0)
 
-    def get_product_details(self, product_item, order_item):
-        if (
-            hasattr(product_item, "product")
-            and hasattr(product_item.product, "new_price")
-            and hasattr(product_item.product, "old_price")
-        ):
-            price = (
-                product_item.product.new_price
-                if product_item.product.new_price > 0
-                else product_item.product.old_price
-            )
-            total_amount = price * order_item.quantity
+    # ---------------- LOYALTY BONUS ----------------
+    def create_loyalty_pending_bonus(self):
+        if LoyaltyPendingBonus.objects.filter(order=self).exists():
+            return
 
-            product_instance = product_item.product
+        total = Decimal(0)
 
-            if hasattr(product_instance, "goods"):
-                return f"{product_instance.goods.name_uz} x {order_item.quantity} {product_instance.get_measure_display()} = {total_amount} ₩"
-            elif hasattr(product_instance, "tickets"):
-                return f"{product_instance.tickets.event_name_uz} x {order_item.quantity} {product_instance.get_measure_display()} = {total_amount} ₩"
-            elif hasattr(product_instance, "phones"):
-                return f"{product_instance.phones.model_name_uz}/{product_instance.phones.get_ram_display()}/{product_instance.phones.get_storage_display()} x {order_item.quantity} {product_instance.get_measure_display()} = {total_amount} ₩"
+        items = self.orderitem.all()
+        if not items.exists():
+            return
 
-        return "Mahsulot tafsiloti mavjud emas"
-
-    def save(self, *args, **kwargs):
-        # self.update_total_amount()
-        if self.status == "in_cart":
-            existing_order = Order.objects.filter(
-                user=self.user, status="in_cart"
-            ).exclude(pk=self.pk)
-            if existing_order.exists():
-                raise ValueError(
-                    "Foydalanuvchi allaqachon 'in_cart' statusidagi Orderga ega"
-                )
-        # Agar yangi holat 'sent' bo'lsa va oldingi holat 'sent' emas bo'lsa
-        if self.status == "sent" and self.pk is not None:
-            old_status = Order.objects.get(pk=self.pk).status
-            if old_status != "sent":
-                self.update_product_stock()
-        # self.update_total_amount()
-        super(Order, self).save(*args, **kwargs)
-
-    def update_product_stock(self):
-        # Bu yerda 'sent' holatidagi orderlar uchun ProductItem'larni yangilaymiz
-        for item in self.orderitem.all():
-            product_item = item.product
-
-            # Calculate the new value of available_quantity using annotate
-            new_quantity = F("available_quantity") - item.quantity
-            product_item_with_updated_quantity = (
-                product_item.__class__.objects.filter(id=product_item.id)
-                .annotate(
-                    new_available_quantity=ExpressionWrapper(
-                        new_quantity, output_field=fields.PositiveIntegerField()
-                    )
-                )
-                .values("new_available_quantity")
-                .get()
-            )
-
-            if product_item_with_updated_quantity["new_available_quantity"] < 0:
-                response_data = {"error": "Not enough product"}
-                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
-
-            product_item.available_quantity = product_item_with_updated_quantity[
-                "new_available_quantity"
-            ]
-            product_item.save()
-
-    _service_cache = None
-    _bonus_cache = None
-
-    @classmethod
-    def update_service_cache(cls):
-        cls._service_cache = Service.objects.first()
-
-    @classmethod
-    def update_bonus_cache(cls, total):
-        cls._bonus_cache = (
-            Bonus.objects.filter(amount__lte=total, active=True)
-            .order_by("-amount")
-            .first()
-        )
-
-    @property
-    def delivery_fee(self):
-        if not self.__class__._service_cache:
-            self.__class__.update_service_cache()
-
-        total_weight = sum(
-            item.product.weight * item.quantity for item in self.orderitem.all()
-        )
-        if self.__class__._service_cache:
-            delivery_fee = self.__class__._service_cache.delivery_fee
-            weight_factor = Decimal(total_weight // 20)
-            return delivery_fee * (weight_factor + Decimal(1))
-        return Decimal(0)
-
-    # @property
-    # def bonus_amount(self):
-    #     total = sum(
-    #         (
-    #             item.product.new_price
-    #             if item.product.new_price > 0
-    #             else item.product.old_price
-    #         )
-    #         * item.quantity
-    #         for item in self.orderitem.all()
-    #     )
-
-    #     if not self.__class__._bonus_cache:
-    #         self.__class__.update_bonus_cache(total)
-
-    #     if self.__class__._bonus_cache:
-    #         return {
-    #             "amount": self.__class__._bonus_cache.amount,
-    #             "percentage": self.__class__._bonus_cache.percentage,
-    #         }
-    #     return None
-    # @property
-    # def delivery_fee(self):
-    #     total_weight = 0
-    #     for item in self.orderitem.all():
-    #         total_weight += item.product.weight * item.quantity
-
-    #     # Pochta xarajatlarini hisoblash
-    #     service = Service.objects.first()  # Pochta xizmati olish
-    #     if service:
-    #         delivery_fee = service.delivery_fee
-    #         weight_factor = Decimal(
-    #             total_weight // 20
-    #         )  # Har 20 kg uchun qo'shimcha pochta xarajati
-    #         total_delivery_fee = delivery_fee * (weight_factor + Decimal(1))
-    #     else:
-    #         total_delivery_fee = Decimal(0)
-
-    #     return total_delivery_fee
-    @property
-    def bonus_amount(self):
-        total = 0
-        for item in self.orderitem.all():
-            price = item.product.new_price if item.product.new_price > 0 else item.product.old_price
-            total += price * item.quantity
-
-        # Bonuslarni tekshirish
-        applicable_bonus = (
-            Bonus.objects.filter(amount__lte=total, active=True)
-            .order_by("-amount")
-            .first()
-        )
-        if applicable_bonus:
-            return {
-                "amount": applicable_bonus.amount,
-                "percentage": applicable_bonus.percentage
-            }
-        return None
-    def update_total_amount(self):
-        total = 0
-        for item in self.orderitem.all():
+        for item in items:
             price = (
                 item.product.new_price
                 if item.product.new_price > 0
@@ -195,30 +54,55 @@ class Order(TimeStampedModel, models.Model):
             )
             total += price * item.quantity
 
-        # Bonuslarni tekshirish
-        applicable_bonus = (
-            Bonus.objects.filter(amount__lte=total, active=True)
-            .order_by("-amount")
-            .first()
+        if total <= 0:
+            return
+
+        LoyaltyPendingBonus.objects.create(
+            profile=self.user,
+            order=self,
+            username=self.user.full_name or self.user.phone_number,
+            order_amount=total,
         )
-        if applicable_bonus:
-            discount_percentage = Decimal(applicable_bonus.percentage) / Decimal(100)
-            discount = total * discount_percentage
-            total -= discount
 
-        self.total_amount = total
-        self.save(update_fields=["total_amount"])
+    # ---------------- SAVE ----------------
+    def save(self, *args, **kwargs):
+        old_status = None
+        if self.pk:
+            old_status = Order.objects.get(pk=self.pk).status
 
+        # 1️⃣ Сохраняем order, чтобы был pk
+        super().save(*args, **kwargs)
+
+        # 2️⃣ Считаем сумму заказа
+        total = Decimal(0)
+        items = self.orderitem.all()
+
+        for item in items:
+            price = (
+                item.product.new_price
+                if item.product.new_price > 0
+                else item.product.old_price
+            )
+            total += price * item.quantity
+
+        # 4️⃣ Создаём pending bonus ТОЛЬКО при переходе в sent
+        if self.status == "sent" and old_status != "sent":
+            self.create_loyalty_pending_bonus()
+
+    # ---------------- STOCK UPDATE ----------------
+    def update_product_stock(self):
+        for item in self.orderitem.all():
+            product_item = item.product
+            product_item.available_quantity -= item.quantity
+            if product_item.available_quantity < 0:
+                raise ValidationError(f"Not enough product: {product_item.name}")
+            product_item.save()
+
+    # ---------------- HELPER METHODS ----------------
     def get_status_display_value(self):
-        """
-        Returns the human-readable value for the status.
-        """
         return dict(self.STATUS_CHOICES).get(self.status, "Unknown")
 
     def get_order_items(self):
-        """
-        Order bilan bog'liq barcha OrderItem'larni qaytaradi.
-        """
         return self.orderitem.all().order_by("-pk")
 
 
@@ -274,3 +158,143 @@ class Bonus(TimeStampedModel, models.Model):
 
     def __str__(self) -> str:
         return self.title if len(self.title) > 0 else str(self.amount)
+
+
+class LoyaltyCard(models.Model):
+    profile = models.OneToOneField(
+        Profile,
+        on_delete=models.CASCADE,
+        related_name='loyalty_card'
+    )
+    current_balance = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0
+    )
+    cycle_start = models.DateField()
+    cycle_end = models.DateField()
+    cycle_days = models.PositiveIntegerField(default=60)
+    cycle_number = models.PositiveIntegerField(default=1)
+
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+
+
+    def __str__(self):
+        return f"LoyaltyCard({self.profile})"
+
+
+class LoyaltyPendingBonus(models.Model):
+    STATUS_CHOICES = (
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+    )
+
+    profile = models.ForeignKey(
+        "customer.Profile",
+        on_delete=models.CASCADE
+    )
+    order = models.OneToOneField(
+        "merchant.Order",
+        on_delete=models.CASCADE,
+        related_name="pending_bonus"
+    )
+
+    order_name = models.CharField(max_length=255)
+    order_amount = models.DecimalField(max_digits=20, decimal_places=0)
+
+    percent = models.PositiveIntegerField(null=True, blank=True)
+    bonus_amount = models.DecimalField(
+        max_digits=20,
+        decimal_places=0,
+        default=0
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        """
+        Автоматический расчёт bonus_amount:
+        - только если статус approved
+        - только если percent указан
+        """
+        if self.status == "approved" and self.percent:
+            # Приводим к Decimal для точного вычисления
+            self.bonus_amount = Decimal(self.order_amount) * Decimal(self.percent) / Decimal(100)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.order_name} | {self.order_amount}"
+
+
+class Referral(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('rewarded', 'Rewarded'),
+        ('expired', 'Expired'),
+    )
+
+    referrer = models.ForeignKey(
+        Profile,
+        on_delete=models.CASCADE,
+        related_name='referrals_made'
+    )
+    referee = models.ForeignKey(
+        Profile,
+        on_delete=models.CASCADE,
+        related_name='referrals_received'
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('referrer', 'referee')  # только 1 раз
+
+    def __str__(self):
+        return f"{self.referrer.full_name} -> {self.referee.full_name} | {self.status}"
+
+
+class WalletTransaction(models.Model):
+    TYPE_CHOICES = (
+        ('loyalty', 'Loyalty'),
+        ('referral', 'Referral'),
+        ('spend', 'Spend'),
+    )
+
+    profile = models.ForeignKey(
+        Profile,
+        on_delete=models.CASCADE,
+        related_name='wallet_transactions'
+    )
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2
+    )
+    type = models.CharField(
+        max_length=10,
+        choices=TYPE_CHOICES
+    )
+    reference_id = models.PositiveIntegerField(
+        null=True,
+        blank=True
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Transaction({self.user_id}, {self.type}, {self.amount})"
+

@@ -9,7 +9,7 @@ from rest_framework.generics import (
 from django.utils.translation import gettext_lazy as _
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, status, permissions
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from twilio.rest import Client
 from django.conf import settings
 from rest_framework.response import Response
@@ -31,8 +31,9 @@ from .serializers import (
     LoginSerializer,
     RegisterSerializer,
     VerifyOTPSerializer,
-    SetPasswordSerializer,
+    SetPasswordSerializer
 )
+from ..merchant.models import Referral
 
 
 class LoginView(APIView):
@@ -58,6 +59,7 @@ class LoginView(APIView):
 class ProfileCreateAPIView(CreateAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+
 
 
 class ProfileUpdate(APIView):
@@ -213,26 +215,31 @@ class RegisterView(APIView):
         serializer.is_valid(raise_exception=True)
         phone_number = serializer.validated_data["phone_number"]
         full_name = serializer.validated_data.get("full_name", "")
-        try:
-            otp = generate_otp()
-            send_otp_sms(phone_number, otp)
-        except Exception as e:
-            return Response(
-                {"message": "OTP yuborishda xatolik yuz berdi."},
-                status=status.HTTP_408_REQUEST_TIMEOUT,
-            )
-        user, _ = User.objects.get_or_create(username=phone_number)
-        profile, _ = Profile.objects.update_or_create(
-            origin=user,
-            defaults={"phone_number": phone_number, "full_name": full_name, "otp": otp},
-        )
+        referral_code = serializer.validated_data.get("referral_code")  # если пришёл
 
-        return Response(
-            {
-                "message": "OTP sent successfully. Please verify to complete registration."
-            },
-            status=status.HTTP_200_OK,
-        )
+        with transaction.atomic():
+            user, _ = User.objects.get_or_create(username=phone_number)
+            profile, created = Profile.objects.get_or_create(
+                origin=user,
+                defaults={"full_name": full_name, "phone_number": phone_number}
+            )
+
+            # Проверяем реферала
+            if referral_code:
+                try:
+                    referrer = Profile.objects.get(referral_code=referral_code)
+                    if referrer != profile:
+                        Referral.objects.get_or_create(
+                            referrer=referrer,
+                            referee=profile
+                        )
+                except Profile.DoesNotExist:
+                    pass  # реферал не найден — игнорируем
+
+        return Response({
+            "message": "User registered successfully",
+            "referral_code": profile.referral_code
+        })
 
 
 def send_otp_sms(phone_number, otp):
@@ -339,3 +346,4 @@ class MarkNewsAsViewed(APIView):
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

@@ -17,8 +17,6 @@ from django.core.exceptions import ImproperlyConfigured
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -47,29 +45,29 @@ LOGIN_REDIRECT_URL = "dashboard"
 # Application definition
 LOCAL_APPS = [
     "apps.product",
-    "apps.customer",
-    "apps.merchant",
+    'apps.merchant.apps.MerchantConfig',
+    'apps.customer.apps.CustomerConfig',
 ]
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 INSTALLED_APPS = [
-    "modeltranslation",
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    "drf_yasg",
-    "django_filters",
-    "rest_framework",
-    "rest_framework.authtoken",
-    "corsheaders",
-    "ckeditor",
-    "ckeditor_uploader",
-    "debug_toolbar",
-] + LOCAL_APPS
+                     "modeltranslation",
+                     "django.contrib.admin",
+                     "django.contrib.auth",
+                     "django.contrib.contenttypes",
+                     "django.contrib.sessions",
+                     "django.contrib.messages",
+                     "django.contrib.staticfiles",
+                     "drf_yasg",
+                     "django_filters",
+                     "rest_framework",
+                     "rest_framework.authtoken",
+                     "corsheaders",
+                     "ckeditor",
+                     "ckeditor_uploader",
+                     "debug_toolbar",
+                 ] + LOCAL_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -98,7 +96,6 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
-
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -203,3 +200,12 @@ TWILIO_PHONE_NUMBER = config("TWILIO_PHONE_NUMBER")
 FCM_SERVER_KEY = config("FCM_SERVER_KEY")
 
 DOMAIN_NAME = "https://millionmart.uz"
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
+
+SWAGGER_SETTINGS = {'SCHEMES': ['https']}

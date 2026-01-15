@@ -13,3 +13,4 @@ admin.site.register(News, NewsAdmin)
 admin.site.register(ViewedNews)
 admin.site.register(Favorite)
 admin.site.register(Banner)
+

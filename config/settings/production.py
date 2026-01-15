@@ -6,16 +6,16 @@ from config.settings.base import *
 
 DEBUG = config("DEBUG")
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME"),
-        "USER": config("BOUNCER_USER"),
-        "PASSWORD": config("BOUNCER_PASSWORD"),
-        "HOST": config("BOUNCER_HOST"),
-        "PORT": config("BOUNCER_PORT"),
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": config("DB_NAME"),
+#         "USER": config("BOUNCER_USER"),
+#         "PASSWORD": config("BOUNCER_PASSWORD"),
+#         "HOST": config("BOUNCER_HOST"),
+#         "PORT": config("BOUNCER_PORT"),
+#     }
+# }
 # SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
