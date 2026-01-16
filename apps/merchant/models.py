@@ -244,12 +244,12 @@ class Referral(models.Model):
     )
 
     referrer = models.ForeignKey(
-        Profile,
+        'customer.Profile',  # <--- ИСПРАВЬ ЗДЕСЬ (добавь customer.)
         on_delete=models.CASCADE,
         related_name='referrals_made'
     )
     referee = models.ForeignKey(
-        Profile,
+        'customer.Profile',  # <--- ИСПРАВЬ ЗДЕСЬ (добавь customer.)
         on_delete=models.CASCADE,
         related_name='referrals_received'
     )
@@ -258,25 +258,26 @@ class Referral(models.Model):
         choices=STATUS_CHOICES,
         default='pending'
     )
-
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        # 1. Проверяем, существует ли уже эта запись в базе (чтобы понять, изменился ли статус)
+        # Логика автоматического начисления при создании
+        if not self.pk and self.status == 'rewarded':
+            super().save(*args, **kwargs)
+            self.make_rewarded_logic()
+            return
+
+        # Логика при обновлении статуса
         if self.pk:
             old_status = Referral.objects.get(pk=self.pk).status
-            # 2. Если старый статус был 'pending', а новый стал 'rewarded'
             if old_status == 'pending' and self.status == 'rewarded':
                 self.make_rewarded_logic()
 
         super().save(*args, **kwargs)
 
     def make_rewarded_logic(self):
-        """Внутренняя логика начисления бонуса"""
+        from .models import LoyaltyCard
         with transaction.atomic():
-            from .models import LoyaltyCard  # Импорт внутри для избежания ошибок
-
-            # Находим или создаем карту лояльности пригласителя
             card, created = LoyaltyCard.objects.get_or_create(
                 profile=self.referrer,
                 defaults={
@@ -285,17 +286,14 @@ class Referral(models.Model):
                     'current_balance': 0
                 }
             )
-
-            # Начисляем 5000 вон
             card.current_balance = F('current_balance') + 5000
             card.save()
-            print(f"Бонус 5000 начислен для {self.referrer.full_name}")
 
     class Meta:
-        unique_together = ('referrer', 'referee')  # только 1 раз
+        unique_together = ('referrer', 'referee')
 
     def __str__(self):
-        return f"{self.referrer.full_name} -> {self.referee.full_name} | {self.status}"
+        return f"{self.referrer.full_name} -> {self.referee.full_name}"
 
 
 class WalletTransaction(models.Model):

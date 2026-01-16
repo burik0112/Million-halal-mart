@@ -226,7 +226,6 @@ class RegisterView(APIView):
         full_name = serializer.validated_data.get("full_name", "")
         referral_code = serializer.validated_data.get("referral_code")
 
-        # 1. Генерируем случайный 4-значный или 6-значный код
         otp_code = str(random.randint(1000, 9999))
 
         with transaction.atomic():
@@ -236,36 +235,34 @@ class RegisterView(APIView):
                 defaults={
                     "full_name": full_name,
                     "phone_number": phone_number,
-                    "otp": otp_code  # 2. Сохраняем код в профиль
+                    "otp": otp_code
                 }
             )
 
-            # Если профиль уже был, но мы перерегистрируемся (запросили новый код)
             if not profile_created:
                 profile.otp = otp_code
                 profile.save()
 
-            # Логика реферала (остается твоя)
+            # Логика реферала
             if profile_created and referral_code:
                 try:
                     referrer = Profile.objects.get(referral_code=referral_code)
                     if referrer != profile:
-                        Referral.objects.get_or_create(
+                        # ВАЖНО: Ставим сразу статус 'rewarded'
+                        Referral.objects.create(
                             referrer=referrer,
                             referee=profile,
-                            defaults={'status': 'pending'}
+                            status='rewarded' # Теперь бонус начислится сам через метод save()
                         )
                 except Profile.DoesNotExist:
                     pass
 
-        # 3. ВЫЗЫВАЕМ ОТПРАВКУ СМС (делаем это ВНЕ транзакции atomic)
-        # Это важно: если СМС не отправится, база данных все равно сохранит юзера
         send_otp_sms(phone_number, otp_code)
 
         return Response({
             "message": "OTP code sent to your phone",
             "referral_code": profile.referral_code,
-            "otp_debug": otp_code # Удали эту строку в продакшене, это только для теста!
+            "otp_debug": otp_code
         })
 
 

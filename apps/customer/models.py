@@ -15,6 +15,12 @@ def generate_referral_code(length=8):
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
 class User(AbstractUser):
+    img = models.ImageField(
+        upload_to='wholesaler',
+        null=True,
+        blank=True,
+        verbose_name="Rasm"
+    )
     is_wholesaler = models.BooleanField(default=False) # Optomchi xaridor
     is_approved = models.BooleanField(default=False)  # Admin tasdig'i
 
@@ -24,7 +30,10 @@ class User(AbstractUser):
 
 
 
-class Profile(TimeStampedModel, models.Model):
+def generate_referral_code():
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+
+class Profile(models.Model): # Удали TimeStampedModel если она вызывает ошибки, или оставь если она есть
     LANG = (("uz", "UZ"), ("ru", "RU"), ("en", "EN"), ("kr", "KR"))
     origin = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=255)
@@ -35,13 +44,12 @@ class Profile(TimeStampedModel, models.Model):
     referral_code = models.CharField(
         max_length=20,
         unique=True,
-        blank = True,  # <--- ДОБАВЬ ЭТО: позволяет оставлять поле пустым в админке
-        null = True
+        blank=True,
+        null=True
     )
 
     def save(self, *args, **kwargs):
         if not self.referral_code:
-            # Генерируем уникальный код
             while True:
                 code = generate_referral_code()
                 if not Profile.objects.filter(referral_code=code).exists():
@@ -49,9 +57,9 @@ class Profile(TimeStampedModel, models.Model):
                     break
         super().save(*args, **kwargs)
 
-
-def __str__(self) -> str:
-    return self.origin.username
+    # ВАЖНО: def __str__ должен быть ВНУТРИ класса (с отступом)
+    def __str__(self) -> str:
+        return f"{self.full_name} ({self.origin.username})"
 
 
 class Location(TimeStampedModel, models.Model):

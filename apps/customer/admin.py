@@ -7,7 +7,7 @@ from .models import *
 class NewsAdmin(admin.ModelAdmin):
     list_display=['start_date','title', 'end_date', 'description']
 class ProfileAdmin(admin.ModelAdmin):
-    list_display=['phone_number','full_name', 'created']
+    list_display=['phone_number','full_name']
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Location)
 admin.site.register(News, NewsAdmin)
@@ -16,27 +16,22 @@ admin.site.register(Favorite)
 admin.site.register(Banner)
 
 
-@admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    # 1. Ro'yxatda ko'rinadigan ustunlar
-    list_display = ('username', 'email', 'is_wholesaler', 'is_approved', 'is_staff')
+    # Добавляем новые поля в список отображения (в таблице)
+    list_display = ('username' ,'is_wholesaler', 'is_approved', 'is_staff', 'img')
 
-    # 2. Yon tomondagi filtrlar
-    list_filter = ('is_wholesaler', 'is_approved', 'is_staff', 'is_superuser')
-
-    # 3. Foydalanuvchini tahrirlash sahifasida yangi maydonlarni qo'shish
-    # Standard UserAdmin fieldsetlariga bizning maydonlarni qo'shamiz
+    # Добавляем новые поля в форму редактирования (когда нажал на юзера)
     fieldsets = UserAdmin.fieldsets + (
-        ('Optomchi Maqomi', {'fields': ('is_wholesaler', 'is_approved')}),
+        (None, {'fields': ('img', 'is_wholesaler', 'is_approved')}),
     )
 
-    # 4. Yangi foydalanuvchi yaratish sahifasida ko'rinishi
+    # Добавляем новые поля в форму создания (когда нажимаешь "Add User")
     add_fieldsets = UserAdmin.add_fieldsets + (
-        ('Optomchi Maqomi', {'fields': ('is_wholesaler', 'is_approved')}),
+        (None, {'fields': ('img', 'is_wholesaler', 'is_approved')}),
     )
 
-    # 5. Admin panelning o'zidan turib tezkor tasdiqlash (Action)
-    actions = ['approve_wholesalers', 'unapprove_wholesalers']
+
+
 
     @admin.action(description="Tanlanganlarni optomchi sifatida tasdiqlash")
     def approve_wholesalers(self, request, queryset):
@@ -47,3 +42,6 @@ class CustomUserAdmin(UserAdmin):
     def unapprove_wholesalers(self, request, queryset):
         updated = queryset.update(is_approved=False)
         self.message_user(request, f"{updated} ta foydalanuvchidan tasdiq olib tashlandi.")
+
+# Регистрируем модель с новыми настройками
+admin.site.register(User, CustomUserAdmin)
