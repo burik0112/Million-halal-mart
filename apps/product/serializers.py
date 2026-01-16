@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import AllowAny
 
 from apps.customer.models import Favorite
 
@@ -32,16 +33,24 @@ class ImageSerializer(serializers.ModelSerializer):
 
 
 class ProductItemSerializer(serializers.ModelSerializer):
-    sale = serializers.SerializerMethodField()
-    images = ImageSerializer(many=True, read_only=True)
+    current_price = serializers.SerializerMethodField()
+    sale = serializers.ReadOnlyField()
 
     class Meta:
         model = ProductItem
         fields = "__all__"
 
-    def get_sale(self, obj):
-        """ProductItem obyektining price_reduction_percentage xususiyatini qaytaradi."""
-        return obj.sale
+    def get_current_price(self, obj):
+        request = self.context.get('request')
+        user = request.user if request else None
+
+        # Optomchi va tasdiqlangan bo'lsa optom narxni ko'rsatish
+        if user and user.is_authenticated and getattr(user, 'is_wholesaler', False) and getattr(user, 'is_approved',
+                                                                                                False):
+            if obj.wholesale_price > 0:
+                return obj.wholesale_price
+
+        return obj.new_price
 
 
 class TicketSerializer(ProductItemCreatorMixin):
@@ -211,3 +220,5 @@ class TicketVariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = "__all__"
+
+

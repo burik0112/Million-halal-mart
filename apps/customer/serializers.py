@@ -83,6 +83,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=17)
     full_name = serializers.CharField(max_length=255, required=False, allow_blank=True)
+    referral_code = serializers.CharField(max_length=20, required=False, allow_blank=True)
 
     def validate_phone_number(self, value):
         # Telefon raqamini validatsiya qilish

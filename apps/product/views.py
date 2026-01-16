@@ -4,12 +4,16 @@ from rest_framework.filters import SearchFilter
 from django.conf import settings
 from rest_framework.generics import ListAPIView
 from rest_framework import views, status
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.db.models import Q, Exists, OuterRef, F, Sum, Value, BooleanField
 
 from django.db.models import Prefetch
+from rest_framework.views import APIView
+
 from apps.customer.models import Favorite
 from .models import Category, Good, Image, Phone, SubCategory, Ticket, ProductItem
+from .permissions import IsApprovedWholesaler
 from .serializers import (
     CategorySerializer,
     CustomPageNumberPagination,
@@ -23,7 +27,7 @@ from .serializers import (
     TicketPopularSerializer,
     PhonePopularSerializer,
     GoodPopularSerializer,
-    TicketVariantSerializer,
+    TicketVariantSerializer, ProductItemSerializer,
 )
 
 # Create your views here.
@@ -397,3 +401,40 @@ class MultiProductSearchView(views.APIView):
         }
 
         return Response(results)
+
+
+
+class RegularProductListAPIView(ListAPIView):
+    queryset = ProductItem.objects.filter(active=True)
+    serializer_class = ProductItemSerializer
+    permission_classes = [AllowAny]
+
+    # Generic ichidagi funksiyani override qilish
+    def get_queryset(self):
+        # Bu yerda qo'shimcha filtrlar yozish mumkin
+        queryset = super().get_queryset()
+        # Masalan, qidiruv (search) kiritish mumkin:
+        q = self.request.query_params.get('search')
+        if q:
+            queryset = queryset.filter(desc__icontains=q)
+        return queryset
+
+    # Serializerga context yuborishni ta'minlash
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        return context
+
+
+class WholesaleProductAPIView(APIView):
+    # Faqat tasdiqlangan optomchilar kira oladi
+    permission_classes = [IsApprovedWholesaler]
+
+    def get(self, request):
+        # Faqat optom narxi bor va aktiv mahsulotlarni olamiz
+        products = ProductItem.objects.filter(active=True, wholesale_price__gt=0)
+
+        # Serializerga requestni context qilib yuboramiz (user statusini bilish uchun)
+        serializer = ProductItemSerializer(products, many=True, context={'request': request})
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

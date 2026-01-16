@@ -76,18 +76,16 @@ class LoyaltyPendingBonusAdmin(admin.ModelAdmin):
 
 
 @admin.register(Referral)
-class ReferralModelAdmin(admin.ModelAdmin):
-    list_display = [
-        'referrer',
-        'referee',
-        'status',
-        'created_at'
-    ]
-    list_filter = ['status', 'created_at']
-    search_fields = [
-        'referrer__username',
-        'referee__username'
-    ]
+class ReferralAdmin(admin.ModelAdmin):
+    list_display = ('referrer', 'referee', 'status', 'created_at')
+    list_filter = ('status',)
+    actions = ['approve_referral_bonus']
+
+    def approve_referral_bonus(self, request, queryset):
+        for ref in queryset:
+            if ref.status == 'pending':
+                ref.status = 'rewarded'  # Меняем статус
+                ref.save()  # Это само вызовет нашу логику из метода save()
 
 
 

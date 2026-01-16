@@ -1,7 +1,7 @@
-from datetime import timedelta
+from datetime import timedelta, date
 
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from model_utils.models import TimeStampedModel
 from django.db.models import F
@@ -260,6 +260,36 @@ class Referral(models.Model):
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        # 1. Проверяем, существует ли уже эта запись в базе (чтобы понять, изменился ли статус)
+        if self.pk:
+            old_status = Referral.objects.get(pk=self.pk).status
+            # 2. Если старый статус был 'pending', а новый стал 'rewarded'
+            if old_status == 'pending' and self.status == 'rewarded':
+                self.make_rewarded_logic()
+
+        super().save(*args, **kwargs)
+
+    def make_rewarded_logic(self):
+        """Внутренняя логика начисления бонуса"""
+        with transaction.atomic():
+            from .models import LoyaltyCard  # Импорт внутри для избежания ошибок
+
+            # Находим или создаем карту лояльности пригласителя
+            card, created = LoyaltyCard.objects.get_or_create(
+                profile=self.referrer,
+                defaults={
+                    'cycle_start': date.today(),
+                    'cycle_end': date.today() + timedelta(days=60),
+                    'current_balance': 0
+                }
+            )
+
+            # Начисляем 5000 вон
+            card.current_balance = F('current_balance') + 5000
+            card.save()
+            print(f"Бонус 5000 начислен для {self.referrer.full_name}")
 
     class Meta:
         unique_together = ('referrer', 'referee')  # только 1 раз

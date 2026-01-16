@@ -209,3 +209,4 @@ DATABASES = {
 }
 
 SWAGGER_SETTINGS = {'SCHEMES': ['https']}
+AUTH_USER_MODEL = 'customer.User'

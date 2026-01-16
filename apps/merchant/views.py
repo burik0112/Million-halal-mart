@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import (
@@ -25,9 +26,11 @@ from .serializers import (
     OrderListSerializer,
     OrderCreateSerializer,
     SocialMediaSerializer,
-    BonusSerializer, LoyaltyCardSerializer,
+    BonusSerializer, LoyaltyCardSerializer, UserBonusSerializer,
 )
 from apps.dashboard.main import bot
+from ..customer.models import Profile
+
 
 # Create your views here.
 
@@ -305,3 +308,28 @@ class LoyaltyCardDetailAPIView(APIView):
 
         serializer = LoyaltyCardSerializer(card)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class MyBonusScreenAPIView(APIView):
+    """
+    Экран бонусов конкретного профиля по его ID (pk).
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        # 1. Ищем профиль по pk (ID). Если не найден — вернет 404.
+        profile = get_object_or_404(Profile, pk=pk)
+
+        # 2. БЕЗОПАСНОСТЬ: Проверяем, что этот профиль принадлежит именно залогиненному юзеру
+        # Если ты хочешь, чтобы АДМИН тоже мог смотреть, можно добавить: or request.user.is_staff
+        if profile.origin != request.user:
+            return Response(
+                {"error": "У вас нет прав для просмотра этого профиля."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # 3. Передаем найденный профиль в сериализатор
+        serializer = UserBonusSerializer(profile)
+
+        # 4. Возвращаем результат
+        return Response(serializer.data)

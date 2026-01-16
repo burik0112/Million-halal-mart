@@ -1,4 +1,6 @@
 from django.urls import path
+
+
 from .views import (
     GoodVariantsAPIView,
     NewPhonesListView,
@@ -18,7 +20,7 @@ from .views import (
     GoodListAPIView,
     NewGoodsListView,
     ImageListAPIView,
-    MultiProductSearchView,
+    MultiProductSearchView, WholesaleProductAPIView, RegularProductListAPIView,
 )
 
 urlpatterns = [
@@ -41,4 +43,9 @@ urlpatterns = [
     path("sale-goods/list/", GoodsOnSaleListView.as_view()),
     path("images/list/", ImageListAPIView.as_view()),
     path("product-search/", MultiProductSearchView.as_view()),
+    # Oddiy xaridorlar uchun endpoint
+    path('products/', RegularProductListAPIView.as_view(), name='product-list'),
+
+    # Faqat optomchilar uchun alohida oyna (endpoint)
+    path('wholesale-shop/', WholesaleProductAPIView.as_view(), name='wholesale-list'),
 ]

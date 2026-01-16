@@ -3,9 +3,10 @@ from rest_framework.pagination import PageNumberPagination
 from apps.product.serializers import (
     ProductItemSerializer,
 )
-from .models import Bonus, LoyaltyCard
+from .models import Bonus, LoyaltyCard, Referral
 from apps.product.models import Phone, Ticket, Good
 from .models import Order, OrderItem, Information, Service, SocialMedia
+from ..customer.models import Profile
 
 
 class CustomPageNumberPagination(PageNumberPagination):
@@ -199,3 +200,31 @@ class LoyaltyCardSerializer(serializers.ModelSerializer):
             'updated_at',
         ]
         read_only_fields = ['id', 'full_name', 'created_at', 'updated_at']
+
+
+
+class MyReferralHistorySerializer(serializers.ModelSerializer):
+    friend_name = serializers.CharField(source='referee.full_name', read_only=True)
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+
+    class Meta:
+        model = Referral
+        fields = ['friend_name', 'status', 'created_at']
+
+class UserBonusSerializer(serializers.ModelSerializer):
+    balance = serializers.SerializerMethodField()
+    my_referrals_list = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Profile
+        fields = ['id', 'full_name', 'referral_code', 'balance', 'my_referrals_list']
+
+    def get_balance(self, obj):
+        try:
+            return obj.loyalty_card.current_balance
+        except:
+            return 0
+
+    def get_my_referrals_list(self, obj):
+        invites = Referral.objects.filter(referrer=obj).order_by('-created_at')
+        return MyReferralHistorySerializer(invites, many=True).data

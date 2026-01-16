@@ -1,9 +1,12 @@
 import random, string
 
-
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.contrib.auth.models import User, AbstractUser
 from django.db import models
 from model_utils.models import TimeStampedModel
+
+
+
 
 # Create your models here.
 
@@ -11,11 +14,19 @@ def generate_referral_code(length=8):
     """Генерирует уникальный код из букв и цифр"""
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
+class User(AbstractUser):
+    is_wholesaler = models.BooleanField(default=False) # Optomchi xaridor
+    is_approved = models.BooleanField(default=False)  # Admin tasdig'i
+
+    def __str__(self):
+        return self.username
+
+
 
 
 class Profile(TimeStampedModel, models.Model):
     LANG = (("uz", "UZ"), ("ru", "RU"), ("en", "EN"), ("kr", "KR"))
-    origin = models.OneToOneField(User, on_delete=models.CASCADE)
+    origin = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=17)
     lang = models.CharField(max_length=2, choices=LANG, default="uz")
@@ -23,7 +34,9 @@ class Profile(TimeStampedModel, models.Model):
     otp = models.CharField(max_length=100, null=True, blank=True)
     referral_code = models.CharField(
         max_length=20,
-        unique=True
+        unique=True,
+        blank = True,  # <--- ДОБАВЬ ЭТО: позволяет оставлять поле пустым в админке
+        null = True
     )
 
     def save(self, *args, **kwargs):
@@ -38,7 +51,7 @@ class Profile(TimeStampedModel, models.Model):
 
 
 def __str__(self) -> str:
-        return self.origin.username
+    return self.origin.username
 
 
 class Location(TimeStampedModel, models.Model):
@@ -106,3 +119,15 @@ class Banner(TimeStampedModel, models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+
+
+
+class Product(models.Model):
+    name = models.CharField(max_length=255)
+    retail_price = models.DecimalField(max_digits=10, decimal_places=2) # Oddiy narx
+    wholesale_price = models.DecimalField(max_digits=10, decimal_places=2) # Optom narx
+    min_wholesale_quantity = models.IntegerField(default=10) # Minimal optom miqdori
+
+    def __str__(self):
+        return self.name

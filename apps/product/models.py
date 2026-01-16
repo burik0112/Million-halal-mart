@@ -40,48 +40,57 @@ class ProductItem(TimeStampedModel, models.Model):
         (3, "PAKET"),
     )
     desc = models.TextField()
+    product_type = models.UUIDField(default=uuid.uuid4, editable=True)
+
+    # CHAKANA NARXLAR
     old_price = models.DecimalField(
         decimal_places=0, max_digits=10, null=True, blank=True, default=0
     )
-    product_type = models.UUIDField(default=uuid.uuid4, editable=True)
     new_price = models.DecimalField(
         decimal_places=0, max_digits=10, null=True, blank=True, default=0
     )
+
+    # OPTOM NARXLAR (YANGI QO'SHILDI)
+    wholesale_price = models.DecimalField(
+        decimal_places=0, max_digits=10, null=True, blank=True, default=0,
+        help_text="Tasdiqlangan optomchilar uchun narx"
+    )
+    min_wholesale_quantity = models.PositiveIntegerField(
+        default=1,
+        help_text="Optom narxda olish uchun minimal miqdor"
+    )
+
     weight = models.FloatField(default=1, blank=True)
     measure = models.IntegerField(choices=CHOICES, default=0)
     available_quantity = models.PositiveIntegerField(default=0)
     bonus = models.IntegerField(default=0)
-    main=models.BooleanField(default=True)
+    main = models.BooleanField(default=True)
     active = models.BooleanField(default=True)
+
     class Meta:
         indexes = [
             models.Index(fields=['product_type']),
         ]
-    
+
     @property
     def variants(self):
-        return ProductItem.objects.filter(product_type=self.product_type).exclude(
-            id=self.id
-        )
+        return ProductItem.objects.filter(product_type=self.product_type).exclude(id=self.id)
 
     @property
     def sale(self):
-        if self.new_price == 0:
+        """Chegirma foizini hisoblash (Optimallashtirildi)"""
+        if not self.old_price or not self.new_price or self.new_price >= self.old_price:
             return 0
-            """Agar yangi narx eski narxdan past bo'lsa, foizni qaytaradi."""
-        elif self.old_price and self.new_price < self.old_price:
-            return round(abs(1 - self.new_price / self.old_price) * 100)
-        return 0
+        return round((1 - (self.new_price / self.old_price)) * 100)
 
     def price_changed(self):
-        """Narx o'zgarganligini tekshiradi."""
         return self.old_price > self.new_price
 
     def __str__(self) -> str:
-        return str(self.created)
+        # Created o'rniga tavsifni qaytarish qulayroq
+        return f"{self.desc[:30]} ({self.new_price} so'm)"
 
     def get_measure_display(self):
-        """Get the human-readable measure label."""
         return dict(self.CHOICES).get(self.measure, "Unknown")
 
 

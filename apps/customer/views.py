@@ -1,3 +1,7 @@
+import random
+from datetime import date, timedelta
+
+from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import (
@@ -33,8 +37,8 @@ from .serializers import (
     VerifyOTPSerializer,
     SetPasswordSerializer
 )
-from ..merchant.models import Referral
-
+from ..merchant.models import Referral, LoyaltyCard
+User = get_user_model()
 
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):
@@ -209,36 +213,59 @@ class FavoriteRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     serializer_class = FavoriteSerializer
 
 
+from django.db import transaction
+from django.db.models import F
+
+
 class RegisterView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         phone_number = serializer.validated_data["phone_number"]
         full_name = serializer.validated_data.get("full_name", "")
-        referral_code = serializer.validated_data.get("referral_code")  # если пришёл
+        referral_code = serializer.validated_data.get("referral_code")
+
+        # 1. Генерируем случайный 4-значный или 6-значный код
+        otp_code = str(random.randint(1000, 9999))
 
         with transaction.atomic():
             user, _ = User.objects.get_or_create(username=phone_number)
-            profile, created = Profile.objects.get_or_create(
+            profile, profile_created = Profile.objects.get_or_create(
                 origin=user,
-                defaults={"full_name": full_name, "phone_number": phone_number}
+                defaults={
+                    "full_name": full_name,
+                    "phone_number": phone_number,
+                    "otp": otp_code  # 2. Сохраняем код в профиль
+                }
             )
 
-            # Проверяем реферала
-            if referral_code:
+            # Если профиль уже был, но мы перерегистрируемся (запросили новый код)
+            if not profile_created:
+                profile.otp = otp_code
+                profile.save()
+
+            # Логика реферала (остается твоя)
+            if profile_created and referral_code:
                 try:
                     referrer = Profile.objects.get(referral_code=referral_code)
                     if referrer != profile:
                         Referral.objects.get_or_create(
                             referrer=referrer,
-                            referee=profile
+                            referee=profile,
+                            defaults={'status': 'pending'}
                         )
                 except Profile.DoesNotExist:
-                    pass  # реферал не найден — игнорируем
+                    pass
+
+        # 3. ВЫЗЫВАЕМ ОТПРАВКУ СМС (делаем это ВНЕ транзакции atomic)
+        # Это важно: если СМС не отправится, база данных все равно сохранит юзера
+        send_otp_sms(phone_number, otp_code)
 
         return Response({
-            "message": "User registered successfully",
-            "referral_code": profile.referral_code
+            "message": "OTP code sent to your phone",
+            "referral_code": profile.referral_code,
+            "otp_debug": otp_code # Удали эту строку в продакшене, это только для теста!
         })
 
 
