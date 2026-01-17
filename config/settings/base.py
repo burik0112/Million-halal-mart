@@ -203,12 +203,24 @@ FCM_SERVER_KEY = config("FCM_SERVER_KEY")
 
 DOMAIN_NAME = "https://millionmart.uz"
 
-DATABASES = {
-    'default': dj_database_url.config(
-        # Если переменной нет (локально), используем sqlite
-        default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}",
-        conn_max_age=600
-    )
-}
+DATABASE_URL = config("DATABASE_URL", default=None)
+
+if DATABASE_URL:
+    # Настройка для сервера (Render/Heroku)
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True # ОБЯЗАТЕЛЬНО для Postgres на Render
+        )
+    }
+else:
+    # Настройка для локальной разработки
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 SWAGGER_SETTINGS = {'SCHEMES': ['https']}
 AUTH_USER_MODEL = 'customer.User'
