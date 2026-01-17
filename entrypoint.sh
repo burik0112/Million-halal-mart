@@ -1,17 +1,11 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -e
 
-echo 'Waiting for postgres...'
+# Выполняем миграции
+python manage.py migrate --noinput
 
-while ! nc -z $DB_HOSTNAME $DB_PORT; do
-    sleep 0.1
-done
+# Собираем статику
+python manage.py collectstatic --noinput
 
-echo 'PostgreSQL started'
-
-echo 'Running migrations...'
-python manage.py migrate
-
-echo 'Collecting static files...'
-python manage.py collectstatic --no-input
-
-exec "$@"
+# Запускаем сервер (ОБЯЗАТЕЛЬНО проверь путь к wsgi!)
+exec gunicorn config.wsgi:application --bind 0.0.0.0:10000
