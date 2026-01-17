@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 
+import dj_database_url
 from decouple import config
 from django.core.exceptions import ImproperlyConfigured
 import sentry_sdk
@@ -71,6 +72,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Добавь эту строку здесь!
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -202,11 +204,11 @@ FCM_SERVER_KEY = config("FCM_SERVER_KEY")
 DOMAIN_NAME = "https://millionmart.uz"
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    'default': dj_database_url.config(
+        # Если переменной нет (локально), используем sqlite
+        default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}",
+        conn_max_age=600
+    )
 }
-
 SWAGGER_SETTINGS = {'SCHEMES': ['https']}
 AUTH_USER_MODEL = 'customer.User'

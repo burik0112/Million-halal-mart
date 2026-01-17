@@ -1,0 +1,26 @@
+services:
+  # Настройка веб-сервиса (Django)
+  - type: web
+    name: Million-halal-mart  # Название твоего проекта
+    env: python
+    buildCommand: "./build.sh"
+    # Замени 'my_project' на название папки, где лежит файл wsgi.py
+    startCommand: "gunicorn config.wsgi:application"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: eco-db
+          property: connectionString
+      - key: PYTHON_VERSION
+        value: 3.10.0 # Укажи свою версию Python
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+
+databases:
+  # Настройка базы данных PostgreSQL
+  - name: eco-db
+    plan: free # Бесплатный тариф
+    databaseName: eco_database
+    user: admin_user
