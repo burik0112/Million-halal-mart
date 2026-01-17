@@ -9,8 +9,7 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = True
 
 sentry_sdk.init(
-    dsn="твой_dsn",
+    dsn="https://a3fdf4caf4765a08afd9dd01c0d11f41@o4506424091934720.ingest.sentry.io/4506424100323328",
     integrations=[DjangoIntegration()],
-    traces_sample_rate=1.0,
-    send_default_pii=True,
+    # ...
 )
