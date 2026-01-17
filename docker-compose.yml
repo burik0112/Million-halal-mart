@@ -1,20 +1,38 @@
-FROM python:3.10-slim
+version: "3.9"
 
-# Устанавливаем системные зависимости для базы данных
-RUN apt-get update && apt-get install -y libpq-dev gcc && rm -rf /var/lib/apt/lists/*
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    env_file:
+      - ./.env
+    ports:
+      - 8000:8000
+    expose:
+      - 8000
+    depends_on:
+      - db
+  db:
+    image: postgres:16.2
+    # image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+
+volumes:
+  postgres_data:
+
+
 
 WORKDIR /code
-
-# Устанавливаем зависимости Python
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Копируем проект
-COPY . .
-
-# Настройка entrypoint
+# ... другие команды ...
 COPY ./entrypoint.sh /code/entrypoint.sh
 RUN chmod +x /code/entrypoint.sh
 
-# На Render лучше использовать полный путь
-ENTRYPOINT ["/code/entrypoint.sh"]
+# Указывай полный путь:
+CMD ["/code/entrypoint.sh"]
