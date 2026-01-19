@@ -10,6 +10,18 @@ from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
     RetrieveUpdateAPIView,
 )
+# = shu qimni man qoshidim 
+# ADDED FOR SWAGGER
+# ===============================
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+# ===============================
+# ADDED FOR SWAGGER
+# ===============================
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
+
 from django.utils.translation import gettext_lazy as _
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, status, permissions
@@ -22,7 +34,9 @@ from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from .utils import generate_otp
 from .models import Favorite, Location, News, Profile, ViewedNews, Banner
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
 from .serializers import (
     CustomPageNumberPagination,
     FavoriteSerializer,
@@ -42,13 +56,45 @@ from ..merchant.models import Referral, LoyaltyCard
 User = get_user_model()
 
 
+# class LoginView(APIView):
+#     def post(self, request):
+#         serializer = LoginSerializer(data=request.data)
+#         if serializer.is_valid():
+#             user = serializer.validated_data['user']
+
+#             # JWT Token generatsiya qilish
+#             refresh = RefreshToken.for_user(user)
+
+#             return Response({
+#                 'refresh': str(refresh),
+#                 'access': str(refresh.access_token),
+#                 'full_name': serializer.validated_data['profile'].full_name,
+#                 'message': "Muvaffaqiyatli kirdingiz"
+#             }, status=status.HTTP_200_OK)
+
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class LoginView(APIView):
+
+    @swagger_auto_schema(
+        request_body=LoginSerializer,
+        responses={
+            200: openapi.Response(
+                description="JWT token",
+                examples={
+                    "application/json": {
+                        "refresh": "string",
+                        "access": "string",
+                        "full_name": "Test User",
+                        "message": "Muvaffaqiyatli kirdingiz"
+                    }
+                }
+            )
+        }
+    )
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
-
-            # JWT Token generatsiya qilish
             refresh = RefreshToken.for_user(user)
 
             return Response({
@@ -220,8 +266,16 @@ class FavoriteRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
 from django.db import transaction
 from django.db.models import F
 
+from drf_yasg.utils import swagger_auto_schema
 
 class RegisterView(APIView):
+    @swagger_auto_schema(
+    request_body=RegisterSerializer,
+    responses={
+        200: "OTP sent",
+        400: "Bad request"
+    }
+)
     def post(self, request, *args, **kwargs):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -308,7 +362,29 @@ class VerifyRegisterOTPView(APIView):
         )
 
 
+# ===== IMPORTLAR (FAQAT FAYL BOSHIDA) =====
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import get_user_model
+User = get_user_model()
+    
+from drf_yasg.utils import swagger_auto_schema
+
+from .serializers import SetPasswordSerializer
+
+
+# ===== VIEW =====
 class SetPasswordView(APIView):
+
+    @swagger_auto_schema(
+        request_body=SetPasswordSerializer,
+        responses={
+            200: "Password set successfully",
+            400: "Bad request"
+        }
+    )
     def post(self, request, *args, **kwargs):
         serializer = SetPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -321,17 +397,22 @@ class SetPasswordView(APIView):
             user.set_password(new_password)
             user.save()
 
-            # Foydalanuvchiga token yaratish yoki topish
-            token, created = Token.objects.get_or_create(user=user)
+            token, _ = Token.objects.get_or_create(user=user)
 
             return Response(
-                {"token": token.key, "message": "Password set successfully"},
-                status=status.HTTP_200_OK,
+                {
+                    "token": token.key,
+                    "message": "Password set successfully"
+                },
+                status=status.HTTP_200_OK
             )
+
         except User.DoesNotExist:
             return Response(
-                {"message": "User not found"}, status=status.HTTP_404_NOT_FOUND
+                {"message": "User not found"},
+                status=status.HTTP_404_NOT_FOUND
             )
+
 
 
 class BannerListAPIView(ListAPIView):

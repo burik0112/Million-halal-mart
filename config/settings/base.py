@@ -228,4 +228,6 @@ SWAGGER_SETTINGS = {
     'USE_SESSION_AUTH': False, # Session authni o'chirib qo'ygan ma'qul, chalkashmaslik uchun
     'JSON_EDITOR': True,
 }
-AUTH_USER_MODEL = 'customer.User'
+AUTH_USER_MODEL = "customer.User"
+
+
