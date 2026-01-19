@@ -156,6 +156,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
 
@@ -216,6 +217,15 @@ if os.environ.get('DATABASE_URL'):
     DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
     DATABASES['default']['OPTIONS'] = {'sslmode': 'require'}
 
-
-SWAGGER_SETTINGS = {'SCHEMES': ['https']}
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    },
+    'USE_SESSION_AUTH': False, # Session authni o'chirib qo'ygan ma'qul, chalkashmaslik uchun
+    'JSON_EDITOR': True,
+}
 AUTH_USER_MODEL = 'customer.User'

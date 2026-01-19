@@ -40,20 +40,23 @@ from .serializers import (
 from ..merchant.models import Referral, LoyaltyCard
 User = get_user_model()
 
+
 class LoginView(APIView):
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.validated_data["user"]
-            profile = serializer.validated_data["profile"]
-            token, created = Token.objects.get_or_create(user=user)
+            user = serializer.validated_data['user']
 
-            profile_serializer = ProfileSerializer(profile)
+            # JWT Token generatsiya qilish
+            refresh = RefreshToken.for_user(user)
 
-            return Response(
-                {"token": token.key, "profile": profile_serializer.data},
-                status=status.HTTP_200_OK,
-            )
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'full_name': serializer.validated_data['profile'].full_name,
+                'message': "Muvaffaqiyatli kirdingiz"
+            }, status=status.HTTP_200_OK)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
