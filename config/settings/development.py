@@ -48,11 +48,11 @@ from decouple import config
 DEBUG = True
 
 # --- ALLOWED HOSTS FOR LOCAL ---
-# ALLOWED_HOSTS = [
-#     "127.0.0.1",
-#     "localhost",
-#     "*",
-# ]
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "*",
+]
 
 # --- SIMPLE SQLITE DB FOR LOCAL (NO PROD DB TOUCH) ---
 DATABASES = {
