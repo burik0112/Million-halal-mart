@@ -310,26 +310,44 @@ class LoyaltyCardDetailAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+# class MyBonusScreenAPIView(APIView):
+#     """
+#     Экран бонусов конкретного профиля по его ID (pk).
+#     """
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request, pk):
+#         # 1. Ищем профиль по pk (ID). Если не найден — вернет 404.
+#         profile = get_object_or_404(Profile, pk=pk)
+
+#         # 2. БЕЗОПАСНОСТЬ: Проверяем, что этот профиль принадлежит именно залогиненному юзеру
+#         # Если ты хочешь, чтобы АДМИН тоже мог смотреть, можно добавить: or request.user.is_staff
+#         if profile.origin != request.user:
+#             return Response(
+#                 {"error": "У вас нет прав для просмотра этого профиля."},
+#                 status=status.HTTP_403_FORBIDDEN
+#             )
+
+#         # 3. Передаем найденный профиль в сериализатор
+#         serializer = UserBonusSerializer(profile)
+
+#         # 4. Возвращаем результат
+#         return Response(serializer.data)from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+
+from .serializers import UserBonusSerializer
+
+
 class MyBonusScreenAPIView(APIView):
-    """
-    Экран бонусов конкретного профиля по его ID (pk).
-    """
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, pk):
-        # 1. Ищем профиль по pk (ID). Если не найден — вернет 404.
-        profile = get_object_or_404(Profile, pk=pk)
+    def get(self, request):
+        # 🔥 ENG MUHIM JOY
+        profile = request.user.profile
 
-        # 2. БЕЗОПАСНОСТЬ: Проверяем, что этот профиль принадлежит именно залогиненному юзеру
-        # Если ты хочешь, чтобы АДМИН тоже мог смотреть, можно добавить: or request.user.is_staff
-        if profile.origin != request.user:
-            return Response(
-                {"error": "У вас нет прав для просмотра этого профиля."},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
-        # 3. Передаем найденный профиль в сериализатор
         serializer = UserBonusSerializer(profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-        # 4. Возвращаем результат
-        return Response(serializer.data)
