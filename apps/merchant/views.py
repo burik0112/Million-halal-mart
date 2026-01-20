@@ -294,51 +294,32 @@ class LoyaltyCardByProfileAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class LoyaltyCardDetailAPIView(APIView):
+class MyLoyaltyCardAPIView(APIView):
+    # Только залогиненный пользователь может получить данные
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, pk, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         """
-        Возвращает loyalty card пользователя по profile pk
+        Возвращает карту лояльности ТОГО пользователя, который сделал запрос
         """
         try:
-            card = LoyaltyCard.objects.select_related('profile').get(profile__id=pk)
+            # 1. Получаем профиль текущего пользователя через токен
+            user_profile = request.user.profile
+
+            # 2. Ищем карту, которая принадлежит этому профилю
+            card = LoyaltyCard.objects.get(profile=user_profile)
+
+            # 3. Отдаем данные в сериализатор
+            serializer = LoyaltyCardSerializer(card)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except AttributeError:
+            # Если у юзера вдруг нет профиля
+            return Response({"detail": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
         except LoyaltyCard.DoesNotExist:
-            return Response({"detail": "Loyalty card not found"}, status=status.HTTP_404_NOT_FOUND)
+            # Если карта еще не создана
+            return Response({"detail": "Loyalty card not found for this user"}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = LoyaltyCardSerializer(card)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-# class MyBonusScreenAPIView(APIView):
-#     """
-#     Экран бонусов конкретного профиля по его ID (pk).
-#     """
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request, pk):
-#         # 1. Ищем профиль по pk (ID). Если не найден — вернет 404.
-#         profile = get_object_or_404(Profile, pk=pk)
-
-#         # 2. БЕЗОПАСНОСТЬ: Проверяем, что этот профиль принадлежит именно залогиненному юзеру
-#         # Если ты хочешь, чтобы АДМИН тоже мог смотреть, можно добавить: or request.user.is_staff
-#         if profile.origin != request.user:
-#             return Response(
-#                 {"error": "У вас нет прав для просмотра этого профиля."},
-#                 status=status.HTTP_403_FORBIDDEN
-#             )
-
-#         # 3. Передаем найденный профиль в сериализатор
-#         serializer = UserBonusSerializer(profile)
-
-#         # 4. Возвращаем результат
-#         return Response(serializer.data)from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
-
-from .serializers import UserBonusSerializer
 
 
 class MyBonusScreenAPIView(APIView):

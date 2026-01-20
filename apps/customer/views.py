@@ -52,27 +52,8 @@ from .serializers import (
     VerifyOTPSerializer,
     SetPasswordSerializer
 )
-from ..merchant.models import Referral, LoyaltyCard
+from ..merchant.models import Referral
 User = get_user_model()
-
-
-# class LoginView(APIView):
-#     def post(self, request):
-#         serializer = LoginSerializer(data=request.data)
-#         if serializer.is_valid():
-#             user = serializer.validated_data['user']
-
-#             # JWT Token generatsiya qilish
-#             refresh = RefreshToken.for_user(user)
-
-#             return Response({
-#                 'refresh': str(refresh),
-#                 'access': str(refresh.access_token),
-#                 'full_name': serializer.validated_data['profile'].full_name,
-#                 'message': "Muvaffaqiyatli kirdingiz"
-#             }, status=status.HTTP_200_OK)
-
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class LoginView(APIView):
 
     @swagger_auto_schema(
@@ -361,18 +342,6 @@ class VerifyRegisterOTPView(APIView):
             status=status.HTTP_200_OK,
         )
 
-
-# ===== IMPORTLAR (FAQAT FAYL BOSHIDA) =====
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.authtoken.models import Token
-from django.contrib.auth import get_user_model
-User = get_user_model()
-    
-from drf_yasg.utils import swagger_auto_schema
-
-from .serializers import SetPasswordSerializer
 
 
 # ===== VIEW =====
