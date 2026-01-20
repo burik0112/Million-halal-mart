@@ -1,15 +1,15 @@
 from config.settings.base import *
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
-
-DEBUG = False # В продакшене ОБЯЗАТЕЛЬНО False
-
-# Настройки безопасности для Render (HTTPS)
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-SECURE_SSL_REDIRECT = True
-
-sentry_sdk.init(
-    dsn="https://a3fdf4caf4765a08afd9dd01c0d11f41@o4506424091934720.ingest.sentry.io/4506424100323328",
-    integrations=[DjangoIntegration()],
-    # ...
-)
+# import sentry_sdk
+# from sentry_sdk.integrations.django import DjangoIntegration
+#
+# DEBUG = False # В продакшене ОБЯЗАТЕЛЬНО False
+#
+# # Настройки безопасности для Render (HTTPS)
+# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# SECURE_SSL_REDIRECT = True
+#
+# sentry_sdk.init(
+#     dsn="https://a3fdf4caf4765a08afd9dd01c0d11f41@o4506424091934720.ingest.sentry.io/4506424100323328",
+#     integrations=[DjangoIntegration()],
+#     # ...
+# )

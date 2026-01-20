@@ -37,8 +37,8 @@ def get_env_value(env_variable):
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = get_env_value("SECRET_KEY")
 
-# # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
 
 ALLOWED_HOSTS = [get_env_value("ALLOWED_HOSTS")]
 LOGIN_REDIRECT_URL = "dashboard"
@@ -204,18 +204,18 @@ FCM_SERVER_KEY = config("FCM_SERVER_KEY")
 
 DOMAIN_NAME = "https://millionmart.uz"
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-        ssl_require=False  # Для локальной базы SSL не нужен
-    )
-}
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+#         conn_max_age=600,
+#         ssl_require=False  # Для локальной базы SSL не нужен
+#     )
+# }
 
-# Если мы на сервере (DATABASE_URL есть), включаем SSL (обязательно для Render)
-if os.environ.get('DATABASE_URL'):
-    DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
-    DATABASES['default']['OPTIONS'] = {'sslmode': 'require'}
+# # Если мы на сервере (DATABASE_URL есть), включаем SSL (обязательно для Render)
+# if os.environ.get('DATABASE_URL'):
+#     DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
+#     DATABASES['default']['OPTIONS'] = {'sslmode': 'require'}
 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
@@ -230,4 +230,9 @@ SWAGGER_SETTINGS = {
 }
 AUTH_USER_MODEL = "customer.User"
 
-
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
