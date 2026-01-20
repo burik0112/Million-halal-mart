@@ -67,3 +67,4 @@ urlpatterns = [
         name="my-bonus",
     ),
 ]
+#  shu mmanimcha togri aka ishlayapti 
