@@ -35,7 +35,14 @@ def get_env_value(env_variable):
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_env_value("SECRET_KEY")
+# SECRET_KEY = get_env_value("SECRET_KEY")
+ALLOWED_HOSTS = [
+    "million-halal-mart-tjj5.onrender.com",
+    ".onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
