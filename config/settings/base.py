@@ -75,6 +75,8 @@ INSTALLED_APPS = [
                      "ckeditor",
                      "ckeditor_uploader",
                      "debug_toolbar",
+                     "rest_framework",
+                     "drf_spectacular",
                  ] + LOCAL_APPS
 
 MIDDLEWARE = [
@@ -97,8 +99,15 @@ CKEDITOR_CONFIGS = {
     },
 }
 REST_FRAMEWORK = {
-    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"]
+    # "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"]
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Million Halal Mart API",
+    "DESCRIPTION": "Backend API",
+    "VERSION": "1.0.0",
+}
+
 CSRF_TRUSTED_ORIGINS = [
     "https://millionmart.uz",
     "https://millionmart.uz/",

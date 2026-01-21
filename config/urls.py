@@ -8,6 +8,10 @@ from apps.dashboard.users import user_login, user_logout
 import debug_toolbar
 def redirect_dashboard(request):
     return redirect("dashboard")
+    from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularSwaggerView,
+)
 
 
 urlpatterns = [
@@ -22,6 +26,14 @@ urlpatterns = [
     path("login/", user_login, name="login_page"),
     path('logout/', user_logout, name='logout'),
     path("", redirect_dashboard),
+     # schema (json)
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+
+    # swagger UI
+    path("swagger/", SpectacularSwaggerView.as_view(url_name="schema")),
+
+    # qolgan url lar
+    path("admin/", admin.site.urls),
 ] + swagger_urlpatterns
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
