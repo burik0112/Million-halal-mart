@@ -96,14 +96,12 @@ CKEDITOR_CONFIGS = {
         'config.versionCheck': False,
     },
 }
-REST_FRAMEWORK = {
-    # "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"]
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-}
+
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Million Halal Mart API",
-    "DESCRIPTION": "Backend API",
-    "VERSION": "1.0.0",
+    'TITLE': 'Million Mart API',
+    'DESCRIPTION': 'API for Million Mart Project',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
 
 CSRF_TRUSTED_ORIGINS = [
@@ -167,6 +165,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",  # 👈 THIS FIXES YOUR ERROR
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",  # 👈 MUHIM
     ],
