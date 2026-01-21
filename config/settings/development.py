@@ -49,10 +49,12 @@ DEBUG = True
 
 # --- ALLOWED HOSTS FOR LOCAL ---
 ALLOWED_HOSTS = [
-    "127.0.0.1",
+    "million-halal-mart-tjj5.onrender.com",
+    ".onrender.com",
     "localhost",
-    "*",
+    "127.0.0.1",
 ]
+
 
 # --- SIMPLE SQLITE DB FOR LOCAL (NO PROD DB TOUCH) ---
 DATABASES = {
