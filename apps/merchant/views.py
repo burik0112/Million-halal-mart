@@ -13,28 +13,6 @@ from rest_framework import status, permissions
 from django.db import transaction
 from django.db.models import Prefetch
 from rest_framework.response import Response
-from ..merchant.models import LoyaltyCard
-from ..merchant.serializers import LoyaltyCardSerializer
-class MyLoyaltyCardAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        if not hasattr(request.user, "profile"):
-            return Response(
-                {"detail": "User profile not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        try:
-            card = LoyaltyCard.objects.get(profile=request.user.profile)
-        except LoyaltyCard.DoesNotExist:
-            return Response(
-                {"detail": "Loyalty card not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        return Response(LoyaltyCardSerializer(card).data)
-
 from apps.product.models import Image, ProductItem
 from .models import Order, OrderItem, Information, Service, SocialMedia, Bonus, LoyaltyCard
 from .serializers import (
@@ -50,7 +28,6 @@ from .serializers import (
     BonusSerializer, LoyaltyCardSerializer, UserBonusSerializer,
 )
 from apps.dashboard.main import bot
-from ..customer.models import Profile
 
 
 # Create your views here.
@@ -288,78 +265,34 @@ class BonusPIView(ListAPIView):
 
 
 
-class LoyaltyCardByProfileAPIView(APIView):
+
+
+class MyLoyaltyCardAPIView(APIView):
+    # Только залогиненный пользователь может получить данные
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        full_name = request.query_params.get('full_name')
-        profile_id = request.query_params.get('profile_id')
-
-        # Начинаем с всех карт
-        queryset = LoyaltyCard.objects.select_related('profile').all()
-
-        # Фильтруем по full_name, если передан
-        if full_name:
-            queryset = queryset.filter(profile__full_name__icontains=full_name)
-
-        # Фильтруем по profile_id, если передан
-        if profile_id:
-            queryset = queryset.filter(profile__id=profile_id)
-
-        # Если ничего не найдено
-        if not queryset.exists():
-            return Response({"detail": "Loyalty cards not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        # Сериализуем данные
-        serializer = LoyaltyCardSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-# class MyLoyaltyCardAPIView(APIView):
-#     # Только залогиненный пользователь может получить данные
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request, *args, **kwargs):
-#         """
-#         Возвращает карту лояльности ТОГО пользователя, который сделал запрос
-#         """
-#         try:
-#             # 1. Получаем профиль текущего пользователя через токен
-#             user_profile = request.user.profile
-
-#             # 2. Ищем карту, которая принадлежит этому профилю
-#             card = LoyaltyCard.objects.get(profile=user_profile)
-
-#             # 3. Отдаем данные в сериализатор
-#             serializer = LoyaltyCardSerializer(card)
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-
-#         except AttributeError:
-#             # Если у юзера вдруг нет профиля
-#           return Response({"error": "Profile not found"}, status=status.HTTP_400_BAD_REQUEST)
-#         except LoyaltyCard.DoesNotExist:
-#             # Если карта еще не создана
-#             return Response({"detail": "Loyalty card not found for this user"}, status=status.HTTP_404_NOT_FOUND)
-
-class MyLoyaltyCardAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        if not hasattr(request.user, "profile"):
-            return Response(
-                {"detail": "User profile not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
+        """
+        Возвращает карту лояльности ТОГО пользователя, который сделал запрос
+        """
         try:
-            card = LoyaltyCard.objects.get(profile=request.user.profile)
-        except LoyaltyCard.DoesNotExist:
-            return Response(
-                {"detail": "Loyalty card not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            # 1. Получаем профиль текущего пользователя через токен
+            user_profile = request.user.profile
 
-        return Response(LoyaltyCardSerializer(card).data)
+            # 2. Ищем карту, которая принадлежит этому профилю
+            card = LoyaltyCard.objects.get(profile=user_profile)
+
+            # 3. Отдаем данные в сериализатор
+            serializer = LoyaltyCardSerializer(card)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except AttributeError:
+            # Если у юзера вдруг нет профиля
+          return Response({"error": "Profile not found"}, status=status.HTTP_400_BAD_REQUEST)
+        except LoyaltyCard.DoesNotExist:
+            # Если карта еще не создана
+            return Response({"detail": "Loyalty card not found for this user"}, status=status.HTTP_404_NOT_FOUND)
+
 
 class MyBonusScreenAPIView(APIView):
     permission_classes = [IsAuthenticated]

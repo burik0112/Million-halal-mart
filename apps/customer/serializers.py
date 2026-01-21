@@ -81,9 +81,18 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class RegisterSerializer(serializers.Serializer):
-    phone_number = serializers.CharField(max_length=17)
-    full_name = serializers.CharField(max_length=255, required=False, allow_blank=True)
-    referral_code = serializers.CharField(max_length=20, required=False, allow_blank=True)
+    phone_number = serializers.CharField(
+        max_length=17,
+        help_text="Номер телефона в формате +998901234567"
+    )
+    full_name = serializers.CharField(
+        required=False,
+        help_text="Полное имя пользователя"
+    )
+    referral_code = serializers.CharField(
+        required=False,
+        help_text="Реферальный код друга (если есть)"
+    )
 
     def validate_phone_number(self, value):
         # Telefon raqamini validatsiya qilish

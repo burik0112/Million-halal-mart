@@ -16,7 +16,7 @@ from drf_yasg import openapi
 
 
 from django.utils.translation import gettext_lazy as _
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import generics, status, permissions
 from django.db import IntegrityError, transaction
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -48,9 +48,17 @@ from .serializers import (
 )
 from ..merchant.models import Referral
 User = get_user_model()
+
+
 class LoginView(APIView):
+    # ОБЯЗАТЕЛЬНО ДОБАВЬТЕ ЭТИ ДВЕ СТРОКИ:
+    permission_classes = [AllowAny]  # Разрешить вход без токена
+    authentication_classes = []  # Отключить проверку токена для этого входа
+
+    serializer_class = LoginSerializer
 
     @swagger_auto_schema(
+        operation_summary="Вход в систему (Получение JWT токена)",
         request_body=LoginSerializer,
         responses={
             200: openapi.Response(
@@ -238,19 +246,29 @@ class FavoriteRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     serializer_class = FavoriteSerializer
 
 
-from django.db import transaction
-from django.db.models import F
-
-from drf_yasg.utils import swagger_auto_schema
-
 class RegisterView(APIView):
+    serializer_class = RegisterSerializer
+
     @swagger_auto_schema(
-    request_body=RegisterSerializer,
-    responses={
-        200: "OTP sent",
-        400: "Bad request"
-    }
-)
+        operation_summary="Регистрация и вход по OTP",
+        operation_description="Отправляет OTP на телефон. Если пользователь новый и указан реферал-код, пригласившему сразу начисляется 5000 вон.",
+        request_body=RegisterSerializer,
+        responses={
+            200: openapi.Response(
+                description="Успешная отправка СМС",
+                examples={
+                    "application/json": {
+                        "message": "OTP code sent to your phone",
+                        "referral_code": "ABC12345",
+                        "otp_debug": "5566"
+                    }
+                }
+            ),
+            400: "Неверные данные (валидация)",
+            408: "Ошибка отправки СМС (Twilio)"
+        },
+        tags=['Authentication']  # Группировка в Swagger
+    )
     def post(self, request, *args, **kwargs):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -261,43 +279,53 @@ class RegisterView(APIView):
 
         otp_code = str(random.randint(1000, 9999))
 
-        with transaction.atomic():
-            user, _ = User.objects.get_or_create(username=phone_number)
-            profile, profile_created = Profile.objects.get_or_create(
-                origin=user,
-                defaults={
-                    "full_name": full_name,
-                    "phone_number": phone_number,
-                    "otp": otp_code
-                }
-            )
+        try:
+            with transaction.atomic():
+                # Создаем/получаем юзера
+                user, _ = User.objects.get_or_create(username=phone_number)
 
-            if not profile_created:
-                profile.otp = otp_code
-                profile.save()
+                # Создаем/обновляем профиль
+                profile, profile_created = Profile.objects.get_or_create(
+                    origin=user,
+                    defaults={
+                        "full_name": full_name,
+                        "phone_number": phone_number,
+                        "otp": otp_code
+                    }
+                )
 
-            # Логика реферала
-            if profile_created and referral_code:
-                try:
-                    referrer = Profile.objects.get(referral_code=referral_code)
-                    if referrer != profile:
-                        # ВАЖНО: Ставим сразу статус 'rewarded'
-                        Referral.objects.create(
-                            referrer=referrer,
-                            referee=profile,
-                            status='rewarded' # Теперь бонус начислится сам через метод save()
-                        )
-                except Profile.DoesNotExist:
-                    pass
+                if not profile_created:
+                    profile.otp = otp_code
+                    profile.save()
 
-        send_otp_sms(phone_number, otp_code)
+                # Логика реферала (Мгновенный бонус)
+                if profile_created and referral_code:
+                    try:
+                        referrer = Profile.objects.get(referral_code=referral_code)
+                        if referrer != profile:
+                            # Ставим статус 'rewarded' для автоматического начисления
+                            Referral.objects.create(
+                                referrer=referrer,
+                                referee=profile,
+                                status='rewarded'
+                            )
+                    except Profile.DoesNotExist:
+                        pass  # Код неверный - игнорируем
 
-        return Response({
-            "message": "OTP code sent to your phone",
-            "referral_code": profile.referral_code,
-            "otp_debug": otp_code
-        })
+            # Отправка СМС
+            send_otp_sms(phone_number, otp_code)
 
+            return Response({
+                "message": "OTP code sent to your phone",
+                "referral_code": profile.referral_code,
+                "otp_debug": otp_code
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({
+                "message": "Internal server error",
+                "details": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def send_otp_sms(phone_number, otp):
     try:
@@ -340,6 +368,7 @@ class VerifyRegisterOTPView(APIView):
 
 # ===== VIEW =====
 class SetPasswordView(APIView):
+    serializer_class = SetPasswordSerializer
 
     @swagger_auto_schema(
         request_body=SetPasswordSerializer,

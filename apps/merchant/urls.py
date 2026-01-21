@@ -2,7 +2,6 @@
 from django.urls import path
 from . import views
 from .views import (
-    LoyaltyCardByProfileAPIView,
     MyBonusScreenAPIView,
 )
 
@@ -25,26 +24,6 @@ urlpatterns = [
 
     # Bonus
     path("bonus-list/", views.BonusPIView.as_view()),
-
-    # Loyalty cards (AUTH orqali, IDsiz)
-    path(
-        "loyalty-cards/",
-        LoyaltyCardByProfileAPIView.as_view(),
-        name="loyalty-cards-by-profile",
-    ),
-
-    # 🔥 ENG MUHIM QISM
-    # faqat login bo‘lgan user uchun, ID YO‘Q
-    path(
-        "my-bonus/",
-        MyBonusScreenAPIView.as_view(),
-        name="my-bonus",
-    ),
-    path(
-    "my-loyalty-card/",
-    views.MyLoyaltyCardAPIView.as_view(),
-    name="merchant-my-loyalty-card",
-),
-
+    path("my-bonus/",MyBonusScreenAPIView.as_view(),name="my-bonus"),
+    path("my-loyalty-card/", views.MyLoyaltyCardAPIView.as_view(),name="merchant-my-loyalty-card"),
 ]
-#  shu mmanimcha togri aka ishlayapti 
