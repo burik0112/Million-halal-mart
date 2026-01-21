@@ -67,7 +67,6 @@ INSTALLED_APPS = [
                      "django.contrib.sessions",
                      "django.contrib.messages",
                      "django.contrib.staticfiles",
-                     "drf_yasg",
                      "django_filters",
                      "rest_framework",
                      "rest_framework.authtoken",
@@ -75,7 +74,6 @@ INSTALLED_APPS = [
                      "ckeditor",
                      "ckeditor_uploader",
                      "debug_toolbar",
-                     "rest_framework",
                      "drf_spectacular",
                  ] + LOCAL_APPS
 
