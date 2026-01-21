@@ -11,13 +11,6 @@ from rest_framework.generics import (
     RetrieveUpdateAPIView,
 )
 # = shu qimni man qoshidim 
-# ADDED FOR SWAGGER
-# ===============================
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
-# ===============================
-# ADDED FOR SWAGGER
-# ===============================
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -35,6 +28,7 @@ from rest_framework.views import APIView
 from .utils import generate_otp
 from .models import Favorite, Location, News, Profile, ViewedNews, Banner
 from django.contrib.auth import get_user_model
+
 User = get_user_model()
 
 from .serializers import (
@@ -108,9 +102,9 @@ class ProfileUpdate(APIView):
         try:
             profile = user.profile
 
-        except:
-            profile = None
-            return Response({"error": "Profile not found"}, status=status.HTTP_400_B)
+        except Profile.DoesNotExist:
+            return Response({"error": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
         serializer = self.serializer_class(profile, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -214,7 +208,7 @@ class RemoveFromFavoritesView(APIView):
 
 
 class FavoriteListAPIView(ListAPIView):
-    permission_class = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Favorite.objects.all().order_by("-pk")
     serializer_class = FavoriteListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]

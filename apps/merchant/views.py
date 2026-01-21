@@ -13,6 +13,27 @@ from rest_framework import status, permissions
 from django.db import transaction
 from django.db.models import Prefetch
 from rest_framework.response import Response
+from ..merchant.models import LoyaltyCard
+from ..merchant.serializers import LoyaltyCardSerializer
+class MyLoyaltyCardAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not hasattr(request.user, "profile"):
+            return Response(
+                {"detail": "User profile not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        try:
+            card = LoyaltyCard.objects.get(profile=request.user.profile)
+        except LoyaltyCard.DoesNotExist:
+            return Response(
+                {"detail": "Loyalty card not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        return Response(LoyaltyCardSerializer(card).data)
 
 from apps.product.models import Image, ProductItem
 from .models import Order, OrderItem, Information, Service, SocialMedia, Bonus, LoyaltyCard
@@ -294,33 +315,51 @@ class LoyaltyCardByProfileAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+# class MyLoyaltyCardAPIView(APIView):
+#     # Только залогиненный пользователь может получить данные
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request, *args, **kwargs):
+#         """
+#         Возвращает карту лояльности ТОГО пользователя, который сделал запрос
+#         """
+#         try:
+#             # 1. Получаем профиль текущего пользователя через токен
+#             user_profile = request.user.profile
+
+#             # 2. Ищем карту, которая принадлежит этому профилю
+#             card = LoyaltyCard.objects.get(profile=user_profile)
+
+#             # 3. Отдаем данные в сериализатор
+#             serializer = LoyaltyCardSerializer(card)
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+
+#         except AttributeError:
+#             # Если у юзера вдруг нет профиля
+#           return Response({"error": "Profile not found"}, status=status.HTTP_400_BAD_REQUEST)
+#         except LoyaltyCard.DoesNotExist:
+#             # Если карта еще не создана
+#             return Response({"detail": "Loyalty card not found for this user"}, status=status.HTTP_404_NOT_FOUND)
+
 class MyLoyaltyCardAPIView(APIView):
-    # Только залогиненный пользователь может получить данные
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, *args, **kwargs):
-        """
-        Возвращает карту лояльности ТОГО пользователя, который сделал запрос
-        """
+    def get(self, request):
+        if not hasattr(request.user, "profile"):
+            return Response(
+                {"detail": "User profile not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
         try:
-            # 1. Получаем профиль текущего пользователя через токен
-            user_profile = request.user.profile
-
-            # 2. Ищем карту, которая принадлежит этому профилю
-            card = LoyaltyCard.objects.get(profile=user_profile)
-
-            # 3. Отдаем данные в сериализатор
-            serializer = LoyaltyCardSerializer(card)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        except AttributeError:
-            # Если у юзера вдруг нет профиля
-            return Response({"detail": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
+            card = LoyaltyCard.objects.get(profile=request.user.profile)
         except LoyaltyCard.DoesNotExist:
-            # Если карта еще не создана
-            return Response({"detail": "Loyalty card not found for this user"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"detail": "Loyalty card not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
-
+        return Response(LoyaltyCardSerializer(card).data)
 
 class MyBonusScreenAPIView(APIView):
     permission_classes = [IsAuthenticated]
