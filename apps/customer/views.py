@@ -248,6 +248,9 @@ class FavoriteRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
 
 class RegisterView(APIView):
     serializer_class = RegisterSerializer
+    permission_classes = [AllowAny]
+
+    authentication_classes = []
 
     @swagger_auto_schema(
         operation_summary="Регистрация и вход по OTP",

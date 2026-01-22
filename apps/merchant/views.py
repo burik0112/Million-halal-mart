@@ -13,6 +13,8 @@ from rest_framework import status, permissions
 from django.db import transaction
 from django.db.models import Prefetch
 from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 from apps.product.models import Image, ProductItem
 from .models import Order, OrderItem, Information, Service, SocialMedia, Bonus, LoyaltyCard
 from .serializers import (
@@ -269,6 +271,7 @@ class BonusPIView(ListAPIView):
 
 class MyLoyaltyCardAPIView(APIView):
     # Только залогиненный пользователь может получить данные
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
