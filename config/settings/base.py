@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+from datetime import timedelta
 from pathlib import Path
 
 import dj_database_url
@@ -267,3 +268,16 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+
+SIMPLE_JWT = {
+    # Время жизни Access Token (теперь 180 дней)
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=180),
+
+    # Время жизни Refresh Token (лучше сделать его таким же или больше)
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=180),
+
+    # Остальные стандартные настройки
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
