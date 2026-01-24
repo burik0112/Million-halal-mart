@@ -79,7 +79,8 @@ def dashboard(request):
 
     # Count total customers and customers created today
     customers_count = Profile.objects.count()
-    customers_today_count = Profile.objects.filter(created__date=today).count()
+    # TODO: Add created_at timestamp field to Profile model for date tracking
+    customers_today_count = 0  # Placeholder - Profile model doesn't have created_at field yet
 
     # Aggregate revenue for today's orders
     total_revenue=orders.filter(status="sent").aggregate(total_amount_sum=Sum("total_amount"))[

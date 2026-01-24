@@ -4,16 +4,24 @@ from modeltranslation.admin import TranslationAdmin
 from .models import *
 
 # Register your models here.
-class NewsAdmin(admin.ModelAdmin):
+class NewsAdmin(TranslationAdmin):
     list_display=['start_date','title', 'end_date', 'description']
+
+class BannerAdmin(admin.ModelAdmin):
+    list_display=['title', 'active']
+
+class LocationAdmin(admin.ModelAdmin):
+    list_display=['user', 'address']
+
 class ProfileAdmin(admin.ModelAdmin):
     list_display=['phone_number','full_name']
+
 admin.site.register(Profile, ProfileAdmin)
-admin.site.register(Location)
+admin.site.register(Location, LocationAdmin)
 admin.site.register(News, NewsAdmin)
 admin.site.register(ViewedNews)
 admin.site.register(Favorite)
-admin.site.register(Banner)
+admin.site.register(Banner, BannerAdmin)
 
 
 class CustomUserAdmin(UserAdmin):

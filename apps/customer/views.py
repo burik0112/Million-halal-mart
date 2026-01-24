@@ -10,10 +10,8 @@ from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
     RetrieveUpdateAPIView,
 )
-# = shu qimni man qoshidim 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
 
 from django.utils.translation import gettext_lazy as _
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -27,6 +25,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from .utils import generate_otp
 from .models import Favorite, Location, News, Profile, ViewedNews, Banner
+from .base import CustomerListService, CustomerFilterService
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -140,12 +139,18 @@ class LocationCreateAPIView(CreateAPIView):
 
 
 class LocationListAPIView(ListAPIView):
-    queryset = Location.objects.all().order_by("-pk")
+    """
+    Barcha location'larni list qilish
+    Filter va search bilan
+    """
     serializer_class = LocationListSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
-    search_fields = ["user__full_name", "address"]
+    filter_backends = CustomerFilterService.get_filter_backends()
+    search_fields = CustomerFilterService.get_location_search_fields()
     filterset_fields = ["user__full_name", "address"]
     pagination_class = CustomPageNumberPagination
+
+    def get_queryset(self):
+        return Location.objects.all().order_by("-pk")
 
 
 class LocationRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
@@ -154,12 +159,18 @@ class LocationRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
 
 
 class NewsListAPIView(ListAPIView):
-    queryset = News.objects.all().order_by("-pk")
+    """
+    Barcha yangiliklarni list qilish
+    Filter va search bilan
+    """
     serializer_class = NewsSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]  # Add both filter backends
-    search_fields = ["description"]
+    filter_backends = CustomerFilterService.get_filter_backends()
+    search_fields = CustomerFilterService.get_news_search_fields()
     filterset_fields = ["description"]
     pagination_class = CustomPageNumberPagination
+
+    def get_queryset(self):
+        return CustomerListService.get_news_list()
 
 
 class NewsRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
@@ -216,29 +227,24 @@ class RemoveFromFavoritesView(APIView):
 
 
 class FavoriteListAPIView(ListAPIView):
+    """
+    Foydalanuvchining sevimli mahsulotlarini list qilish
+    """
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    queryset = Favorite.objects.all().order_by("-pk")
     serializer_class = FavoriteListSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]
-    # filterset_fields = ["user", "product"]
-    search_fields = ["product__name", "user__full_name"]
+    filter_backends = CustomerFilterService.get_filter_backends()
+    search_fields = CustomerFilterService.get_favorite_search_fields()
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
         if not self.request.user.is_authenticated:
             return Favorite.objects.none()
-        # qs = (
-        #     Favorite.objects.filter(user=self.request.user.profile)
-        #     .select_related("product", "user")
-        #     .order_by("-pk")
-        # )
-        qs = (
-            Favorite.objects.all()
-            .order_by("-pk")
-            .select_related("product__tickets", "product__goods", "product__phones")
-            .prefetch_related("product__images")
-        )
-        return qs
+        
+        return Favorite.objects.all().order_by("-pk").select_related(
+            'product__tickets',
+            'product__goods',
+            'product__phones'
+        ).prefetch_related('product__images')
 
 
 class FavoriteRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
@@ -408,9 +414,14 @@ class SetPasswordView(APIView):
 
 
 class BannerListAPIView(ListAPIView):
-    queryset = Banner.objects.all().order_by("-pk")
+    """
+    Barcha banner'larni list qilish
+    """
     serializer_class = BannerSerializer
     pagination_class = CustomPageNumberPagination
+
+    def get_queryset(self):
+        return CustomerListService.get_banners_list()
 
 
 class ProfileEditAPIView(generics.UpdateAPIView):
