@@ -34,6 +34,7 @@ class Order(TimeStampedModel, models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="in_cart")
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     total_amount = models.DecimalField(decimal_places=0, max_digits=20, default=0)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     # ---------------- LOYALTY BONUS ----------------
     def create_loyalty_pending_bonus(self):

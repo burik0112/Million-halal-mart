@@ -8,7 +8,7 @@ from rest_framework.generics import (
 )
 from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status, permissions
 from django.db import transaction
 from django.db.models import Prefetch
@@ -38,6 +38,7 @@ from apps.dashboard.main import bot
 class OrderCreateAPIView(CreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderCreateSerializer
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -47,8 +48,8 @@ class OrderCreateAPIView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
 
         if (
-            serializer.validated_data.get("status") == "in_cart"
-            and Order.objects.filter(user=request.user, status="in_cart").exists()
+                serializer.validated_data.get("status") == "in_cart"
+                and Order.objects.filter(user=request.user, status="in_cart").exists()
         ):
             return Response(
                 {"detail": "You already have an in-cart order."},
@@ -79,7 +80,6 @@ class OrderListAPIView(ListAPIView):
         if user.is_anonymous:
             return Order.objects.none()
 
-        
         # Efficiently prefetching related data
         # product_prefetch = Prefetch(
         #     'products',
@@ -103,10 +103,10 @@ class OrderListAPIView(ListAPIView):
         product_prefetch = Prefetch(
             'product',
             queryset=ProductItem.objects.all()
-            .select_related('phones', 'tickets', 'goods') 
+            .select_related('phones', 'tickets', 'goods')
             .prefetch_related(
-                    'images'  # Prefetch all related images without using a custom attribute
-                )# Optimize OneToOne relations
+                'images'  # Prefetch all related images without using a custom attribute
+            )  # Optimize OneToOne relations
             # .prefetch_related(
             #     Prefetch('images', queryset=Image.objects.all(), to_attr='prefetched_images')
             # )
@@ -125,9 +125,11 @@ class OrderListAPIView(ListAPIView):
             .order_by("-created")  # Most recent orders first
         )
 
+
 class OrderRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     queryset = Order.objects.all().order_by("-pk")
     serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class OrderItemCreateAPIView(CreateAPIView):
@@ -167,12 +169,13 @@ class OrderItemCreateAPIView(CreateAPIView):
 class OrderItemListAPIView(ListAPIView):
     queryset = OrderItem.objects.all().order_by("-pk")
     serializer_class = OrderItemSerializer
-    # pagination_class = CustomPageNumberPagination
+    permission_classes = [IsAuthenticated]
 
 
 class OrderItemRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     queryset = OrderItem.objects.all().order_by("-pk")
     serializer_class = OrderItemSerializer
+    permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -194,9 +197,12 @@ class OrderItemRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
 class InformationListAPIView(ListAPIView):
     queryset = Information.objects.all().order_by("-pk")
     serializer_class = InformationSerializer
+    permission_classes = [AllowAny]
 
 
 class CheckoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, order_id, *args, **kwargs):
         with transaction.atomic():
             try:
@@ -254,19 +260,19 @@ class CheckoutView(APIView):
 class ServiceListAPIView(ListAPIView):
     queryset = Service.objects.all().order_by("-pk")
     serializer_class = ServiceSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class SocialMeadiaAPIView(ListAPIView):
     queryset = SocialMedia.objects.all().order_by("-pk")
     serializer_class = SocialMediaSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class BonusPIView(ListAPIView):
     queryset = Bonus.objects.all().order_by("pk")
     serializer_class = BonusSerializer
-
-
-
+    permission_classes = [IsAuthenticated]
 
 
 class MyLoyaltyCardAPIView(APIView):
@@ -291,7 +297,7 @@ class MyLoyaltyCardAPIView(APIView):
 
         except AttributeError:
             # Если у юзера вдруг нет профиля
-          return Response({"error": "Profile not found"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Profile not found"}, status=status.HTTP_400_BAD_REQUEST)
         except LoyaltyCard.DoesNotExist:
             # Если карта еще не создана
             return Response({"detail": "Loyalty card not found for this user"}, status=status.HTTP_404_NOT_FOUND)
@@ -306,4 +312,3 @@ class MyBonusScreenAPIView(APIView):
 
         serializer = UserBonusSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
-

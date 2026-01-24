@@ -47,6 +47,7 @@ class Profile(models.Model): # Удали TimeStampedModel если она вы�
         blank=True,
         null=True
     )
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.referral_code:

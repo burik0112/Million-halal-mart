@@ -74,12 +74,12 @@ def dashboard(request):
     )
 
     # Filter orders for today and count them
-    order_today = orders.filter(created__date=today, status="sent")
+    order_today = orders.filter(created_at__date=today, status="sent")
     order_today_count = order_today.count()
 
-    # Count total customers and customers created today
+    # Count total customers and customers created_atat_at_at today
     customers_count = Profile.objects.count()
-    customers_today_count = Profile.objects.filter(created__date=today).count()
+    customers_today_count = Profile.objects.filter(created_at__date=today).count()
 
     # Aggregate revenue for today's orders
     total_revenue=orders.filter(status="sent").aggregate(total_amount_sum=Sum("total_amount"))[
@@ -92,7 +92,7 @@ def dashboard(request):
     revenue_today = decimal_cutter(revenue_today)
 
     # Get recent orders
-    recent = orders.order_by("-created")[:20]
+    recent = orders.order_by("-created_at")[:20]
 
     # Get top selling products with total quantity
     top_selling_products = (
@@ -127,7 +127,7 @@ def dashboard(request):
     )
 
     # Get orders with comments
-    orders_with_comments = orders.order_by('-created').exclude(comment="")[:10]
+    orders_with_comments = orders.order_by('-created_at').exclude(comment="")[:10]
 
     return render(
         request,
@@ -217,7 +217,7 @@ class BannerView(ListView):
     form_class = BannerForm
 
     def get_queryset(self):
-        return Banner.objects.all().order_by("-created")
+        return Banner.objects.all().order_by("-created_at")
 
     def get(self, request, *args, **kwargs):
         form = self.form_class()
@@ -371,7 +371,7 @@ def bot(order):
     for order_item in order.get_order_items():
         product_details = order.get_product_details(order_item, order_item)
         text4channel += f" 🟢 <i>{product_details}</i>\n"
-    text4channel += f"📝 <b>Izoh:</b> <i>{order.comment}</i>\n📅 <b>Sana:</b> <i>{order.created.strftime('%Y-%m-%d %H:%M')}</i>\n💸 <b>Jami:</b> <i>{order.total_amount} ₩</i>\n\n⁉️ <u>To`lov amalga oshirilganligini tasdiqlaysizmi?</u>"
+    text4channel += f"📝 <b>Izoh:</b> <i>{order.comment}</i>\n📅 <b>Sana:</b> <i>{order.created_at.strftime('%Y-%m-%d %H:%M')}</i>\n💸 <b>Jami:</b> <i>{order.total_amount} ₩</i>\n\n⁉️ <u>To`lov amalga oshirilganligini tasdiqlaysizmi?</u>"
     inline_keyboard = [
         [
             {"text": "✅ Ha", "callback_data": f"yes|{order.id}"},
