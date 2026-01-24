@@ -17,6 +17,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import generics, status, permissions
 from django.db import IntegrityError, transaction
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from twilio.rest import Client
 from django.conf import settings
@@ -254,6 +255,9 @@ class FavoriteRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
 
 class RegisterView(APIView):
     serializer_class = RegisterSerializer
+    permission_classes = [AllowAny]
+
+    authentication_classes = []
 
     @swagger_auto_schema(
         operation_summary="Регистрация и вход по OTP",
@@ -375,6 +379,8 @@ class VerifyRegisterOTPView(APIView):
 # ===== VIEW =====
 class SetPasswordView(APIView):
     serializer_class = SetPasswordSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [AllowAny]
 
     @swagger_auto_schema(
         request_body=SetPasswordSerializer,

@@ -34,6 +34,23 @@ class Order(TimeStampedModel, models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="in_cart")
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     total_amount = models.DecimalField(decimal_places=0, max_digits=20, default=0)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+
+    def update_total_amount(self):
+        """
+        Считает общую сумму всех товаров в заказе и сохраняет её.
+        """
+        # Считаем сумму через связь ManyToMany (products)
+        # Если у товара есть новая цена (скидка), берем её, иначе старую
+        total = 0
+        for product in self.products.all():
+            price = product.new_price if product.new_price else product.old_price
+            total += (price or 0)
+
+        self.total_amount = total
+        # Используем update_fields, чтобы не вызывать сигналы по кругу (рекурсию)
+        self.save(update_fields=['total_amount'])
+
 
     # ---------------- LOYALTY BONUS ----------------
     def create_loyalty_pending_bonus(self):
@@ -131,13 +148,13 @@ class Information(TimeStampedModel, models.Model):
 
 
 class SocialMedia(TimeStampedModel, models.Model):
-    telegram = models.CharField(blank=True, null=True)
-    instagram = models.CharField(blank=True, null=True)
-    whatsapp = models.CharField(blank=True, null=True)
-    phone_number = models.CharField(blank=True, null=True)
-    imo = models.CharField(blank=True, null=True)
-    kakao = models.CharField(blank=True, null=True)
-    tiktok = models.CharField(blank=True, null=True)
+    telegram = models.CharField(max_length = 255,blank=True, null=True)
+    instagram = models.CharField(max_length = 255,blank=True, null=True)
+    whatsapp = models.CharField(max_length = 255,blank=True, null=True)
+    phone_number = models.CharField(max_length = 255,blank=True, null=True)
+    imo = models.CharField(max_length = 255,blank=True, null=True)
+    kakao = models.CharField(max_length = 255,blank=True, null=True)
+    tiktok = models.CharField(max_length = 255,blank=True, null=True)
 
     def __str__(self) -> str:
         return "SocialMedias"

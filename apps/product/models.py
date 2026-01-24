@@ -169,8 +169,8 @@ class Phone(models.Model):
         ProductItem, on_delete=models.CASCADE, related_name="phones"
     )
     model_name = models.CharField(max_length=255)
-    ram = models.CharField(choices=RAM, default=0)
-    storage = models.CharField(choices=STORAGE, default=0)
+    ram = models.CharField(max_length=255, choices=RAM, default=0)
+    storage = models.CharField(max_length=255, choices=STORAGE, default=0)
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True, related_name="phones"
     )

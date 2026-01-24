@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+from datetime import timedelta
 from pathlib import Path
 
 import dj_database_url
@@ -247,10 +248,36 @@ SWAGGER_SETTINGS = {
     'JSON_EDITOR': True,
 }
 AUTH_USER_MODEL = "customer.User"
+DATABASE_URL = config('DATABASE_URL', default=None)
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if DATABASE_URL:
+    # Если DATABASE_URL найден (для Neon.tech)
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True
+        )
     }
+else:
+    # Если DATABASE_URL НЕ найден (локальная разработка), используем SQLite
+    # Чтобы проект не выдавал ошибку ENGINE
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+SIMPLE_JWT = {
+    # Время жизни Access Token (теперь 180 дней)
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=180),
+
+    # Время жизни Refresh Token (лучше сделать его таким же или больше)
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=180),
+
+    # Остальные стандартные настройки
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }

@@ -4,7 +4,7 @@ from rest_framework.filters import SearchFilter
 from django.conf import settings
 from rest_framework.generics import ListAPIView
 from rest_framework import views, status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.db.models import Q, Exists, OuterRef, F, Sum, Value, BooleanField
 
@@ -40,7 +40,7 @@ class CategoryListAPIView(ListAPIView):
     search_fields = ["name", "main_type"]
     filterset_fields = ["name", "main_type"]
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = [IsAuthenticated]
 
 class SubCategoryListAPIView(ListAPIView):
     queryset = SubCategory.objects.all().order_by("-pk")
@@ -48,7 +48,7 @@ class SubCategoryListAPIView(ListAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ["category"]
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = [IsAuthenticated]
 
 class TicketListAPIView(ListAPIView):
     queryset = Ticket.objects.all().order_by("-pk")
@@ -59,7 +59,7 @@ class TicketListAPIView(ListAPIView):
         "product__product_type",
     ]
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = [IsAuthenticated]
 
 class PhoneListAPIView(ListAPIView):
     queryset = (
@@ -71,7 +71,7 @@ class PhoneListAPIView(ListAPIView):
     serializer_class = PhoneSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ["category", "product", "product__product_type"]
-
+    permission_classes = [IsAuthenticated]
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
@@ -112,7 +112,7 @@ class GoodListAPIView(ListAPIView):
         "product__product_type",
     ]
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         user = self.request.user
         if user.is_anonymous:
@@ -137,6 +137,7 @@ class GoodListAPIView(ListAPIView):
 
 
 class GoodVariantsAPIView(views.APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, product_type):
         # Good obyektlarini olish
         goods = (
@@ -160,6 +161,7 @@ class GoodVariantsAPIView(views.APIView):
         return Response(serializer.data)
 
 class TicketVariantsAPIView(views.APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, product_type):
         tickets = (
             Ticket.objects.filter(product__product_type=product_type)
@@ -180,6 +182,8 @@ class TicketVariantsAPIView(views.APIView):
         return Response(serializer.data)
 
 class PhoneVariantsAPIView(views.APIView):
+
+    permission_classes = [IsAuthenticated]
     def get(self, request, product_type):
         phones = (
             Phone.objects.filter(product__product_type=product_type)
@@ -205,7 +209,7 @@ class ImageListAPIView(ListAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ["product"]
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = [IsAuthenticated]
 
 class FamousTickets(ListAPIView):
     queryset = Ticket.objects.all().order_by("-pk")
@@ -215,13 +219,13 @@ class FamousTickets(ListAPIView):
         "product",
     ]
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = [IsAuthenticated]
 
 class PopularTicketsAPIView(ListAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketPopularSerializer
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         return (
             Ticket.objects.select_related("product")
@@ -235,7 +239,7 @@ class PopularPhonesAPIView(ListAPIView):
     queryset = Phone.objects.all()
     serializer_class = PhonePopularSerializer
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         return (
             Phone.objects.select_related("product")
@@ -249,7 +253,7 @@ class PopularGoodAPIView(ListAPIView):
     queryset = Good.objects.all()
     serializer_class = GoodPopularSerializer
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
 
         user = self.request.user
@@ -280,13 +284,13 @@ class NewTicketsListView(ListAPIView):
     queryset = Ticket.objects.all().order_by("product__created")
     serializer_class = TicketSerializer
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = [IsAuthenticated]
 
 class NewPhonesListView(ListAPIView):
     queryset = Phone.objects.all().order_by("product__created")
     serializer_class = PhoneSerializer
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = [IsAuthenticated]
 
 class NewGoodsListView(ListAPIView):
     queryset = (
@@ -297,7 +301,7 @@ class NewGoodsListView(ListAPIView):
     )
     serializer_class = GoodSerializer
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         user = self.request.user
         if user.is_anonymous:
@@ -324,7 +328,7 @@ class NewGoodsListView(ListAPIView):
 class TicketsOnSaleListView(ListAPIView):
     serializer_class = TicketSerializer
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
 
         queryset = Ticket.objects.filter(product__new_price__lt=F("product__old_price"))
@@ -334,7 +338,7 @@ class TicketsOnSaleListView(ListAPIView):
 class PhonesOnSaleListView(ListAPIView):
     serializer_class = PhoneSerializer
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         queryset = Phone.objects.filter(product__new_price__lt=F("product__old_price"))
         return queryset
@@ -343,7 +347,7 @@ class PhonesOnSaleListView(ListAPIView):
 class GoodsOnSaleListView(ListAPIView):
     serializer_class = GoodSerializer
     pagination_class = CustomPageNumberPagination
-
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         user = self.request.user
         if self.request.user.is_anonymous:
@@ -366,6 +370,7 @@ class GoodsOnSaleListView(ListAPIView):
 
 
 class MultiProductSearchView(views.APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         search_query = request.query_params.get("search", None)
         if not search_query:
@@ -407,7 +412,7 @@ class MultiProductSearchView(views.APIView):
 class RegularProductListAPIView(ListAPIView):
     queryset = ProductItem.objects.filter(active=True)
     serializer_class = ProductItemSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     # Generic ichidagi funksiyani override qilish
     def get_queryset(self):

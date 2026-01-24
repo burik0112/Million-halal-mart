@@ -157,7 +157,7 @@ class OrdersListView(ListView):
         query = self.request.GET.get('q', '')
         # Retrieve goods with related product and sub_category, and filter by name if a search query is provided
         order = (
-            Order.objects.select_related("user").order_by("-created")
+            Order.objects.select_related("user").order_by("-id")
         )
         if query:
             order = order.filter(Q(user__full_name__icontains=query) | Q(id__icontains=query))
