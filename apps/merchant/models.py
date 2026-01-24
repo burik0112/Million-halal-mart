@@ -36,6 +36,22 @@ class Order(TimeStampedModel, models.Model):
     total_amount = models.DecimalField(decimal_places=0, max_digits=20, default=0)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
+    def update_total_amount(self):
+        """
+        Считает общую сумму всех товаров в заказе и сохраняет её.
+        """
+        # Считаем сумму через связь ManyToMany (products)
+        # Если у товара есть новая цена (скидка), берем её, иначе старую
+        total = 0
+        for product in self.products.all():
+            price = product.new_price if product.new_price else product.old_price
+            total += (price or 0)
+
+        self.total_amount = total
+        # Используем update_fields, чтобы не вызывать сигналы по кругу (рекурсию)
+        self.save(update_fields=['total_amount'])
+
+
     # ---------------- LOYALTY BONUS ----------------
     def create_loyalty_pending_bonus(self):
         if LoyaltyPendingBonus.objects.filter(order=self).exists():
