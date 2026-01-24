@@ -103,6 +103,17 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'API for Million Mart Project',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENTS': {
+        'SECURITY_SCHEMES': {
+            'Bearer': {
+                'type': 'http',
+                'scheme': 'bearer',
+                'bearerFormat': 'JWT',
+                'description': 'JWT Token based authentication',
+            }
+        }
+    },
+    'SECURITY': [{'Bearer': []}],
 }
 
 CSRF_TRUSTED_ORIGINS = [
@@ -172,7 +183,6 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-        "rest_framework.authentication.TokenAuthentication",
     ],
 }
 
@@ -237,13 +247,6 @@ DOMAIN_NAME = "https://millionmart.uz"
 #     DATABASES['default']['OPTIONS'] = {'sslmode': 'require'}
 
 SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header'
-        }
-    },
     'USE_SESSION_AUTH': False, # Session authni o'chirib qo'ygan ma'qul, chalkashmaslik uchun
     'JSON_EDITOR': True,
 }
