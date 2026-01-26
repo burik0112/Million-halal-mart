@@ -35,6 +35,7 @@ class Order(TimeStampedModel, models.Model):
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     total_amount = models.DecimalField(decimal_places=0, max_digits=20, default=0)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
+    delivery_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def update_total_amount(self):
         """
