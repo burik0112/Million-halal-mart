@@ -151,7 +151,8 @@ class LocationListAPIView(ListAPIView):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-        return Location.objects.all().order_by("-pk")
+        # ВАЖНО: Фильтруем данные, чтобы юзер видел только свои локации
+        return Location.objects.filter(user=self.request.user.profile).order_by("-pk")
 
 
 class LocationRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
