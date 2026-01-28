@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework.pagination import PageNumberPagination
 from apps.product.models import ProductItem, Good, Phone, Ticket, Image
-from .models import Favorite, Location, News, Profile, ViewedNews, Banner
+from .models import Favorite, Location, News, Profile, ViewedNews, Banner, B2BApplication
 
 
 class CustomPageNumberPagination(PageNumberPagination):
@@ -219,14 +219,49 @@ class ImageForProductItemSerializer(serializers.ModelSerializer):
 
 
 class ProductItemForFavouriteSerializer(serializers.ModelSerializer):
+    # price -> bitta narx qaytadi (B2C yoki B2B)
+    price = serializers.SerializerMethodField()
     tickets = TicketForFavouriteSerializer(read_only=True)
     phones = PhoneFavouriteSerializer(read_only=True)
     goods = GoodFavouriteSerializer(read_only=True)
     images = ImageForProductItemSerializer(many=True, read_only=True)
+    sale = serializers.ReadOnlyField()
 
     class Meta:
         model = ProductItem
-        fields = "__all__"
+        fields = [
+            "id",
+            "desc",
+            "product_type",
+            "price",
+            "sale",
+            "weight",
+            "measure",
+            "available_quantity",
+            "bonus",
+            "main",
+            "active",
+            "tickets",
+            "phones",
+            "goods",
+            "images",
+            "created",
+            "modified",
+        ]
+
+    def get_price(self, obj):
+        request = self.context.get("request")
+        user = request.user if request else None
+
+        if user and user.is_authenticated and getattr(user, "is_b2b", False):
+            if getattr(obj, "b2b_price", 0) and obj.b2b_price > 0:
+                return obj.b2b_price
+
+        if user and user.is_authenticated and getattr(user, "is_wholesaler", False) and getattr(user, "is_approved", False):
+            if getattr(obj, "wholesale_price", 0) and obj.wholesale_price > 0:
+                return obj.wholesale_price
+
+        return obj.new_price
 
 
 class FavoriteListSerializer(serializers.ModelSerializer):
@@ -241,6 +276,28 @@ class BannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Banner
         fields = "__all__"
+
+
+class B2BApplicationCreateSerializer(serializers.ModelSerializer):
+    """/api/customer/b2b/apply/ -> B2B ariza yuborish (POST)"""
+
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    status = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = B2BApplication
+        fields = [
+            "id",
+            "user",
+            "company_name",
+            "phone",
+            "address",
+            "contact_person",
+            "extra_info",
+            "document_image",
+            "status",
+            "created",
+        ]
 
 
 # class NewsSerializer(serializers.ModelSerializer):

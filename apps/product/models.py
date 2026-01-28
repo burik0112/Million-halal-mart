@@ -50,6 +50,16 @@ class ProductItem(TimeStampedModel, models.Model):
         decimal_places=0, max_digits=10, null=True, blank=True, default=0
     )
 
+    # B2B NARX (kompaniya mijozlar uchun)
+    b2b_price = models.DecimalField(
+        decimal_places=0,
+        max_digits=10,
+        null=True,
+        blank=True,
+        default=0,
+        help_text="B2B (company) mijozlar uchun narx (user.is_b2b=True bo'lsa)",
+    )
+
     # OPTOM NARXLAR (YANGI QO'SHILDI)
     wholesale_price = models.DecimalField(
         decimal_places=0, max_digits=10, null=True, blank=True, default=0,

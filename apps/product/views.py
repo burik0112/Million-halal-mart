@@ -11,6 +11,8 @@ from django.db.models import Q, Exists, OuterRef, F, Sum, Value, BooleanField
 from django.db.models import Prefetch
 from rest_framework.views import APIView
 
+from drf_spectacular.utils import extend_schema
+
 from apps.customer.models import Favorite
 from .models import Category, Good, Image, Phone, SubCategory, Ticket, ProductItem
 from .permissions import IsApprovedWholesaler
@@ -33,6 +35,7 @@ from .serializers import (
 # Create your views here.
 
 
+@extend_schema(tags=["Product"])
 class CategoryListAPIView(ListAPIView):
     queryset = Category.objects.all().order_by("-pk")
     serializer_class = CategorySerializer
@@ -42,6 +45,7 @@ class CategoryListAPIView(ListAPIView):
     pagination_class = CustomPageNumberPagination
     permission_classes = [IsAuthenticated]
 
+@extend_schema(tags=["Product"])
 class SubCategoryListAPIView(ListAPIView):
     queryset = SubCategory.objects.all().order_by("-pk")
     serializer_class = SubCategorySerializer
@@ -50,6 +54,7 @@ class SubCategoryListAPIView(ListAPIView):
     pagination_class = CustomPageNumberPagination
     permission_classes = [IsAuthenticated]
 
+@extend_schema(tags=["Product"])
 class TicketListAPIView(ListAPIView):
     queryset = Ticket.objects.all().order_by("-pk")
     serializer_class = TicketSerializer
@@ -61,6 +66,7 @@ class TicketListAPIView(ListAPIView):
     pagination_class = CustomPageNumberPagination
     permission_classes = [IsAuthenticated]
 
+@extend_schema(tags=["Product"])
 class PhoneListAPIView(ListAPIView):
     queryset = (
         Phone.objects.all()
@@ -97,6 +103,7 @@ class PhoneListAPIView(ListAPIView):
             )
 
 
+@extend_schema(tags=["Product"])
 class GoodListAPIView(ListAPIView):
     queryset = (
         Good.objects.filter(product__main=True).select_related("product")
@@ -136,6 +143,7 @@ class GoodListAPIView(ListAPIView):
             )
 
 
+@extend_schema(tags=["Product"])
 class GoodVariantsAPIView(views.APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request, product_type):
@@ -160,6 +168,7 @@ class GoodVariantsAPIView(views.APIView):
 
         return Response(serializer.data)
 
+@extend_schema(tags=["Product"])
 class TicketVariantsAPIView(views.APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request, product_type):
@@ -181,6 +190,7 @@ class TicketVariantsAPIView(views.APIView):
 
         return Response(serializer.data)
 
+@extend_schema(tags=["Product"])
 class PhoneVariantsAPIView(views.APIView):
 
     permission_classes = [IsAuthenticated]
@@ -203,6 +213,7 @@ class PhoneVariantsAPIView(views.APIView):
 
         return Response(serializer.data)
 
+@extend_schema(tags=["Product"])
 class ImageListAPIView(ListAPIView):
     queryset = Image.objects.all().order_by("-pk")
     serializer_class = ImageSerializer
@@ -211,6 +222,7 @@ class ImageListAPIView(ListAPIView):
     pagination_class = CustomPageNumberPagination
     permission_classes = [IsAuthenticated]
 
+@extend_schema(tags=["Product"])
 class FamousTickets(ListAPIView):
     queryset = Ticket.objects.all().order_by("-pk")
     serializer_class = TicketSerializer
@@ -221,6 +233,7 @@ class FamousTickets(ListAPIView):
     pagination_class = CustomPageNumberPagination
     permission_classes = [IsAuthenticated]
 
+@extend_schema(tags=["Product"])
 class PopularTicketsAPIView(ListAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketPopularSerializer
@@ -235,6 +248,7 @@ class PopularTicketsAPIView(ListAPIView):
         )
 
 
+@extend_schema(tags=["Product"])
 class PopularPhonesAPIView(ListAPIView):
     queryset = Phone.objects.all()
     serializer_class = PhonePopularSerializer
@@ -249,6 +263,7 @@ class PopularPhonesAPIView(ListAPIView):
         )
 
 
+@extend_schema(tags=["Product"])
 class PopularGoodAPIView(ListAPIView):
     queryset = Good.objects.all()
     serializer_class = GoodPopularSerializer
@@ -280,18 +295,21 @@ class PopularGoodAPIView(ListAPIView):
             )
 
 
+@extend_schema(tags=["Product"])
 class NewTicketsListView(ListAPIView):
     queryset = Ticket.objects.all().order_by("product__created")
     serializer_class = TicketSerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = [IsAuthenticated]
 
+@extend_schema(tags=["Product"])
 class NewPhonesListView(ListAPIView):
     queryset = Phone.objects.all().order_by("product__created")
     serializer_class = PhoneSerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = [IsAuthenticated]
 
+@extend_schema(tags=["Product"])
 class NewGoodsListView(ListAPIView):
     queryset = (
         Good.objects.all()
@@ -325,6 +343,7 @@ class NewGoodsListView(ListAPIView):
             )
 
 
+@extend_schema(tags=["Product"])
 class TicketsOnSaleListView(ListAPIView):
     serializer_class = TicketSerializer
     pagination_class = CustomPageNumberPagination
@@ -335,6 +354,7 @@ class TicketsOnSaleListView(ListAPIView):
         return queryset
 
 
+@extend_schema(tags=["Product"])
 class PhonesOnSaleListView(ListAPIView):
     serializer_class = PhoneSerializer
     pagination_class = CustomPageNumberPagination
@@ -344,6 +364,7 @@ class PhonesOnSaleListView(ListAPIView):
         return queryset
 
 
+@extend_schema(tags=["Product"])
 class GoodsOnSaleListView(ListAPIView):
     serializer_class = GoodSerializer
     pagination_class = CustomPageNumberPagination
@@ -369,6 +390,7 @@ class GoodsOnSaleListView(ListAPIView):
         return queryset
 
 
+@extend_schema(tags=["Product"])
 class MultiProductSearchView(views.APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
@@ -409,6 +431,7 @@ class MultiProductSearchView(views.APIView):
 
 
 
+@extend_schema(tags=["Product"])
 class RegularProductListAPIView(ListAPIView):
     queryset = ProductItem.objects.filter(active=True)
     serializer_class = ProductItemSerializer
@@ -431,6 +454,7 @@ class RegularProductListAPIView(ListAPIView):
         return context
 
 
+@extend_schema(tags=["Product"])
 class WholesaleProductAPIView(APIView):
     # Faqat tasdiqlangan optomchilar kira oladi
     permission_classes = [IsApprovedWholesaler]

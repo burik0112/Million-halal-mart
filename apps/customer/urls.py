@@ -28,6 +28,9 @@ urlpatterns = [
     path("banners/", views.BannerListAPIView.as_view(), name="banner"),
     path('latest-unviewed-news/', views.LatestUnviewedNewsView.as_view(), name='latest-unviewed-news'),
     path('mark-news-as-viewed/', views.MarkNewsAsViewed.as_view(), name='mark-news-as-viewed'),
+
+    # /api/customer/b2b/apply/ -> B2B ariza yuborish
+    path("b2b/apply/", views.B2BApplicationCreateAPIView.as_view(), name="b2b-apply"),
    
 
 ]

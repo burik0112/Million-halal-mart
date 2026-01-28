@@ -12,8 +12,10 @@ from rest_framework.generics import (
 )
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from drf_spectacular.utils import extend_schema
 
 from django.utils.translation import gettext_lazy as _
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import generics, status, permissions
 from django.db import IntegrityError, transaction
@@ -25,7 +27,7 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from .utils import generate_otp
-from .models import Favorite, Location, News, Profile, ViewedNews, Banner
+from .models import Favorite, Location, News, Profile, ViewedNews, Banner, B2BApplication
 from .base import CustomerListService, CustomerFilterService
 from django.contrib.auth import get_user_model
 
@@ -44,12 +46,14 @@ from .serializers import (
     LoginSerializer,
     RegisterSerializer,
     VerifyOTPSerializer,
-    SetPasswordSerializer
+    SetPasswordSerializer,
+    B2BApplicationCreateSerializer,
 )
 from ..merchant.models import Referral
 User = get_user_model()
 
 
+@extend_schema(tags=["Authentication"])
 class LoginView(APIView):
     # ОБЯЗАТЕЛЬНО ДОБАВЬТЕ ЭТИ ДВЕ СТРОКИ:
     permission_classes = [AllowAny]  # Разрешить вход без токена
@@ -58,6 +62,7 @@ class LoginView(APIView):
     serializer_class = LoginSerializer
 
     @swagger_auto_schema(
+        tags=["Authentication"],
         operation_summary="Вход в систему (Получение JWT токена)",
         request_body=LoginSerializer,
         responses={
@@ -74,6 +79,7 @@ class LoginView(APIView):
             )
         }
     )
+
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -93,12 +99,14 @@ class LoginView(APIView):
 # Create your views here.
 
 
+@extend_schema(tags=["Customer"])
 class ProfileCreateAPIView(CreateAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 
 
 
+@extend_schema(tags=["Customer"])
 class ProfileUpdate(APIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
@@ -119,6 +127,7 @@ class ProfileUpdate(APIView):
         return Response(serializer.data)
 
 
+@extend_schema(tags=["Customer"])
 class ProfileDelete(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -131,6 +140,7 @@ class ProfileDelete(APIView):
         )
 
 
+@extend_schema(tags=["Customer"])
 class LocationCreateAPIView(CreateAPIView):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
@@ -139,6 +149,7 @@ class LocationCreateAPIView(CreateAPIView):
         serializer.save(user=self.request.user.profile)
 
 
+@extend_schema(tags=["Customer"])
 class LocationListAPIView(ListAPIView):
     """
     Barcha location'larni list qilish
@@ -155,11 +166,13 @@ class LocationListAPIView(ListAPIView):
         return Location.objects.filter(user=self.request.user.profile).order_by("-pk")
 
 
+@extend_schema(tags=["Customer"])
 class LocationRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
 
 
+@extend_schema(tags=["Customer"])
 class NewsListAPIView(ListAPIView):
     """
     Barcha yangiliklarni list qilish
@@ -175,16 +188,19 @@ class NewsListAPIView(ListAPIView):
         return CustomerListService.get_news_list()
 
 
+@extend_schema(tags=["Customer"])
 class NewsRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     queryset = News.objects.all()
     serializer_class = NewsSerializer
 
 
+@extend_schema(tags=["Customer"])
 class ViewedNewsCreateAPIView(CreateAPIView):
     queryset = ViewedNews.objects.all()
     serializer_class = ViewedNewsSerializer
 
 
+@extend_schema(tags=["Customer"])
 class FavoriteCreateAPIView(CreateAPIView):
     queryset = Favorite.objects.all()
     serializer_class = FavoriteSerializer
@@ -194,7 +210,14 @@ class FavoriteCreateAPIView(CreateAPIView):
         serializer.save(user=self.request.user.profile)
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        # Front product yuborishda 2 xil format bo'lishi mumkin:
+        # 1) {"product": <id>}  (DRF standart)
+        # 2) {"product_id": <id>} (talab bo'yicha)
+        data = request.data.copy()
+        if "product" not in data and "product_id" in data:
+            data["product"] = data.get("product_id")
+
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
 
         try:
@@ -213,12 +236,16 @@ class FavoriteCreateAPIView(CreateAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(tags=["Customer"])
 class RemoveFromFavoritesView(APIView):
-    def post(self, request, product_id, *args, **kwargs):
-        user = request.user
+    # /api/customer/remove_from_favorites/<product_id>/ -> UNLIKE (product_id bo'yicha)
+    permission_classes = [IsAuthenticated]
 
+    def _delete_by_product_id(self, request, product_id):
+        # Like ID bilan emas, aynan product_id bo'yicha o'chiramiz:
+        # login bo'lgan user + product_id
         try:
-            favorite = Favorite.objects.get(user=user.profile, product_id=product_id)
+            favorite = Favorite.objects.get(user=request.user.profile, product_id=product_id)
             favorite.delete()
             return Response({"status": "success"}, status=status.HTTP_204_NO_CONTENT)
         except Favorite.DoesNotExist:
@@ -227,7 +254,16 @@ class RemoveFromFavoritesView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+    def post(self, request, product_id, *args, **kwargs):
+        return self._delete_by_product_id(request, product_id)
 
+    # Front o'zgarmasin: eski loyihada POST ishlatilgan bo'lishi mumkin.
+    # Shu bilan birga, DELETE (unlike) ham ishlayversin.
+    def delete(self, request, product_id, *args, **kwargs):
+        return self._delete_by_product_id(request, product_id)
+
+
+@extend_schema(tags=["Customer"])
 class FavoriteListAPIView(ListAPIView):
     """
     Foydalanuvchining sevimli mahsulotlarini list qilish
@@ -241,19 +277,46 @@ class FavoriteListAPIView(ListAPIView):
     def get_queryset(self):
         if not self.request.user.is_authenticated:
             return Favorite.objects.none()
-        
-        return Favorite.objects.all().order_by("-pk").select_related(
+
+        # Faqat login bo'lgan user'ning sevimlilari (leak bo'lmasin)
+        return (
+            Favorite.objects.filter(user=self.request.user.profile)
+            .order_by("-pk")
+            .select_related(
             'product__tickets',
             'product__goods',
             'product__phones'
-        ).prefetch_related('product__images')
+            )
+            .prefetch_related('product__images')
+        )
 
 
+@extend_schema(tags=["Customer"])
 class FavoriteRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     queryset = Favorite.objects.all()
     serializer_class = FavoriteSerializer
 
+    # /api/customer/favorite/<pk>/retrieve/ -> front ba'zan pk=product_id yuboradi.
+    # Shart: delete (unlike) LIKE ID bilan emas, product_id bilan ishlasin.
+    def destroy(self, request, *args, **kwargs):
+        pk = kwargs.get("pk")
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
 
+        # 1) Avval pk ni product_id deb ko'ramiz (talab bo'yicha)
+        favorite = Favorite.objects.filter(user=request.user.profile, product_id=pk).first()
+        if favorite is None:
+            # 2) Fallback: agar front eskicha favorite id yuborsa ham, faqat o'ziga tegishlisini o'chirsin
+            favorite = Favorite.objects.filter(user=request.user.profile, pk=pk).first()
+
+        if favorite is None:
+            return Response({"error": "Item not found in favorites"}, status=status.HTTP_404_NOT_FOUND)
+
+        favorite.delete()
+        return Response({"status": "success"}, status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema(tags=["Authentication"])
 class RegisterView(APIView):
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
@@ -350,6 +413,7 @@ def send_otp_sms(phone_number, otp):
         pass
 
 
+@extend_schema(tags=["Authentication"])
 class VerifyRegisterOTPView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = VerifyOTPSerializer(data=request.data)
@@ -378,12 +442,14 @@ class VerifyRegisterOTPView(APIView):
 
 
 # ===== VIEW =====
+@extend_schema(tags=["Authentication"])
 class SetPasswordView(APIView):
     serializer_class = SetPasswordSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [AllowAny]
 
     @swagger_auto_schema(
+        tags=["Authentication"],
         request_body=SetPasswordSerializer,
         responses={
             200: "Password set successfully",
@@ -420,6 +486,7 @@ class SetPasswordView(APIView):
 
 
 
+@extend_schema(tags=["Customer"])
 class BannerListAPIView(ListAPIView):
     """
     Barcha banner'larni list qilish
@@ -431,6 +498,7 @@ class BannerListAPIView(ListAPIView):
         return CustomerListService.get_banners_list()
 
 
+@extend_schema(tags=["Customer"])
 class ProfileEditAPIView(generics.UpdateAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -441,6 +509,7 @@ class ProfileEditAPIView(generics.UpdateAPIView):
         return profile
 
 
+@extend_schema(tags=["Customer"])
 class LatestUnviewedNewsView(APIView):
     def get(self, request, *args, **kwargs):
         latest_news = News.get_latest_unviewed_news(request.user.profile)
@@ -453,6 +522,7 @@ class LatestUnviewedNewsView(APIView):
         )
 
 
+@extend_schema(tags=["Customer"])
 class MarkNewsAsViewed(APIView):
     def post(self, request, *args, **kwargs):
         serializer = ViewedNewsSerializer(
@@ -465,4 +535,21 @@ class MarkNewsAsViewed(APIView):
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# /api/customer/b2b/apply/ -> B2B ariza yuborish (frontenddagi "Ariza yuborish")
+@extend_schema(tags=["B2B"])
+class B2BApplicationCreateAPIView(CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = B2BApplicationCreateSerializer
+
+    def perform_create(self, serializer):
+        # 1 user -> 1 ta pending ariza (dublikat bo'lmasin)
+        if B2BApplication.objects.filter(
+            user=self.request.user,
+            status=B2BApplication.Status.PENDING,
+        ).exists():
+            raise ValidationError({"detail": "You already have a pending B2B application."})
+
+        serializer.save(user=self.request.user)
 

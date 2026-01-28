@@ -3,6 +3,7 @@ import random, string
 from django.conf import settings
 from django.contrib.auth.models import User, AbstractUser
 from django.db import models
+from django.db.models import Q
 from model_utils.models import TimeStampedModel
 
 
@@ -23,6 +24,7 @@ class User(AbstractUser):
     )
     is_wholesaler = models.BooleanField(default=False) # Optomchi xaridor
     is_approved = models.BooleanField(default=False)  # Admin tasdig'i
+    is_b2b = models.BooleanField(default=False)  # B2B (kompaniya) mijoz
 
     def __str__(self):
         return self.username
@@ -61,6 +63,53 @@ class Profile(models.Model): # Удали TimeStampedModel если она вы�
     # ВАЖНО: def __str__ должен быть ВНУТРИ класса (с отступом)
     def __str__(self) -> str:
         return f"{self.full_name} ({self.origin.username})"
+
+
+class B2BApplication(TimeStampedModel, models.Model):
+    """B2B ariza modeli.
+
+    /api/customer/b2b/apply/ endpointi shu modelga yozadi.
+    """
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="b2b_applications",
+    )
+    company_name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=50)
+    address = models.CharField(max_length=510)
+    contact_person = models.CharField(max_length=255)
+    extra_info = models.TextField(blank=True)
+    document_image = models.ImageField(upload_to="b2b/documents/", null=True, blank=True)
+    status = models.CharField(
+        max_length=10,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        # Admin arizani approved qilsa -> user.is_b2b = True
+        if self.status == self.Status.APPROVED and not getattr(self.user, "is_b2b", False):
+            self.user.is_b2b = True
+            self.user.save(update_fields=["is_b2b"])
+
+    class Meta:
+        # 1 user -> 1 ta pending ariza (dublikat bo'lmasin)
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user"],
+                condition=Q(status="pending"),
+                name="unique_pending_b2b_application_per_user",
+            )
+        ]
 
 
 class Location(TimeStampedModel, models.Model):

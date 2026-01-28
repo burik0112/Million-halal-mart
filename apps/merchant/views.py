@@ -16,6 +16,8 @@ from django.db.models import Prefetch
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from drf_spectacular.utils import extend_schema
+
 from apps.product.models import Image, ProductItem
 from .models import Order, OrderItem, Information, Service, SocialMedia, Bonus, LoyaltyCard
 from .serializers import (
@@ -37,6 +39,7 @@ from apps.dashboard.main import bot
 # Create your views here.
 
 
+@extend_schema(tags=["Merchant"])
 class OrderCreateAPIView(CreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderCreateSerializer
@@ -65,6 +68,7 @@ class OrderCreateAPIView(CreateAPIView):
         )
 
 
+@extend_schema(tags=["Merchant"])
 class OrderListAPIView(ListAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderListSerializer
@@ -128,12 +132,14 @@ class OrderListAPIView(ListAPIView):
         )
 
 
+@extend_schema(tags=["Merchant"])
 class OrderRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     queryset = Order.objects.all().order_by("-pk")
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
 
+@extend_schema(tags=["Merchant"])
 class OrderItemCreateAPIView(CreateAPIView):
     queryset = OrderItem.objects.all().order_by("-pk")
     serializer_class = OrderItemSerializer
@@ -168,12 +174,14 @@ class OrderItemCreateAPIView(CreateAPIView):
         )
 
 
+@extend_schema(tags=["Merchant"])
 class OrderItemListAPIView(ListAPIView):
     queryset = OrderItem.objects.all().order_by("-pk")
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
 
 
+@extend_schema(tags=["Merchant"])
 class OrderItemRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
@@ -199,12 +207,14 @@ class OrderItemRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
         return Response({"message": success_message}, status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(tags=["Merchant"])
 class InformationListAPIView(ListAPIView):
     queryset = Information.objects.all().order_by("-pk")
     serializer_class = InformationSerializer
     permission_classes = [AllowAny]
 
 
+@extend_schema(tags=["Merchant"])
 class CheckoutView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -262,24 +272,28 @@ class CheckoutView(APIView):
                 )
 
 
+@extend_schema(tags=["Merchant"])
 class ServiceListAPIView(ListAPIView):
     queryset = Service.objects.all().order_by("-pk")
     serializer_class = ServiceSerializer
     permission_classes = [IsAuthenticated]
 
 
+@extend_schema(tags=["Merchant"])
 class SocialMeadiaAPIView(ListAPIView):
     queryset = SocialMedia.objects.all().order_by("-pk")
     serializer_class = SocialMediaSerializer
     permission_classes = [IsAuthenticated]
 
 
+@extend_schema(tags=["Merchant"])
 class BonusPIView(ListAPIView):
     queryset = Bonus.objects.all().order_by("pk")
     serializer_class = BonusSerializer
     permission_classes = [IsAuthenticated]
 
 
+@extend_schema(tags=["Merchant"])
 class MyLoyaltyCardAPIView(APIView):
     # Только залогиненный пользователь может получить данные
     authentication_classes = [JWTAuthentication]
@@ -308,6 +322,7 @@ class MyLoyaltyCardAPIView(APIView):
             return Response({"detail": "Loyalty card not found for this user"}, status=status.HTTP_404_NOT_FOUND)
 
 
+@extend_schema(tags=["Merchant"])
 class MyBonusScreenAPIView(APIView):
     permission_classes = [IsAuthenticated]
 

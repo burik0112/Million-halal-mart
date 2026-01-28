@@ -33,23 +33,45 @@ class ImageSerializer(serializers.ModelSerializer):
 
 
 class ProductItemSerializer(serializers.ModelSerializer):
-    current_price = serializers.SerializerMethodField()
+    # price -> bitta narx qaytadi (B2C yoki B2B), frontend shu maydonni ishlatadi
+    price = serializers.SerializerMethodField()
     sale = serializers.ReadOnlyField()
 
     class Meta:
         model = ProductItem
-        fields = "__all__"
+        fields = [
+            "id",
+            "desc",
+            "product_type",
+            "old_price",
+            "new_price",
+            "price",
+            "sale",
+            "weight",
+            "measure",
+            "available_quantity",
+            "bonus",
+            "main",
+            "active",
+            "created",
+            "modified",
+        ]
 
-    def get_current_price(self, obj):
-        request = self.context.get('request')
+    def get_price(self, obj):
+        request = self.context.get("request")
         user = request.user if request else None
 
-        # Optomchi va tasdiqlangan bo'lsa optom narxni ko'rsatish
-        if user and user.is_authenticated and getattr(user, 'is_wholesaler', False) and getattr(user, 'is_approved',
-                                                                                                False):
-            if obj.wholesale_price > 0:
+        # B2B bo'lsa -> B2B narx
+        if user and user.is_authenticated and getattr(user, "is_b2b", False):
+            if getattr(obj, "b2b_price", 0) and obj.b2b_price > 0:
+                return obj.b2b_price
+
+        # Eski optom (wholesaler) logikasi buzilmasin
+        if user and user.is_authenticated and getattr(user, "is_wholesaler", False) and getattr(user, "is_approved", False):
+            if getattr(obj, "wholesale_price", 0) and obj.wholesale_price > 0:
                 return obj.wholesale_price
 
+        # Default -> oddiy (B2C) narx
         return obj.new_price
 
 
