@@ -1,15 +1,16 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import (
     CreateAPIView,
     ListAPIView,
-    RetrieveUpdateDestroyAPIView,
+    RetrieveUpdateDestroyAPIView, RetrieveAPIView,
 )
 from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework import status, permissions
+from rest_framework import status, permissions, parsers
 from django.db import transaction
 from django.db.models import Prefetch
 from rest_framework.response import Response
@@ -27,7 +28,8 @@ from .serializers import (
     OrderListSerializer,
     OrderCreateSerializer,
     SocialMediaSerializer,
-    BonusSerializer, LoyaltyCardSerializer, UserBonusSerializer,
+    BonusSerializer, LoyaltyCardSerializer, UserBonusSerializer, CartAddSerializer,
+    CheckoutSerializer, ReceiptUploadSerializer, OrderDetailSerializer,
 )
 from apps.dashboard.main import bot
 
@@ -173,24 +175,27 @@ class OrderItemListAPIView(ListAPIView):
 
 
 class OrderItemRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
-    queryset = OrderItem.objects.all().order_by("-pk")
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Login qilgan userni aniqlaymiz
+        user_profile = self.request.user.profile
+        # Faqat shu userga tegishli bo'lgan "savatdagi" narsalarni qaytaramiz
+        return OrderItem.objects.filter(order__user=user_profile)
 
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
         order = instance.order
         self.perform_destroy(instance)
-        order.update_total_amount()  # Update the order's total amount after deleting the item
+        order.update_total_amount()
 
-        # Multi-language success message for product removal
         success_message = {
-            "en": _("The product has been removed from the cart"),
-            "uz": _("Maxsulot savatdan o'chirib tashlandi"),
-            "ru": _("Товар удален из корзины"),
+            "uz": "Maxsulot savatdan o'chirib tashlandi",
+            "ru": "Товар удален из корзины",
+            "en": "The product has been removed from the cart",
             "kr": _("제품이 장바구니에서 제거되었습니다"),
         }
-
         return Response({"message": success_message}, status=status.HTTP_204_NO_CONTENT)
 
 
@@ -312,3 +317,76 @@ class MyBonusScreenAPIView(APIView):
 
         serializer = UserBonusSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CartManageAPIView(APIView):
+    serializer_class = CartAddSerializer
+
+    @swagger_auto_schema(request_body=CartAddSerializer)
+    def post(self, request):
+        serializer = CartAddSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        order, _ = Order.objects.get_or_create(user=request.user.profile, status='in_cart')
+        product_id = serializer.validated_data['product']
+        quantity = serializer.validated_data['quantity']
+
+        if quantity > 0:
+            OrderItem.objects.update_or_create(order=order, product_id=product_id, defaults={'quantity': quantity})
+        else:
+            OrderItem.objects.filter(order=order, product_id=product_id).delete()
+
+        order.update_total_amount()
+        return Response({"message": "Savat yangilandi", "total": order.total_amount})
+
+
+# --- 2. BUYURTMA BERISH (CHECKOUT) ---
+class CheckoutAPIView(APIView):
+    serializer_class = CheckoutSerializer
+
+    @swagger_auto_schema(request_body=CheckoutSerializer)
+    def post(self, request):
+        order = Order.objects.filter(user=request.user.profile, status='in_cart').first()
+        if not order: return Response({"error": "Savat bo'sh"}, status=400)
+
+        serializer = CheckoutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        order.location_id = serializer.validated_data['location']
+        order.comment = serializer.validated_data.get('comment', '')
+        order.status = 'pending'  # Status o'zgardi -> "To'lov kutilmoqda"
+        order.save()
+        return Response({"message": "Buyurtma berildi, endi to'lov qiling"})
+
+
+# --- 3. CHEK YUKLASH ---
+class ReceiptUploadAPIView(APIView):
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
+    serializer_class = ReceiptUploadSerializer
+
+    @swagger_auto_schema(request_body=ReceiptUploadSerializer)
+    def patch(self, request, pk):
+        order = get_object_or_404(Order, pk=pk, user=request.user.profile, status='pending')
+        serializer = ReceiptUploadSerializer(order, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            order.status = 'waiting_approval'  # Status o'zgardi -> "Admin tasdig'ini kutmoqda"
+            order.save()
+            return Response({"message": "Chek yuklandi"})
+        return Response(serializer.errors, status=400)
+
+
+# --- 4. BUYURTMA DETALI (TIMELINE BILAN) ---
+class OrderDetailAPIView(APIView):
+    def get(self, request, pk):
+        order = get_object_or_404(Order, pk=pk, user=request.user.profile)
+        serializer = OrderDetailSerializer(order)
+        return Response(serializer.data)
+
+class MyOrdersListView(ListAPIView):
+    serializer_class = OrderListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Savatda bo'lmagan, ya'ni haqiqiy buyurtma bo'lgan narsalar
+        return Order.objects.filter(user=self.request.user.profile).exclude(status='in_cart').order_by('-pk')

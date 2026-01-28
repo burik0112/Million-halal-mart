@@ -19,6 +19,7 @@ class Order(TimeStampedModel, models.Model):
     STATUS_CHOICES = (
         ("in_cart", "Savatchada"),
         ("pending", "Kutilmoqda"),
+        ("waiting_approval", "Tasdiq kutilmoqda"),  # User chek yukladi
         ("approved", "Tasdiqlandi"),
         ("sent", "Yuborildi"),
         ("cancelled", "Bekor qilindi"),
@@ -31,12 +32,24 @@ class Order(TimeStampedModel, models.Model):
         ProductItem, through="OrderItem", related_name="order"
     )
     comment = models.TextField(blank=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="in_cart")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="in_cart")
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     total_amount = models.DecimalField(decimal_places=0, max_digits=20, default=0)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     delivery_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     bonus_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    payment_receipt = models.ImageField(upload_to='receipts/', null=True, blank=True)  # To'lov cheki
+
+    def update_total_amount(self):
+        total = 0
+        for item in self.orderitem.all():
+            price = item.product.new_price if item.product.new_price > 0 else item.product.old_price
+            total += (price or 0) * item.quantity
+        self.total_amount = total
+        self.save(update_fields=['total_amount'])
+
+    def get_status_display_value(self):
+        return dict(self.STATUS_CHOICES).get(self.status, "Noma'lum")
 
     def update_total_amount(self):
         """
@@ -87,24 +100,37 @@ class Order(TimeStampedModel, models.Model):
     def save(self, *args, **kwargs):
         old_status = None
         if self.pk:
+            # Eskisining statusini bazadan olish
             old_status = Order.objects.get(pk=self.pk).status
 
-        # 1️⃣ Сохраняем order, чтобы был pk
+        # 1️⃣ Avval orderni saqlaymiz (pk paydo bo'lishi uchun)
         super().save(*args, **kwargs)
 
-        # 2️⃣ Считаем сумму заказа
+        # 2️⃣ Summani hisoblash
         total = Decimal(0)
+        # related_name orqali hamma itemlarni olamiz
         items = self.orderitem.all()
 
         for item in items:
-            price = (
-                item.product.new_price
-                if item.product.new_price > 0
-                else item.product.old_price
-            )
-            total += price * item.quantity
+            # ❗ MUHIM: Mahsulot (product) o'chib ketmaganligini tekshiramiz
+            if item.product:
+                price = (
+                    item.product.new_price
+                    if item.product.new_price > 0
+                    else item.product.old_price
+                )
+                total += price * item.quantity
+            else:
+                # Agar mahsulot yo'q bo'lsa (None), bu itemni o'tkazib yuboramiz
+                continue
 
-        # 4️⃣ Создаём pending bonus ТОЛЬКО при переходе в sent
+        # 3️⃣ Agar jami summa o'zgargan bo'lsa, uni saqlab qo'yamiz
+        # Faqat total_amount ni yangilaymiz (cheksiz sikl bo'lmasligi uchun)
+        if self.total_amount != total:
+            self.total_amount = total
+            Order.objects.filter(pk=self.pk).update(total_amount=total)
+
+        # 4️⃣ Bonus yaratish - faqat status "sent" ga o'tganda
         if self.status == "sent" and old_status != "sent":
             self.create_loyalty_pending_bonus()
 
@@ -344,4 +370,6 @@ class WalletTransaction(models.Model):
 
     def __str__(self):
         return f"Transaction({self.user_id}, {self.type}, {self.amount})"
+
+
 

@@ -1,15 +1,11 @@
 from modeltranslation.translator import register, TranslationOptions
-from .models import Category, SubCategory, ProductItem, Ticket, Phone, Good, Image,  SoldProduct
+from .models import Category, ProductItem, Ticket, Phone, Good, Image, SoldProduct, SubCategory
 
 
 @register(Category)
 class CategoryTranslationOptions(TranslationOptions):
     fields = ('name', 'desc')
 
-
-@register(SubCategory)
-class SubCategoryTranslationOptions(TranslationOptions):
-    fields = ('name', 'desc')
 
 
 @register(Ticket)
@@ -35,3 +31,8 @@ class GoodTranslationOptions(TranslationOptions):
 @register(Image)
 class ImageTranslationOptions(TranslationOptions):
     fields = ('name', )
+
+
+@register(SubCategory)
+class SubCategoryTranslationOptions(TranslationOptions):
+    fields = ('name', 'desc')

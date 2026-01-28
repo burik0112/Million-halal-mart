@@ -6,7 +6,7 @@ from apps.product.serializers import (
 from .models import Bonus, LoyaltyCard, Referral
 from apps.product.models import Phone, Ticket, Good
 from .models import Order, OrderItem, Information, Service, SocialMedia
-from ..customer.models import Profile
+from ..customer.models import Profile, Location
 
 
 class CustomPageNumberPagination(PageNumberPagination):
@@ -83,6 +83,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
+        # Bu qism faqat CreateAPIView da ishlaydi (yangi qo'shishda)
         user = self.context["request"].user
         product = validated_data.get("product")
         order, created = Order.objects.get_or_create(
@@ -228,3 +229,43 @@ class UserBonusSerializer(serializers.ModelSerializer):
     def get_my_referrals_list(self, obj):
         invites = Referral.objects.filter(referrer=obj).order_by('-created_at')
         return MyReferralHistorySerializer(invites, many=True).data
+
+
+
+
+class CartAddSerializer(serializers.Serializer):
+    product = serializers.IntegerField()
+    quantity = serializers.IntegerField()
+
+# 2. Buyurtmani rasmiylashtirish (Checkout) uchun
+class CheckoutSerializer(serializers.Serializer):
+    location = serializers.IntegerField()
+    comment = serializers.CharField(required=False, allow_blank=True)
+
+# 3. Chek yuklash uchun
+class ReceiptUploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['payment_receipt']
+
+# 4. Buyurtma tafsilotlari (Rasmda ko'ringan Timeline bilan)
+class OrderDetailSerializer(serializers.ModelSerializer):
+    items = serializers.SerializerMethodField()
+    timeline = serializers.SerializerMethodField()
+    status_uz = serializers.CharField(source='get_status_display_value')
+
+    class Meta:
+        model = Order
+        fields = ['id', 'status', 'status_uz', 'total_amount', 'items', 'location', 'comment', 'timeline', 'created_at']
+
+    def get_items(self, obj):
+        # Buyurtma ichidagi mahsulotlar ro'yxati
+        return [{"name": i.product.product_type, "quantity": i.quantity, "price": i.product.new_price or i.product.old_price} for i in obj.orderitem.all()]
+
+    def get_timeline(self, obj):
+        # Rasmda ko'ringan Step-by-step holati
+        return {
+            "step1_created": True,
+            "step2_paid": obj.status in ['waiting_approval', 'approved', 'sent'],
+            "step3_approved": obj.status in ['approved', 'sent'],
+        }

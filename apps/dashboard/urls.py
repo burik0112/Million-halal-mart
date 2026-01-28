@@ -1,4 +1,7 @@
 from django.urls import path
+
+from .loyalty_card_managment import loyalty_customer_list, approve_bonus, \
+    loyalty_user_detail_view, edit_loyalty_card
 from .product import (
     PhoneListView,
     PhoneCreateView,
@@ -291,4 +294,9 @@ urlpatterns = [
         name="edit_media",
     ),
     path("base-info/", base_info, name="base_info"),
+
+    path('loyalty/customers/', loyalty_customer_list, name='loyalty_customer_list'),
+    path('loyalty/customer/<int:profile_id>/', loyalty_user_detail_view, name='loyalty_customer_detail'),
+    path('loyalty/approve-bonus/<int:bonus_id>/', approve_bonus, name='approve_bonus'),
+    path('loyalty/edit-card/<int:profile_id>/', edit_loyalty_card, name='edit_loyalty_card'),
 ]
