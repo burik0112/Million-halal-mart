@@ -39,7 +39,7 @@ class OrderItemInline(admin.TabularInline):
 
 class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline]
-    list_display = ("user", "status", "total_amount", "created", "modified")
+    list_display = ("user", "status", "total_amount", "created_at")
     search_fields = ("user__full_name", "status")
     list_filter = ("status",)
 

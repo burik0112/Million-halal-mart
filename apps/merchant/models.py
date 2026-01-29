@@ -1,3 +1,5 @@
+import random
+import time
 from datetime import timedelta, date
 
 from django.core.exceptions import ValidationError
@@ -15,13 +17,24 @@ from apps.customer.models import Profile, Location
 from apps.product.models import ProductItem
 
 
-class Order(TimeStampedModel, models.Model):
+def generate_order_number():
+    # Masalan: ORD + vaqt tamg'asi + 2ta tasodifiy son
+    return f"ORD{int(time.time())}{random.randint(10, 99)}"
+
+class Order(models.Model):
+    # Buyurtma raqami (masalan: ORD1738080000)
+    order_number = models.CharField(
+        max_length=25,
+        unique=True,
+        default=generate_order_number,
+        editable=False
+    )
     STATUS_CHOICES = (
         ("in_cart", "Savatchada"),
-        ("pending", "Kutilmoqda"),
-        ("waiting_approval", "Tasdiq kutilmoqda"),  # User chek yukladi
-        ("approved", "Tasdiqlandi"),
-        ("sent", "Yuborildi"),
+        ("pending", "Admin tasdig'i kutilmoqda"),  # 1-qadam: User buyurtma berdi
+        ("awaiting_payment", "To'lov qilinishi kerak"),  # 2-qadam: Admin tasdiqladi, to'lov kutilmoqda
+        ("check_pending", "To'lov tekshirilmoqda"),  # 3-qadam: User chek yukladi
+        ("approved", "Tasdiqlandi"),  # 4-qadam: Admin pulni ko'rdi va qabul qildi
         ("cancelled", "Bekor qilindi"),
     )
 

@@ -1,8 +1,8 @@
 from django.urls import path
 from . import views
 from .views import (
-    MyBonusScreenAPIView, CartManageAPIView, CheckoutAPIView, ReceiptUploadAPIView,
-    OrderDetailAPIView, MyOrdersListView,
+    MyBonusScreenAPIView, CartManageAPIView, CheckoutAPIView, OrderDetailAPIView, MyOrdersListView,
+    UploadReceiptAPIView,
 )
 
 urlpatterns = [
@@ -37,7 +37,7 @@ urlpatterns = [
 
     # 3. To'lov chekini (rasm) yuklash
     # URL format: /api/merchant/order/15/upload-receipt/
-    path('order/<int:pk>/upload-receipt/', ReceiptUploadAPIView.as_view(), name='upload-receipt'),
+    path('order/upload-receipt/', UploadReceiptAPIView.as_view(), name='upload-receipt'),
 
     # 4. Foydalanuvchining barcha buyurtmalari ro'yxati (Buyurtmalarim sahifasi uchun)
     path('orders/', MyOrdersListView.as_view(), name='my-orders-list'),

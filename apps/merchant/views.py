@@ -1,13 +1,15 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import (
     CreateAPIView,
     ListAPIView,
-    RetrieveUpdateDestroyAPIView, RetrieveAPIView,
+    RetrieveUpdateDestroyAPIView, RetrieveAPIView, GenericAPIView,
 )
 from django.utils.translation import gettext_lazy as _
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status, permissions, parsers
@@ -357,38 +359,95 @@ class CartManageAPIView(APIView):
 
 # --- 2. BUYURTMA BERISH (CHECKOUT) ---
 class CheckoutAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = CheckoutSerializer
 
     @swagger_auto_schema(request_body=CheckoutSerializer)
     def post(self, request):
-        order = Order.objects.filter(user=request.user.profile, status='in_cart').first()
-        if not order: return Response({"error": "Savat bo'sh"}, status=400)
+        user_profile = request.user.profile
+        # Savatdagi buyurtmani topamiz
+        order = Order.objects.filter(user=user_profile, status='in_cart').first()
+
+        if not order or not order.orderitem.exists():
+            return Response({"error": "Savat bo'sh"}, status=400)
 
         serializer = CheckoutSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        order.location_id = serializer.validated_data['location']
+        # 1. Location obyektini serializerdan olamiz
+        location_obj = serializer.validated_data['location']
+
+        # 2. Buyurtmaga biriktiramiz va saqlaymiz
+        order.location = location_obj
         order.comment = serializer.validated_data.get('comment', '')
-        order.status = 'pending'  # Status o'zgardi -> "To'lov kutilmoqda"
+        order.status = 'pending'
         order.save()
-        return Response({"message": "Buyurtma berildi, endi to'lov qiling"})
+
+        # 3. Javob qaytaramiz (manzil matni bilan birga)
+        return Response({
+            "message": "Buyurtmangiz adminga yuborildi. Tasdiqlangach to'lov qilishingiz mumkin.",
+            "order_id": order.id,
+            "status": "pending",
+            "delivery_address": order.location.address,  # <--- MANA SHU YERDA MANZIL CHIQADI
+            "total_amount": order.total_amount
+        })
 
 
 # --- 3. CHEK YUKLASH ---
-class ReceiptUploadAPIView(APIView):
-    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
-    serializer_class = ReceiptUploadSerializer
 
-    @swagger_auto_schema(request_body=ReceiptUploadSerializer)
-    def patch(self, request, pk):
-        order = get_object_or_404(Order, pk=pk, user=request.user.profile, status='pending')
-        serializer = ReceiptUploadSerializer(order, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            order.status = 'waiting_approval'  # Status o'zgardi -> "Admin tasdig'ini kutmoqda"
-            order.save()
-            return Response({"message": "Chek yuklandi"})
-        return Response(serializer.errors, status=400)
+class UploadReceiptAPIView(APIView):
+    # Parserlar faylni qabul qilish uchun shart
+    parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="To'lov chekini yuklash",
+        description="Aynan shu yerda 'Choose File' tugmasi chiqishi shart",
+        request={
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'order_number': {
+                        'type': 'string',
+                        'description': 'Buyurtma raqami (ORD123...)'
+                    },
+                    'payment_receipt': {
+                        'type': 'string',
+                        'format': 'binary',  # MANA SHU QATOR TUGMANI CHIQARADI
+                        'description': 'To\'lov cheki (JPG, PNG yoki PDF)'
+                    }
+                },
+                'required': ['order_number', 'payment_receipt']
+            }
+        },
+        responses={200: {"message": "Muvaffaqiyatli"}}
+    )
+    def post(self, request):
+        user_profile = request.user.profile
+
+        # Ma'lumotlarni olish
+        ord_num = request.data.get('order_number')
+        receipt_file = request.FILES.get('payment_receipt')
+
+        if not ord_num or not receipt_file:
+            return Response({"error": "Order raqami va rasm yuborilishi shart"}, status=400)
+
+        # Buyurtmani qidiramiz
+        order = Order.objects.filter(
+            user=user_profile,
+            order_number=ord_num,
+            status='awaiting_payment'
+        ).first()
+
+        if not order:
+            return Response({"error": "To'lov kutilayotgan buyurtma topilmadi"}, status=404)
+
+        # Saqlash
+        order.payment_receipt = receipt_file
+        order.status = 'check_pending'
+        order.save()
+
+        return Response({"message": "Chek yuklandi, admin tasdig'ini kuting."}, status=200)
 
 
 # --- 4. BUYURTMA DETALI (TIMELINE BILAN) ---

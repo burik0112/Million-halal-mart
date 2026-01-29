@@ -237,33 +237,49 @@ class CartAddSerializer(serializers.Serializer):
     product = serializers.IntegerField()
     quantity = serializers.IntegerField()
 
-# 2. Buyurtmani rasmiylashtirish (Checkout) uchun
 class CheckoutSerializer(serializers.Serializer):
-    location = serializers.IntegerField()
+    # Bu maydon ID qabul qiladi (masalan: 5), lekin bizga Location obyektini beradi
+    location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
     comment = serializers.CharField(required=False, allow_blank=True)
 
-# 3. Chek yuklash uchun
-class ReceiptUploadSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = ['payment_receipt']
+class ReceiptUploadSerializer(serializers.Serializer):
+    order_number = serializers.CharField(
+        max_length=50,
+        help_text="Buyurtma raqamini kiriting (masalan: ORD123...)"
+    )
+    payment_receipt = serializers.FileField(
+        help_text="To'lov cheki rasmi yoki PDF faylini yuklang"
+    )
 
 # 4. Buyurtma tafsilotlari (Rasmda ko'ringan Timeline bilan)
 class OrderDetailSerializer(serializers.ModelSerializer):
-    items = serializers.SerializerMethodField()
+    # 1. Qo'shimcha maydonlarni e'lon qilamiz
     timeline = serializers.SerializerMethodField()
-    status_uz = serializers.CharField(source='get_status_display_value')
+    items = serializers.SerializerMethodField()
+    customer_name = serializers.ReadOnlyField(source='user.full_name')
+    location_address = serializers.ReadOnlyField(source='location.address')
 
     class Meta:
         model = Order
-        fields = ['id', 'status', 'status_uz', 'total_amount', 'items', 'location', 'comment', 'timeline', 'created_at']
+        # 2. BU YERGA 'timeline' VA 'items' NI QO'SHISH SHART!
+        fields = [
+            'id', 'order_number', 'customer_name', 'products', 'comment',
+            'status', 'location_address', 'total_amount', 'created_at',
+            'delivery_fee', 'timeline', 'items'
+        ]
 
     def get_items(self, obj):
         # Buyurtma ichidagi mahsulotlar ro'yxati
-        return [{"name": i.product.product_type, "quantity": i.quantity, "price": i.product.new_price or i.product.old_price} for i in obj.orderitem.all()]
+        return [
+            {
+                "name": i.product.product_type if i.product else "Noma'lum",
+                "quantity": i.quantity,
+                "price": i.product.new_price if i.product and i.product.new_price > 0 else (i.product.old_price if i.product else 0)
+            } for i in obj.orderitem.all()
+        ]
 
     def get_timeline(self, obj):
-        # Rasmda ko'ringan Step-by-step holati
+        # Rasmda ko'ringan Step-by-step holati (faqat bitta metod qoldirdik)
         return {
             "step1_created": True,
             "step2_paid": obj.status in ['waiting_approval', 'approved', 'sent'],
