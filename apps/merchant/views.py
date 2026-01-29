@@ -130,7 +130,7 @@ class OrderListAPIView(ListAPIView):
             Order.objects.filter(user=user.profile)
             .prefetch_related(order_items_prefetch, 'orderitem__product')
             .prefetch_related('products')
-            .order_by("-created")  # Most recent orders first
+            .order_by("-created_at")  # Most recent orders first
         )
 
 
